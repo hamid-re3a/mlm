@@ -9,16 +9,17 @@
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
-        "kalnoy/nestedset": "^5.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
+        "google/protobuf": "^3.17",
         "grpc/grpc": "^1.38",
         "guzzlehttp/guzzle": "^7.0.1",
+        "kalnoy/nestedset": "^5.0",
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "ride-to-the-future/response-transformer": "^0.0.2",
-        "vladimir-yuldashev/laravel-queue-rabbitmq": "^11.3",
-        "google/protobuf": "^3.17"
+        "spatie/laravel-permission": "^4.3",
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^11.3"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",

@@ -175,6 +175,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         \ResponseTransformer\ResponseTransformerServiceProvider::class,
+        \MLM\MLMServiceProvider::class,
+        \User\UserServiceProvider::class
     ],
 
     /*

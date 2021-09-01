@@ -1,10 +1,9 @@
 <?php
 
-namespace UniLevel;
+namespace MLM;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use MLM\MLMConfigure;
 
 class MLMServiceProvider extends ServiceProvider
 {

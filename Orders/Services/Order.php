@@ -86,13 +86,21 @@ class Order extends \Google\Protobuf\Internal\Message
      */
     protected $updated_at = '';
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
      */
     protected $user = null;
     /**
-     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
+     * Generated from protobuf field <code>.user.services.User to_user = 20;</code>
      */
     protected $to_user = null;
+    /**
+     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     */
+    protected $package_id = 0;
+    /**
+     * Generated from protobuf field <code>.packages.services.Package package = 22;</code>
+     */
+    protected $package = null;
 
     /**
      * Constructor.
@@ -118,8 +126,10 @@ class Order extends \Google\Protobuf\Internal\Message
      *     @type string $deleted_at
      *     @type string $created_at
      *     @type string $updated_at
-     *     @type \Orders\Services\User $user
-     *     @type \Orders\Services\User $to_user
+     *     @type \User\Services\User $user
+     *     @type \User\Services\User $to_user
+     *     @type int|string $package_id
+     *     @type \Packages\Services\Package $package
      * }
      */
     public function __construct($data = NULL) {
@@ -524,8 +534,8 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
-     * @return \Orders\Services\User|null
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
+     * @return \User\Services\User|null
      */
     public function getUser()
     {
@@ -543,21 +553,21 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User user = 19;</code>
-     * @param \Orders\Services\User $var
+     * Generated from protobuf field <code>.user.services.User user = 19;</code>
+     * @param \User\Services\User $var
      * @return $this
      */
     public function setUser($var)
     {
-        GPBUtil::checkMessage($var, \Orders\Services\User::class);
+        GPBUtil::checkMessage($var, \User\Services\User::class);
         $this->user = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
-     * @return \Orders\Services\User|null
+     * Generated from protobuf field <code>.user.services.User to_user = 20;</code>
+     * @return \User\Services\User|null
      */
     public function getToUser()
     {
@@ -575,14 +585,68 @@ class Order extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.orders.services.User to_user = 20;</code>
-     * @param \Orders\Services\User $var
+     * Generated from protobuf field <code>.user.services.User to_user = 20;</code>
+     * @param \User\Services\User $var
      * @return $this
      */
     public function setToUser($var)
     {
-        GPBUtil::checkMessage($var, \Orders\Services\User::class);
+        GPBUtil::checkMessage($var, \User\Services\User::class);
         $this->to_user = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     * @return int|string
+     */
+    public function getPackageId()
+    {
+        return $this->package_id;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 package_id = 21;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setPackageId($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->package_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>.packages.services.Package package = 22;</code>
+     * @return \Packages\Services\Package|null
+     */
+    public function getPackage()
+    {
+        return $this->package;
+    }
+
+    public function hasPackage()
+    {
+        return isset($this->package);
+    }
+
+    public function clearPackage()
+    {
+        unset($this->package);
+    }
+
+    /**
+     * Generated from protobuf field <code>.packages.services.Package package = 22;</code>
+     * @param \Packages\Services\Package $var
+     * @return $this
+     */
+    public function setPackage($var)
+    {
+        GPBUtil::checkMessage($var, \Packages\Services\Package::class);
+        $this->package = $var;
 
         return $this;
     }
