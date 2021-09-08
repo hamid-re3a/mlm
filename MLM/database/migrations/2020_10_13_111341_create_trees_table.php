@@ -20,6 +20,8 @@ class CreateTreesTable extends Migration
             NestedSet::columns($table);
             $table->unsignedBigInteger('user_id')->unique();
             $table->enum('position',['left','right'])->nullable()->default('right');
+            $table->unsignedBigInteger('converted_points')->default(0);
+            $table->unsignedBigInteger('packages_price')->default(0);
             $table->timestamps();
         });
     }

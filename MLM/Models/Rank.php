@@ -29,6 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Rank wherePrizeInPf($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Rank whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Rank whereUpdatedAt($value)
+ * @property int $condition_direct_or_indirect
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereConditionDirectOrIndirect($value)
  */
 class Rank extends Model
 {

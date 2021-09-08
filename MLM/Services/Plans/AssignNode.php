@@ -11,7 +11,9 @@ class AssignNode implements Plan
 
     public function getCommissions(): ?Collection
     {
-        return Collection::make([app(DirectSellCommission::class),app(IndirectSellCommission::class)]);
+        return Collection::make([
+
+        ]);
     }
     public function getName(): string
     {

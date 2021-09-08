@@ -40,15 +40,41 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @method static \Illuminate\Database\Eloquent\Builder|Package whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Package whereUserId($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\MLM\Models\Commission[] $commissions
+ * @property-read int|null $commissions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\MLM\Models\PackagesIndirectCommission[] $indirectCommission
+ * @property-read int|null $indirect_commission_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Package active()
+ * @method static \Illuminate\Database\Eloquent\Builder|Package biggest()
  */
 class Package extends Model
 {
     use HasFactory;
     protected $guarded = [];
 
+    public function scopeActive($query){
+        return $query->whereDate('created_at','>',now()->subDays($this->validity_in_days)->toDate());
+    }
 
+    public function scopeBiggest($query){
+        return $query->orderBy('price','desc')->first();
+    }
     public function packageIndirectCommission()
     {
         return $this->hasMany(PackagesIndirectCommission::class);
     }
+
+
+    public function commissions()
+    {
+        return $this->hasMany(Commission::class);
+    }
+
+
+    public function indirectCommission()
+    {
+        return $this->hasMany(PackagesIndirectCommission::class);
+    }
+
+
 }

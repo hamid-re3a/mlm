@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Wallet;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class UserDataJob implements ShouldQueue
+class WalletDepositJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -32,8 +32,6 @@ class UserDataJob implements ShouldQueue
      */
     public function handle()
     {
-        $userDataUnSerialize = unserialize($this->data);
-        echo "event has been handle. the first name and last name of userData is:".$userDataUnSerialize->getFirstName() ." ". $userDataUnSerialize->getLastName(). PHP_EOL;
-
+        $walletDataUnSerialize = unserialize($this->data);
     }
 }

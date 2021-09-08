@@ -16,7 +16,7 @@ class CreatePackagesTable extends Migration
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('order_id')->unique();
 
             $table->unsignedBigInteger('user_id');
 
@@ -29,9 +29,11 @@ class CreatePackagesTable extends Migration
             $table->integer('direct_percentage');
             $table->integer('binary_percentage');
 
-
             $table->softDeletes();
             $table->timestamps();
+
+
+
         });
     }
 

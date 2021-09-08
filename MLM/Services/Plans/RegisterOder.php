@@ -21,10 +21,7 @@ class RegisterOder implements Plan
             app(DirectSellCommission::class),
             app(IndirectSellCommission::class),
 
-            app(QuickStartBonusCommission::class),
             app(TrainerBonusCommission::class),
-
-            app(ResidualBonusCommission::class),
         ]);
     }
     public function getName(): string

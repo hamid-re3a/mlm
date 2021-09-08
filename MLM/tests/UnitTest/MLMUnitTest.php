@@ -27,7 +27,7 @@ class MLMUnitTest extends MLMTest
 
         $order->setUser(user(1));
 
-        \MLM\Jobs\MLMOrderJob::dispatch($order);
+        \MLM\Jobs\TradingProfitJob::dispatch($order);
 
 
 

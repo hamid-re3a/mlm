@@ -24,6 +24,7 @@ class RankTableSeeder extends Seeder
                     'rank' => $setting['rank'],
                     'condition_converted_in_bp' => $setting['condition_converted_in_bp'],
                     'condition_sub_rank' => $setting['condition_sub_rank'],
+                    'condition_direct_or_indirect' => $setting['condition_direct_or_indirect'],
                     'prize_in_pf' => $setting['prize_in_pf'],
                     'prize_alternative' => $setting['prize_alternative'],
                     'cap' => $setting['cap'],

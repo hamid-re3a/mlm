@@ -5,6 +5,7 @@ namespace MLM\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kalnoy\Nestedset\NodeTrait;
+use phpDocumentor\Reflection\Types\Integer;
 use User\Models\User;
 
 /**
@@ -83,6 +84,13 @@ use User\Models\User;
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree withDepth(string $as = 'depth')
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree withoutRoot()
  * @property-read \Kalnoy\Nestedset\Collection|Tree[] $children
+ * @property int $converted_points
+ * @property int $packages_price
+ * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereAllPackagesPrice($value)
+ * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereConvertedPoints($value)
+ * @property int $is_active
+ * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereIsActive($value)
+ * @method static \Kalnoy\Nestedset\QueryBuilder|Tree wherePackagesPrice($value)
  */
 class Tree extends Model
 {
@@ -194,6 +202,33 @@ class Tree extends Model
         return $left_child->descendantsAndSelfCount();
     }
 
+    public function updatePackagesPrice()
+    {
+        $this->packages_price =  $this->user->packages()->sum('price');
+        $this->save();
+    }
+
+    public function leftSideChildrenPackagePrice() : Integer
+    {
+        /** @var  $left_child Tree*/
+        $left_child = $this->children()->left()->first();
+        if(is_null($left_child))
+            return 0;
+
+        return $left_child->descendants()->sum('packages_price');
+    }
+
+    public function leftSideChildrenIds() : array
+    {
+        /** @var  $left_child Tree*/
+        $left_child = $this->children()->left()->first();
+        if(is_null($left_child))
+            return [];
+
+        $children = $left_child->descendants()->pluck('user_id')->toArray();
+        return  array_merge([$left_child->id],$children);
+    }
+
     public function hasRightChild()
     {
         $right_child = $this->children()->right()->first();
@@ -203,9 +238,32 @@ class Tree extends Model
     }
     public function rightChildCount()
     {
+        /** @var  $right_child Tree*/
         $right_child = $this->children()->right()->first();
         if(is_null($right_child))
             return 0;
         return $right_child->descendantsAndSelfCount();
+    }
+
+
+    public function rightSideChildrenIds() : array
+    {
+        /** @var  $right_child Tree*/
+        $right_child = $this->children()->right()->first();
+        if(is_null($right_child))
+            return [];
+
+        $children = $right_child->descendants()->pluck('user_id')->toArray();
+        return  array_merge([$right_child->id],$children);
+    }
+
+    public function rightSideChildrenPackagePrice() : Integer
+    {
+        /** @var  $right_child Tree*/
+        $right_child = $this->children()->right()->first();
+        if(is_null($right_child))
+            return 0;
+
+        return $right_child->descendants()->sum('packages_price');
     }
 }

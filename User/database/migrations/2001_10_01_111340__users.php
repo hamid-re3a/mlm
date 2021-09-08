@@ -21,6 +21,7 @@ class Users extends Migration
             $table->string('username',100)->nullable();
             $table->string('email',100)->nullable();
 
+            $table->integer('rank')->default(0);
             $table->enum('default_binary_position',[\MLM\Models\Tree::LEFT,\MLM\Models\Tree::RIGHT])->default(\MLM\Models\Tree::LEFT);
 
             $table->softDeletes();

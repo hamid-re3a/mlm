@@ -16,9 +16,10 @@ class CreateRanksTable extends Migration
         Schema::create('ranks', function (Blueprint $table) {
             $table->engine = "InnoDB";
             $table->id();
-            $table->string('rank');
+            $table->integer('rank');
             $table->unsignedBigInteger('condition_converted_in_bp');
             $table->unsignedBigInteger('condition_sub_rank');
+            $table->boolean('condition_direct_or_indirect')->default(false);
             $table->unsignedBigInteger('prize_in_pf')->nullable();
             $table->string('prize_alternative')->nullable();
             $table->unsignedBigInteger('cap');
