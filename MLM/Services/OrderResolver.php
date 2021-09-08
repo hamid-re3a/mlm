@@ -1,9 +1,12 @@
 <?php
 
-namespace Orders\Services;
+namespace MLM\Services;
 
 
+use App\Services\AssignNode\AssignNodeResolver;
 use Illuminate\Support\Facades\DB;
+use Orders\Services\Order;
+use User\Models\User;
 
 class OrderResolver
 {
@@ -14,10 +17,7 @@ class OrderResolver
         $this->order = $order;
     }
 
-    /**
-     * @return array [bool,string]
-     * @throws \Throwable
-     */
+
     public function handle(): array
     {
 
@@ -41,7 +41,6 @@ class OrderResolver
 
     /**
      * @return array [bool,string,int]
-     * @throws \Throwable
      */
     public function resolve(): array
     {
@@ -108,8 +107,7 @@ class OrderResolver
 
     private function addUserToNetwork($simulate = false): array
     {
-        // Add user to network with rabbitmq job (MLM Tree stuff)
-        // Check if it is possible to add user to network for simulation
+        return (new AssignNodeResolver($this->order))->handle($simulate);
     }
 
 

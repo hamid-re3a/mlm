@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Jobs;
+namespace MLM\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use MLM\Services\OrderResolver;
+use Orders\Services\Order;
+use User\Services\User;
 
-class UserDataJob implements ShouldQueue
+class MLMOrderJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -25,15 +27,12 @@ class UserDataJob implements ShouldQueue
         $this->data = $data;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
+
     public function handle()
     {
-        $userDataUnSerialize = unserialize($this->data);
-        echo "event has been handle. the first name and last name of userData is:".$userDataUnSerialize->getFirstName() ." ". $userDataUnSerialize->getLastName(). PHP_EOL;
+        /** @var Order $order */
+        $order = unserialize($this->data);
 
+        list($bool, $msg) = (new OrderResolver($order))->handle();
     }
 }
