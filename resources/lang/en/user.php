@@ -30,6 +30,8 @@ return [
         'unauthorized' => 'You are not authorized to visit this',
         'unauthorized-email-is-not-verified' => '',
         'user-is-blocked' => 'You are blocked',
+        'user-updated-successfully' => 'User Updated Successfully',
+
     ]
 ];
 
