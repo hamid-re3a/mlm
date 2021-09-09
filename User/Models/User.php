@@ -52,6 +52,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read int|null $packages_count
  * @property int $rank
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRank($value)
+ * @property-read Rank|null $rank_model
  */
 class User extends Model
 {
@@ -127,13 +128,13 @@ class User extends Model
      */
     public function getUserService()
     {
-        $user = new \User\Services\User();
-        $user->setId((int)$this->attributes['id']);
-        $user->setFirstName($this->attributes['first_name']);
-        $user->setLastName($this->attributes['last_name']);
-        $user->setUsername($this->attributes['username']);
-        $user->setEmail($this->attributes['email']);
-        return $user;
+            $user = new \User\Services\User();
+            $user->setId((int)$this->attributes['id']);
+            $user->setFirstName($this->attributes['first_name']);
+            $user->setLastName($this->attributes['last_name']);
+            $user->setUsername($this->attributes['username']);
+            $user->setEmail($this->attributes['email']);
+            return $user;
     }
 
     public function biggestActivePackage(): ?Package

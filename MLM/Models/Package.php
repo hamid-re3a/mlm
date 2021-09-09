@@ -46,6 +46,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $indirect_commission_count
  * @method static \Illuminate\Database\Eloquent\Builder|Package active()
  * @method static \Illuminate\Database\Eloquent\Builder|Package biggest()
+ * @property string|null $is_paid_at
+ * @property string|null $is_resolved_at
+ * @property string|null $is_commission_resolved_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Package whereIsCommissionResolvedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Package whereIsPaidAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Package whereIsResolvedAt($value)
  */
 class Package extends Model
 {

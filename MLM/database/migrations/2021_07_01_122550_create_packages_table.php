@@ -18,6 +18,10 @@ class CreatePackagesTable extends Migration
 
             $table->unsignedBigInteger('order_id')->unique();
 
+            $table->timestamp('is_paid_at')->nullable();
+            $table->timestamp('is_resolved_at')->nullable();
+            $table->timestamp('is_commission_resolved_at')->nullable();
+
             $table->unsignedBigInteger('user_id');
 
             $table->string('name');
