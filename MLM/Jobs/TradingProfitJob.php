@@ -21,9 +21,12 @@ class TradingProfitJob implements ShouldQueue
         $this->user = $user;
     }
 
-
     public function handle()
     {
+        if($this->user->commissions()->where('type',TRADING_PROFIT_COMMISSION)
+            ->whereDate('created_at','>=',now()->addMonth()->toDate())->exists())
+            return;
+
 
     }
 }
