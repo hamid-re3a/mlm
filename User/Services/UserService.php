@@ -32,4 +32,15 @@ class UserService
         }
     }
 
+
+    public function editBinaryPosition($request)
+    {
+        $this->user_repository->editBinaryPosition($request);
+
+
+    }
+
+
+
+
 }

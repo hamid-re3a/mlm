@@ -47,7 +47,7 @@ class UserServiceProvider extends ServiceProvider
         $this->registerHelpers();
 
         Route::prefix('v1/user')
-            ->middleware('api')
+//            ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');
 
