@@ -5,10 +5,6 @@
          colors="true"
 >get-transaction
     <testsuites>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">MLM/tests/Feature</directory>
-        </testsuite>
-
         <testsuite name="User">
             <directory suffix="Test.php">User/tests/Feature</directory>
         </testsuite>

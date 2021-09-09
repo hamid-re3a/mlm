@@ -17,7 +17,7 @@ class UserFeatureTest extends UserTest
             'id' => 1,
             'binary_position' => 'left',
         ]);
-        dd($response);
+        dd($response->json());
         $response->assertOk();
         $response->json();
     }

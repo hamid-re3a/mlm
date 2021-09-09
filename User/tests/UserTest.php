@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 use Tests\CreatesApplication;
 use User\Models\User;
@@ -36,6 +37,7 @@ class UserTest extends TestCase
 
     public function getHeaders()
     {
+        Role::query()->create(['name'=>'super-admin']);
         User::query()->firstOrCreate([
             'id' => '1',
             'first_name' => 'Admin',
@@ -45,6 +47,8 @@ class UserTest extends TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
+        $user->assignRole('super-admin');
+        $user->save();
         $hash = md5(serialize($user->getUserService()));
         return [
             'X-user-id' => '1',
