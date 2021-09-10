@@ -10,7 +10,6 @@ use Illuminate\Queue\SerializesModels;
 use MLM\Services\OrderResolver;
 use Orders\Services\Order;
 use Orders\Services\OrderService;
-use User\Services\User;
 
 class MLMOrderJob implements ShouldQueue
 {
@@ -34,9 +33,12 @@ class MLMOrderJob implements ShouldQueue
         /** @var Order $order */
         $order = unserialize($this->data);
 
+        /** @var  $order_service OrderService*/
         $order_service = app(OrderService::class);
         $order_service->updateOrder($order);
 
         list($bool, $msg) = (new OrderResolver($order))->handle();
+
+//        MLMOrderJob::dispatch()->
     }
 }

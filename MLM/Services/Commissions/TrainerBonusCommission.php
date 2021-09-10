@@ -7,7 +7,7 @@ namespace MLM\Services\Commissions;
 use App\Jobs\Wallet\WalletDepositJob;
 use MLM\Interfaces\Commission;
 use MLM\Models\Commission as CommissionModel;
-use MLM\Models\Package;
+use MLM\Models\OrderedPackage;
 use Orders\Services\Order;
 use User\Models\User;
 use Wallets\Services\Deposit;
@@ -20,7 +20,7 @@ class TrainerBonusCommission implements Commission
 
         $user = User::query()->findOrFail($order->getUserId());
 
-        $package = Package::query()->where('order_id', $order->getId())->firstOrFail();
+        $package = OrderedPackage::query()->where('order_id', $order->getId())->firstOrFail();
 
         if (!is_null($user->referralTree->parent) && !is_null($user->referralTree->parent->user)) {
             $parent = $user->referralTree->parent->user;
@@ -54,7 +54,7 @@ class TrainerBonusCommission implements Commission
 
                         $commission = $user->referralTree->parent->user->commissions()->create([
                             'amount' => $commission_amount,
-                            'package_id' => $package->id,
+                            'ordered_package_id' => $package->id,
                             'type' => $this->getType(),
                         ]);
                         if ($commission) {

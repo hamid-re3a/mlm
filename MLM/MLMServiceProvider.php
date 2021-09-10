@@ -4,6 +4,7 @@ namespace MLM;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use MLM\Commands\RoiCommand;
 
 class MLMServiceProvider extends ServiceProvider
 {
@@ -41,6 +42,7 @@ class MLMServiceProvider extends ServiceProvider
     public function boot()
     {
 
+
         $this->setupConfig();
 
         $this->registerHelpers();
@@ -51,8 +53,11 @@ class MLMServiceProvider extends ServiceProvider
             ->group(__DIR__ . '/routes/api.php');
 
         if ($this->app->runningInConsole()) {
-//            $this->seed();
+            $this->seed();
 
+            $this->commands([
+                RoiCommand::class
+            ]);
             $this->publishes([
                 __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');

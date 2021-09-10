@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePackagesTable extends Migration
+class CreateOrderedPackagesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreatePackagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('packages', function (Blueprint $table) {
+        Schema::create('ordered_packages', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('order_id')->unique();
@@ -21,6 +21,7 @@ class CreatePackagesTable extends Migration
             $table->timestamp('is_paid_at')->nullable();
             $table->timestamp('is_resolved_at')->nullable();
             $table->timestamp('is_commission_resolved_at')->nullable();
+            $table->string('plan')->nullable();
 
             $table->unsignedBigInteger('user_id');
 
@@ -48,6 +49,6 @@ class CreatePackagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('packages');
+        Schema::dropIfExists('ordered_packages');
     }
 }

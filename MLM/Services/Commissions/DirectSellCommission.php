@@ -5,7 +5,7 @@ namespace MLM\Services\Commissions;
 
 use App\Jobs\Wallet\WalletDepositJob;
 use MLM\Interfaces\Commission;
-use MLM\Models\Package;
+use MLM\Models\OrderedPackage;
 use MLM\Models\Commission as CommissionModel;
 use Orders\Services\Order;
 use User\Models\User;
@@ -17,10 +17,10 @@ class DirectSellCommission implements Commission
     public function calculate(Order $order): bool
     {
         $user = User::query()->findOrFail($order->getUserId());
-        $package = Package::query()->where('order_id', $order->getId())->firstOrFail();
+        $package = OrderedPackage::query()->where('order_id', $order->getId())->firstOrFail();
 
-        if (!CommissionModel::query()->where('package_id', $package->id)->type($this->getType())->exists()) {
-            /** @var  $biggest_active_package Package */
+        if (!CommissionModel::query()->where('ordered_package_id', $package->id)->type($this->getType())->exists()) {
+            /** @var  $biggest_active_package OrderedPackage */
             $biggest_active_package = $user->referralTree->parent->user->biggestActivePackage();
             if ($biggest_active_package) {
 
@@ -49,7 +49,7 @@ class DirectSellCommission implements Commission
                 /** @var $commission CommissionModel */
                 $commission = $user->referralTree->parent->user->commissions()->create([
                     'amount' => $commission_amount,
-                    'package_id' => $package->id,
+                    'ordered_package_id' => $package->id,
                     'type' => $this->getType(),
                 ]);
 

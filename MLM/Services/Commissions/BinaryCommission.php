@@ -6,8 +6,8 @@ namespace MLM\Services\Commissions;
 use App\Jobs\Wallet\WalletDepositJob;
 use MLM\Interfaces\Commission;
 use MLM\Models\Commission as CommissionModel;
-use MLM\Models\Package;
-use MLM\Models\PackagesIndirectCommission;
+use MLM\Models\OrderedPackage;
+use MLM\Models\OrderedPackagesIndirectCommission;
 use MLM\Models\Rank;
 use Orders\Services\Order;
 use User\Models\User;
@@ -20,7 +20,7 @@ class BinaryCommission implements Commission
     {
         $user = User::query()->findOrFail($order->getUserId());
 
-        $package = Package::query()->where('order_id', $order->getId())->firstOrFail();
+        $package = OrderedPackage::query()->where('order_id', $order->getId())->firstOrFail();
 
         $this->binaryCommissionToFather($user, $package);
     }
@@ -35,7 +35,7 @@ class BinaryCommission implements Commission
         return BINARY_COMMISSION;
     }
 
-    private function binaryCommissionToFather(User $user, Package $package)
+    private function binaryCommissionToFather(User $user, OrderedPackage $package)
     {
 
         if (!is_null($user->referralTree->parent) && !is_null($user->referralTree->parent->user)) {
@@ -66,7 +66,7 @@ class BinaryCommission implements Commission
 
                             $parent->commissions()->create([
                                 'amount' => $cap_amount,
-                                'package_id' => $package->id,
+                                'ordered_package_id' => $package->id,
                                 'type' => 'Cap',
                             ]);
                         } else {
@@ -92,7 +92,7 @@ class BinaryCommission implements Commission
 
                             $commission = $parent->commissions()->create([
                                 'amount' => $commission_amount,
-                                'package_id' => $package->id,
+                                'ordered_package_id' => $package->id,
                                 'type' => $this->getType(),
                             ]);
                             if ($commission) {

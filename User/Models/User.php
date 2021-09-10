@@ -4,7 +4,7 @@ namespace User\Models;
 
 use Carbon\Carbon;
 use MLM\Models\Commission;
-use MLM\Models\Package;
+use MLM\Models\OrderedPackage;
 use MLM\Models\Rank;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
@@ -48,11 +48,23 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUsername($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|Commission[] $commissions
  * @property-read int|null $commissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection|Package[] $packages
+ * @property-read \Illuminate\Database\Eloquent\Collection|OrderedPackage[] $packages
  * @property-read int|null $packages_count
  * @property int $rank
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRank($value)
  * @property-read Rank|null $rank_model
+ * @property int|null $member_id
+ * @property int|null $sponsor_id
+ * @property int|null $is_deactivate
+ * @property int|null $is_freeze
+ * @property string|null $block_type
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereBlockType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereIsDeactivate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereIsFreeze($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereMemberId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereSponsorId($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|OrderedPackage[] $ordered_packages
+ * @property-read int|null $ordered_packages_count
  */
 class User extends Model
 {
@@ -81,9 +93,9 @@ class User extends Model
         return $this->hasMany(Commission::class);
     }
 
-    public function packages()
+    public function ordered_packages()
     {
-        return $this->hasMany(Package::class);
+        return $this->hasMany(OrderedPackage::class);
     }
 
     public function binaryTree()
@@ -137,14 +149,14 @@ class User extends Model
             return $user;
     }
 
-    public function biggestActivePackage(): ?Package
+    public function biggestActivePackage(): ?OrderedPackage
     {
-        return $this->packages()->active()->biggest();
+        return $this->ordered_packages()->active()->biggest();
     }
 
     public function hasActivePackage()
     {
-        return is_null($this->packages()->active()->first()) ? false : true;
+        return is_null($this->ordered_packages()->active()->first()) ? false : true;
     }
 
 
@@ -158,7 +170,7 @@ class User extends Model
 
     public function hasRegisteredWithinThirtyDays()
     {
-        $oldest_package = $this->packages()->oldest()->first();
+        $oldest_package = $this->ordered_packages()->oldest()->first();
 
         if (now()->diffInDays(Carbon::make($oldest_package->createdAt())) <= 30) {
             return true;
