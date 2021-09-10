@@ -3,7 +3,7 @@
 namespace MLM\Commands;
 
 use Illuminate\Console\Command;
-use MLM\Jobs\TradingProfitJob;
+use MLM\Jobs\TradingProfitCommissionJob;
 use MLM\Models\OrderedPackage;
 use MLM\Models\PackageRoi;
 
@@ -51,7 +51,7 @@ class RoiCommand extends Command
         $bar->start();
 
         foreach ($ordered_packages as $item) {
-            TradingProfitJob::dispatch($item);
+            TradingProfitCommissionJob::dispatch($item);
             $bar->advance();
         }
 

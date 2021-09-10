@@ -15,7 +15,7 @@ use MLM\Services\PackageRoiService;
 use MLM\Services\PackageService;
 use Wallets\Services\Deposit;
 
-class TradingProfitJob implements ShouldQueue
+class TradingProfitCommissionJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

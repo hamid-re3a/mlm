@@ -5,16 +5,26 @@ namespace MLM\Services;
 
 use App\Services\AssignNode\AssignNodeResolver;
 use Illuminate\Support\Facades\DB;
+use MLM\Interfaces\Commission;
+use MLM\Interfaces\Plan;
+use MLM\Models\OrderedPackage;
+use MLM\Services\Plans\AssignNode;
+use MLM\Services\Plans\RegisterOder;
 use Orders\Services\Order;
 use User\Models\User;
 
 class OrderResolver
 {
     public $order;
+    /**
+     * @var RegisterOder
+     */
+    private $plan;
 
-    public function __construct(Order $order)
+    public function __construct(Order &$order)
     {
         $this->order = $order;
+        $this->plan = app(RegisterOder::class);
     }
 
 
@@ -29,13 +39,10 @@ class OrderResolver
             list($bool, $msg, $problem_level) = $this->resolve();
 //            if($this->plan->getName() == PLAN_BINARY)
 //            dd([$bool, $msg, $problem_level]);
-//            return [$bool, $msg];
+            return [$bool, $msg];
         } else {
             $processed = [false, 'handle.notPaid'];
         }
-        list($bool, $msg) = $processed;
-        if ($bool)
-            $this->order->setIsResolvedAt(now()->timestamp);
         return $processed;
     }
 
@@ -52,8 +59,18 @@ class OrderResolver
         if ($bool) {
             list($bool, $msg) = $this->addUserToNetwork();
             if ($bool) {
-                DB::commit();
-                return [true, 'resolve', $problem_level];
+                list($bool, $msg) = $this->resolveCommission();
+                if ($bool) {
+                    $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId())
+                        ->where('package_id', $this->order->getPackageId())->first();
+                    $ordered_package->is_commission_resolved_at = $this->order->getIsCommissionResolvedAt();
+                    $ordered_package->save();
+
+                    DB::commit();
+                    return [true, 'resolve', $problem_level];
+                } else {
+                    $problem_level = 3;
+                }
             } else {
                 $problem_level = 2;
             }
@@ -89,6 +106,33 @@ class OrderResolver
 
     }
 
+    /**
+     * @return array [bool,string]
+     */
+    public function resolveCommission(): array
+    {
+        if (!$this->order->getIsCommissionResolvedAt()) {
+            $isItOk = true;
+            try {
+                DB::beginTransaction();
+                /** @var  $commission Commission */
+                foreach ($this->plan->getCommissions() as $commission)
+                    $isItOk = $isItOk && $commission->calculate($this->order);
+                if (!$isItOk) {
+                    DB::rollBack();
+                    return [false, trans('responses.resolveCommission')];
+                }
+
+                DB::commit();
+                $this->order->setIsCommissionResolvedAt(now()->toString());
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                return [false, trans('responses.resolveCommission')];
+            }
+
+        }
+        return [true, trans('responses.resolveCommission')];
+    }
 
     /**
      * @return array [bool,string]

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use MLM\Services\OrderResolver;
 use Orders\Services\Order;
 use Orders\Services\OrderService;
@@ -28,17 +29,21 @@ class MLMOrderJob implements ShouldQueue
     }
 
 
-    public function handle()
+    public function handle(OrderService $order_service)
     {
         /** @var Order $order */
         $order = unserialize($this->data);
 
-        /** @var  $order_service OrderService*/
-        $order_service = app(OrderService::class);
         $order_service->updateOrder($order);
 
         list($bool, $msg) = (new OrderResolver($order))->handle();
-
-//        MLMOrderJob::dispatch()->
+        if ($bool) {
+            try {
+                MLMOrderJob::dispatch($order)->onConnection('rabbit')->onQueue('subscription');
+            } catch (\Exception $e) {
+                Log::error('Order didnt update the subscription');
+                Log::error($e->getMessage());
+            }
+        }
     }
 }

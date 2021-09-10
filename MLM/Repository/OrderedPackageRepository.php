@@ -17,7 +17,6 @@ class OrderedPackageRepository
         $package_entity = new $this->entity_name;
         $package_find = $package_entity->query()->firstOrCreate([
             'order_id' => $order->getId(),
-            'package_id' => $order->getPackageId()
         ]);
         $package_find->update([
             "plan" => $order->getPlan(),
