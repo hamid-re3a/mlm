@@ -204,7 +204,7 @@ class Tree extends Model
 
     public function updatePackagesPrice()
     {
-        $this->packages_price =  $this->user->packages()->sum('price');
+        $this->packages_price =  $this->user->ordered_packages()->sum('price');
         $this->save();
     }
 

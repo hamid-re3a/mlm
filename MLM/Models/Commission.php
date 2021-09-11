@@ -36,6 +36,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereUserId($value)
  * @property int $confirmed
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereConfirmed($value)
+ * @property int|null $ordered_package_id
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission whereOrderedPackageId($value)
+ * @property string|null $due_date
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission whereDueDate($value)
  */
 class Commission extends Model
 {

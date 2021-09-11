@@ -18,8 +18,8 @@ class CreateCommissionsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->unsignedBigInteger('package_id')->nullable();
-            $table->foreign('package_id')->references('id')->on('packages');
+            $table->unsignedBigInteger('ordered_package_id')->nullable();
+            $table->foreign('ordered_package_id')->references('id')->on('ordered_packages');
             $table->string('type')->index();
             $table->unsignedDouble('amount')->nullable();
             $table->boolean('confirmed')->default(false);
