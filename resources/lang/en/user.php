@@ -12,7 +12,7 @@ return [
         '2FA-is-now-disabled' => 'You\'ve disabled 2fa',
         'Invalid-verification-Code-Please-try-again' => 'This code is wrong',
         '2FA-is-enabled-successfully' => 'You\'ve enabled 2fa',
-        'ok'=>'ok',
+        'ok' => 'ok',
         'login-successful' => 'You\'ve successfully logged in ',
         'logout-successful' => 'You\'ve successfully logged out ',
         'password-successfully-changed' => 'You\'ve successfully changed your password ',
@@ -31,6 +31,7 @@ return [
         'unauthorized-email-is-not-verified' => '',
         'user-is-blocked' => 'You are blocked',
         'user-updated-successfully' => 'User Updated Successfully',
+        'you-are-not-allowed' => 'You are not Allowed',
 
     ]
 ];

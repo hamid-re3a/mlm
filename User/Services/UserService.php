@@ -4,6 +4,7 @@
 namespace User\Services;
 
 
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use User\Repository\UserRepository;
 
@@ -33,14 +34,10 @@ class UserService
     }
 
 
-    public function editBinaryPosition($request)
+    public function editBinaryPosition($id, $position)
     {
-        $this->user_repository->editBinaryPosition($request);
-
-
+        $this->user_repository->editBinaryPosition($id, $position);
     }
-
-
 
 
 }
