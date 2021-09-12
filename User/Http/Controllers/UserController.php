@@ -9,6 +9,8 @@ use User\Services\UserService;
 class UserController extends Controller
 {
 
+
+
     public function editBinaryPosition(UserRequest $request ,UserService $userService)
     {
         try {
