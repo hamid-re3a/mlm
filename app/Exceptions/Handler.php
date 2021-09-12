@@ -63,7 +63,7 @@ class Handler extends ExceptionHandler
             }
         }
         $code = (int)$e->getCode();
-        return api()->error($e->getMessage(), [], ($code > 599) ? 400 : $code);
+        return api()->error($e->getMessage(), [], ($code > 599 || $code <100) ? 400 : $code);
 
     }
 }

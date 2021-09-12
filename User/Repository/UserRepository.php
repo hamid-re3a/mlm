@@ -29,11 +29,11 @@ class UserRepository
         return $user_find;
     }
 
-    public function editBinaryPosition($request)
+    public function editBinaryPosition($id, $position)
     {
         $user_entity = new $this->entity_name;
-        $user = $user_entity::findOrFail($request['id']);
-        $user->default_binary_position = $request['default_binary_position'];
+        $user = $user_entity::findOrFail($id);
+        $user->default_binary_position = $position;
         $user->save();
     }
 

@@ -17,7 +17,7 @@ class UserController extends Controller
     public function editBinaryPosition(UserRequest $request, UserService $userService)
     {
         try {
-            $userService->editBinaryPosition($request);
+            $userService->editBinaryPosition(auth()->user()->id, request('default_binary_position'));
 
             return api()->success(trans('user.responses.user-updated-successfully'), null);
 

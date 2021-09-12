@@ -18,7 +18,6 @@ class UserRequest extends FormRequest
         $LEFT=\MLM\Models\Tree::LEFT;
         $RIGHT=\MLM\Models\Tree::RIGHT;
         return [
-            'id' => 'required|int',
             'default_binary_position' => [
                 'required',
                 Rule::in([$LEFT, $RIGHT]),
