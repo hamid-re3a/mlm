@@ -9,6 +9,8 @@ use User\Services\UserService;
 class UserController extends Controller
 {
 
+
+
     public function editBinaryPosition(UserRequest $request ,UserService $userService)
     {
         try {
@@ -18,6 +20,7 @@ class UserController extends Controller
             return api()->success(trans('user.responses.user-updated-successfully'), null);
 
         }catch (\Throwable $e){
+
             return api()->success($e->getMessage(), null);
         }
 

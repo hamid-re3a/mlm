@@ -16,14 +16,14 @@ use User\UserConfigure;
 class UserTest extends TestCase
 {
     use CreatesApplication;
-//    use RefreshDatabase;
+    use RefreshDatabase;
 
     public function setUp() : void
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
         UserConfigure::seed();
-        $this->withHeaders($this->getHeaders());
+//        $this->withHeaders($this->getHeaders());
         $this->app->setLocale('en');
     }
 
@@ -37,7 +37,6 @@ class UserTest extends TestCase
 
     public function getHeaders()
     {
-        Role::query()->create(['name'=>'super-admin']);
         User::query()->firstOrCreate([
             'id' => '1',
             'first_name' => 'Admin',
@@ -47,7 +46,7 @@ class UserTest extends TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
-        $user->assignRole('super-admin');
+        $user->assignRole(USER_ROLE_SUPER_ADMIN);
         $user->save();
         $hash = md5(serialize($user->getUserService()));
         return [

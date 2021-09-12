@@ -2,6 +2,7 @@
 
 namespace User\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
@@ -18,7 +19,10 @@ class UserRequest extends FormRequest
         $RIGHT=\MLM\Models\Tree::RIGHT;
         return [
             'id' => 'required|int',
-            'binary_position'=>'required|integer:'.$LEFT.','.$RIGHT
+            'default_binary_position' => [
+                'required',
+                Rule::in([$LEFT, $RIGHT]),
+            ],
         ];
     }
 }

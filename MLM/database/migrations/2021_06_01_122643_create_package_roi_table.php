@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePackageRoiTable extends Migration
+class ُCreatePackageRoiTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,6 +15,7 @@ class CreatePackageRoiTable extends Migration
     {
         Schema::create('package_rois', function (Blueprint $table) {
             $table->id();
+
             $table->unsignedBigInteger('package_id');
             $table->foreign('package_id')->on('packages')->references('id');
 
