@@ -3,6 +3,7 @@
 
 namespace User\tests\Feature;
 
+use Faker\Provider\Color;
 use User\Models\User;
 use User\tests\UserTest;
 
@@ -37,15 +38,29 @@ class UserFeatureTest extends UserTest
     {
 
         $this->put(route('users.binaryPosition'), [
+            'default_binary_position'=>\MLM\Models\Tree::RIGHT
+        ])->assertStatus(422);
+    }
+    /**
+     * @test
+     */
+    public function user_id_is_required_for_editing_binary_position()
+    {
+
+        $this->put(route('users.binaryPosition'), [
             'id' => 1,
         ])->assertStatus(422);
     }
-
-    public function user_id_required_for_editing_binary_position0()
+    /**
+     * @test
+     */
+    public function efault_binary_position_is_correct_enum_value_for_editing_binary_position0()
     {
         $this->put(route('users.binaryPosition'), [
-            'default_binary_position' =>\MLM\Models\Tree::RIGHT
+            'id' => 1,
+            'default_binary_position' =>'  '
         ])->assertStatus(422);
+
     }
 
 

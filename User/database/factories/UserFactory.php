@@ -26,7 +26,7 @@ class UserFactory extends Factory
             'last_name' => $this->faker->lastName,
             'email' => $this->faker->unique()->safeEmail,
             'username' => $this->faker->userName,
-            'sponsor_id' => User::query()->inRandomOrder()->first()->username,
+            'sponsor_id' => User::query()->inRandomOrder()->first()->id,
             'member_id' => mt_rand(121212121,999999999),
             'rank' => 0,
             'default_binary_position' => \MLM\Models\Tree::LEFT
