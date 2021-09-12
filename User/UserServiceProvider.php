@@ -39,6 +39,8 @@ class UserServiceProvider extends ServiceProvider
             __DIR__ . '/database/migrations' => database_path('migrations'),
         ], $this->name . '-migrations');
 
+        $this->loadFactoriesFrom(__DIR__.'/../Database/Factories');
+
     }
 
     /**
