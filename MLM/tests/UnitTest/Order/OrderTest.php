@@ -1,6 +1,6 @@
 <?php
 
-namespace MLM\tests\UnitTest\Tree;
+namespace MLM\tests\Order;
 
 
 use MLM\tests\MLMTest;
