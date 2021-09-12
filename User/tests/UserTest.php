@@ -37,7 +37,6 @@ class UserTest extends TestCase
 
     public function getHeaders()
     {
-        Role::query()->create(['name'=>'super-admin']);
         User::query()->firstOrCreate([
             'id' => '1',
             'first_name' => 'Admin',
@@ -47,7 +46,7 @@ class UserTest extends TestCase
             'username' => 'admin',
         ]);
         $user = User::query()->first();
-        $user->assignRole('super-admin');
+        $user->assignRole(USER_ROLE_SUPER_ADMIN);
         $user->save();
         $hash = md5(serialize($user->getUserService()));
         return [
