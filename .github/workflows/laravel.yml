@@ -27,3 +27,21 @@ jobs:
         touch database/database.sqlite
 
 
+  laravel-deploy:
+    runs-on: vmi627964
+    needs: laravel-tests
+    steps:
+    - uses: actions/checkout@v2
+    - name: Copy project to deployment directory
+      run: |
+        shopt -s dotglob 
+        sudo mkdir -p /home/mlm/public_html/multi-level-marketing/temp-project 
+        sudo cp -r . /home/mlm/public_html/multi-level-marketing/temp-project/
+        sudo rm -rf /home/mlm/public_html/multi-level-marketing/server_deploy.sh
+        sudo mv /home/mlm/public_html/multi-level-marketing/temp-project/server_deploy.sh /home/mlm/public_html/multi-level-marketing/
+        sudo chown mlm:mlm /home/mlm/public_html/multi-level-marketing/server_deploy.sh
+        sudo chmod 700 /home/mlm/public_html/multi-level-marketing/server_deploy.sh
+        sudo chown -R mlm:mlm /home/mlm/public_html/multi-level-marketing/temp-project
+    - name: Run server_deploy.sh
+      run: | 
+        sudo su - mlm -c '/home/mlm/public_html/multi-level-marketing/server_deploy.sh'
