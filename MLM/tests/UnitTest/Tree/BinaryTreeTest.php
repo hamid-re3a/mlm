@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Tree;
+namespace MLM\tests\UnitTest\Tree;
 
 
 use MLM\Exceptions\Tree\TreeMaxChildrenExceededException;
@@ -8,7 +8,7 @@ use MLM\Exceptions\Tree\TreeMaxLeftChildExceededException;
 use MLM\Models\Tree;
 use MLM\tests\MLMTest;
 
-class TreeTest extends MLMTest
+class BinaryTreeTest extends MLMTest
 {
     /**
      * @test

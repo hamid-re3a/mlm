@@ -4,10 +4,12 @@
 namespace MLM\tests;
 
 
+use MLM\MLMConfigure;
 use MLM\Models\Tree;
 use Illuminate\Support\Facades\Artisan;
 use Tests\CreatesApplication;
 use Tests\TestCase;
+use User\UserConfigure;
 
 class MLMTest extends TestCase
 {
@@ -18,7 +20,9 @@ class MLMTest extends TestCase
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
-//        MLMConfigure::seed();
+        MLMConfigure::seed();
+        UserConfigure::seed();
+
         $this->app->setLocale('en');
     }
 

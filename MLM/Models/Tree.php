@@ -5,7 +5,9 @@ namespace MLM\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kalnoy\Nestedset\NodeTrait;
+use MLM\database\factories\TreeFactory;
 use phpDocumentor\Reflection\Types\Integer;
+use User\database\factories\UserFactory;
 use User\Models\User;
 
 /**
@@ -100,6 +102,11 @@ class Tree extends Model
     const RIGHT = "right";
     protected $guarded = [];
 
+
+    protected static function newFactory()
+    {
+        return TreeFactory::new();
+    }
     /**
      * Scopes
      */

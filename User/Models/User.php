@@ -11,6 +11,7 @@ use MLM\Models\Tree;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
+use User\database\factories\UserFactory;
 
 /**
  * User\Models\User
@@ -79,6 +80,10 @@ class User extends Model
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
     }
 
+    protected static function newFactory()
+    {
+        return UserFactory::new();
+    }
 
     /**
      * relations

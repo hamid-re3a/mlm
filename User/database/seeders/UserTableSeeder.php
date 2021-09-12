@@ -18,15 +18,15 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         // Load local seeder
-        if (app()->environment() === 'local') {
+        if (app()->environment() === 'local' || app()->environment() == 'testing') {
             $user = User::query()->firstOrCreate(['id' => 2]);
             $user->update([
                 'first_name' => 'hamid',
                 'last_name' => 'noruzi',
                 'email' => 'hamidrezanoruzinejad@gmail.com',
                 'username' => 'hamid_re3a',
+                'member_id' => mt_rand(121212121,999999999)
             ]);
         }
-
     }
 }

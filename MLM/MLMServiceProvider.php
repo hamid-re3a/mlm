@@ -5,6 +5,8 @@ namespace MLM;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use MLM\Commands\RoiCommand;
+use MLM\Models\Tree;
+use MLM\Observers\TreeObserver;
 
 class MLMServiceProvider extends ServiceProvider
 {
@@ -43,6 +45,7 @@ class MLMServiceProvider extends ServiceProvider
     {
 
 
+        Tree::observe(TreeObserver::class);
         $this->setupConfig();
 
         $this->registerHelpers();
