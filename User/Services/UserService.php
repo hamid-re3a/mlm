@@ -4,6 +4,7 @@
 namespace User\Services;
 
 
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use User\Repository\UserRepository;
 
@@ -35,12 +36,13 @@ class UserService
 
     public function editBinaryPosition($request)
     {
-        $this->user_repository->editBinaryPosition($request);
-
+        if (Auth::user()->id == $request['id']) {
+            $this->user_repository->editBinaryPosition($request);
+        } else {
+            abort(400, trans('user.responses.you-are-not-allowed'));
+        }
 
     }
-
-
 
 
 }
