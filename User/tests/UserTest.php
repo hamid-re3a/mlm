@@ -23,7 +23,7 @@ class UserTest extends TestCase
         parent::setUp();
         Artisan::call('migrate:fresh');
         UserConfigure::seed();
-        $this->withHeaders($this->getHeaders());
+//        $this->withHeaders($this->getHeaders());
         $this->app->setLocale('en');
     }
 
