@@ -16,7 +16,7 @@ use User\UserConfigure;
 class UserTest extends TestCase
 {
     use CreatesApplication;
-//    use RefreshDatabase;
+    use RefreshDatabase;
 
     public function setUp() : void
     {

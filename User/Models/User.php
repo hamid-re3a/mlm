@@ -200,4 +200,14 @@ class User extends Model
         return User::query()->whereIn('id',$children)->where('rank','>=',$rank)->exists();
     }
 
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
+    {
+        return \User\database\factories\UserFactory::new();
+    }
+
 }
