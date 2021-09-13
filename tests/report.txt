@@ -1,5 +1,6 @@
 User Feature (User\tests\Feature\UserFeature)
  [x] User can edit binary position
  [x] Default binary position is required for editing binary position
+ [x] Default binary position is correct enum value for editing binary position
+ [x] User should login before calling binary position
 
-Binary Tree (MLM\tests\UnitTest\Tree\BinaryTree)

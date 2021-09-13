@@ -8,17 +8,16 @@ use User\Services\UserService;
 
 class UserController extends Controller
 {
+
     /**
-     * get count active package
+     * Edit Binary Position
      * @group
-     * Public User > MLM > User Binary Position
-     * @param UserRequest $request
-     * @return JsonResponse
+     * Public User > MLM Settings
      */
     public function editBinaryPosition(UserRequest $request, UserService $userService)
     {
         try {
-            $userService->editBinaryPosition($request);
+            $userService->editBinaryPosition(auth()->user()->id, request('default_binary_position'));
 
             return api()->success(trans('user.responses.user-updated-successfully'), null);
 

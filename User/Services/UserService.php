@@ -34,14 +34,9 @@ class UserService
     }
 
 
-    public function editBinaryPosition($request)
+    public function editBinaryPosition($id, $position)
     {
-        if (Auth::user()->id == $request['id']) {
-            $this->user_repository->editBinaryPosition($request);
-        } else {
-            abort(400, trans('user.responses.you-are-not-allowed'));
-        }
-
+        $this->user_repository->editBinaryPosition($id, $position);
     }
 
 

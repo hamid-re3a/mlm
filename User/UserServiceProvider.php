@@ -64,7 +64,6 @@ class UserServiceProvider extends ServiceProvider
 
                 $user_hash_request = $request->header('X-user-hash');
                 $user = User::query()->find($request->header('X-user-id'));
-
                 /**
                  * if there is not exist user. get data user complete from api gateway
                  * error code 470 is for data user not exist log for development
