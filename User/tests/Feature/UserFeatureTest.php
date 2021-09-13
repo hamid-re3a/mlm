@@ -68,7 +68,7 @@ class UserFeatureTest extends UserTest
     public function user_can_edit_only_her_own_binary_position()
     {
         $user = User::factory()->create();
-        $resp = $this->put(route('users.binaryPosition'), [
+        $this->put(route('users.binaryPosition'), [
             'id' => $user->id,
             'default_binary_position' => \MLM\Models\Tree::LEFT
         ])->assertStatus(400);

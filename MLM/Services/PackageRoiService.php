@@ -15,6 +15,13 @@ class PackageRoiService
     }
 
 
+    public function store($request)
+    {
+        $this->package_roi_repository->create($request);
+
+    }
+
+
 
 
 }

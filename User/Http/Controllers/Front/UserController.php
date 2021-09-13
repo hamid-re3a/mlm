@@ -8,7 +8,13 @@ use User\Services\UserService;
 
 class UserController extends Controller
 {
-
+    /**
+     * get count active package
+     * @group
+     * Public User > MLM > User Binary Position
+     * @param UserRequest $request
+     * @return JsonResponse
+     */
     public function editBinaryPosition(UserRequest $request, UserService $userService)
     {
         try {
