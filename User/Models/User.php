@@ -150,7 +150,7 @@ class User extends Model
      */
     public function getUserService()
     {
-        $user = new \User\Services\User();
+        $user = new \User\Services\Grpc\User();
         $user->setId((int)$this->attributes['id']);
         $user->setFirstName($this->attributes['first_name']);
         $user->setLastName($this->attributes['last_name']);

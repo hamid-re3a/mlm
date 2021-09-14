@@ -4,7 +4,7 @@ namespace MLM\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use MLM\database\factories\PackageRoiFactory;
 
 
 /**
@@ -40,5 +40,11 @@ class PackageRoi extends Model
     {
         return $query->whereDate('due_date', now()->toDate());
     }
+
+    protected static function newFactory()
+    {
+        return PackageRoiFactory::new();
+    }
+
 
 }

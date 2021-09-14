@@ -1,6 +1,6 @@
 <?php
 
-namespace Orders\Http\Controllers\Front;
+namespace MLM\Http\Controllers\Front;
 
 
 use MLM\Http\Requests\ReferralTreeRequest;
