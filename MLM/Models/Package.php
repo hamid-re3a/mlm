@@ -4,6 +4,7 @@ namespace MLM\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MLM\database\factories\PackageFactory;
 
 /**
  * MLM\Models\Package
@@ -39,6 +40,12 @@ class Package extends Model
     public function rois()
     {
         return $this->hasMany(PackageRoi::class);
+    }
+
+
+    protected static function newFactory()
+    {
+        return PackageFactory::new();
     }
 
 }

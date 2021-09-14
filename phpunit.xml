@@ -13,6 +13,10 @@
             <directory suffix="Test.php">MLM/tests/UnitTest</directory>
         </testsuite>
 
+        <testsuite name="MLM-Feature">
+            <directory suffix="Test.php">MLM/tests/Feature</directory>
+        </testsuite>
+
     </testsuites>
     <coverage processUncoveredFiles="true">
         <include>

@@ -4,6 +4,7 @@
 namespace MLM\Services;
 
 use MLM\Repository\PackageRoiRepository;
+use MLM\Services\Grpc\PackageRoi;
 
 class PackageRoiService
 {
@@ -15,13 +16,40 @@ class PackageRoiService
     }
 
 
-    public function store($request)
+    public function store(PackageRoi $packageRoi)
     {
-        $this->package_roi_repository->create($request);
+
+        return $this->package_roi_repository->create($packageRoi);
 
     }
 
+    public function update(PackageRoi $packageRoi)
+    {
 
+        return $this->package_roi_repository->update($packageRoi);
+
+    }
+
+    public function destroy($id)
+    {
+
+        $this->package_roi_repository->delete($id);
+
+    }
+
+    public function getAll()
+    {
+
+        return $this->package_roi_repository->getAll();
+
+    }
+
+    public function getByPackageIdDueDate($packageId,$dueDate)
+    {
+
+        return $this->package_roi_repository->getByPackageIdDueDate($packageId,$dueDate);
+
+    }
 
 
 }

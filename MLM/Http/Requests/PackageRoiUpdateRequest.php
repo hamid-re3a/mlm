@@ -1,10 +1,12 @@
 <?php
 
+
 namespace MLM\Http\Requests;
+
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PackageRoiStoreRequest extends FormRequest
+class PackageRoiUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,3 +34,4 @@ class PackageRoiStoreRequest extends FormRequest
         ];
     }
 }
+

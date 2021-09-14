@@ -50,7 +50,7 @@ class MLMServiceProvider extends ServiceProvider
 
         $this->registerHelpers();
 
-        Route::prefix('v1/uni-level')
+        Route::prefix('v1/mlm')
             ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');
