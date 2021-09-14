@@ -3,14 +3,11 @@
 
 namespace MLM\Services\Commissions;
 
-use App\Jobs\Wallet\WalletDepositJob;
 use MLM\Interfaces\Commission;
 use MLM\Jobs\DirectSellCommissionJob;
 use MLM\Models\OrderedPackage;
-use MLM\Models\Commission as CommissionModel;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
 use User\Models\User;
-use Wallets\Services\Deposit;
 
 class DirectSellCommission implements Commission
 {

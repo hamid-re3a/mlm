@@ -10,9 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use MLM\Models\OrderedPackage;
 use MLM\Models\OrderedPackagesIndirectCommission;
-use MLM\Services\PackageService;
 use User\Models\User;
-use Wallets\Services\Deposit;
+use Wallets\Services\Grpc\Deposit;
 
 class IndirectSellCommissionJob implements ShouldQueue
 {
@@ -47,7 +46,7 @@ class IndirectSellCommissionJob implements ShouldQueue
                 $depositService = app(Deposit::class);
                 $depositService->setUserId($this->user->referralTree->parent->user->id);
                 $depositService->setAmount($commission_amount);
-                $depositService->setWalletName('Earning Wallet');
+                $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
                 $depositService->setDescription(serialize([
                     'description' => 'Commission # ' . $this->getType()

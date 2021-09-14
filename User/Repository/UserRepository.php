@@ -4,7 +4,7 @@
 namespace User\Repository;
 
 use User\Models\User as UserModel;
-use User\Services\User;
+use User\Services\Grpc\User;
 
 class UserRepository
 {
@@ -22,7 +22,7 @@ class UserRepository
         $user_find->sponsor_id = $user->getSponsorId() ? $user->getSponsorId() : $user_find->sponsor_id;
         $user_find->is_freeze = $user->getIsFreeze() ? $user->getIsFreeze() : $user_find->is_freeze;
         $user_find->is_deactivate = $user->getIsDeactivate() ? $user->getIsDeactivate() : $user_find->is_deactivate;
-//        $user_find->member_id = $user->getMemberId() ? $user->getMemberId() : $user_find->member_id;
+        $user_find->member_id = $user->getMemberId() ? $user->getMemberId() : $user_find->member_id;
         if (!empty($user_find->getDirty())) {
             $user_find->save();
         }

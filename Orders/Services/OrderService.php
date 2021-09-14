@@ -5,6 +5,7 @@ namespace Orders\Services;
 
 
 use MLM\Repository\OrderedPackageRepository;
+use Orders\Services\Grpc\Order;
 
 class OrderService
 {

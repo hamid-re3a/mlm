@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "379c6922075a2cd1b044be85f6d686e7",
+    "content-hash": "9a67f687c2a258354a5083bbc3a51a16",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1421,6 +1421,61 @@
                 }
             ],
             "time": "2021-01-18T20:58:21+00:00"
+        },
+        {
+            "name": "mix/grpc",
+            "version": "v3.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mix-php/grpc.git",
+                "reference": "13530e8d9ec9b67dde422d7e3ea7b422ec23ee59"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mix-php/grpc/zipball/13530e8d9ec9b67dde422d7e3ea7b422ec23ee59",
+                "reference": "13530e8d9ec9b67dde422d7e3ea7b422ec23ee59",
+                "shasum": ""
+            },
+            "require": {
+                "ext-swoole": ">=4.4.4",
+                "google/protobuf": "^3.11",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mix\\Grpc\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "liu,jian",
+                    "email": "coder.keda@gmail.com"
+                }
+            ],
+            "description": "PHP gRPC based on Swoole coroutine, including protoc code generator, server, and client",
+            "homepage": "https://openmix.org/mix-php",
+            "keywords": [
+                "client",
+                "coroutine",
+                "gRPC",
+                "mix",
+                "protoc",
+                "server",
+                "swoole"
+            ],
+            "support": {
+                "issues": "https://github.com/mix-php/grpc/issues",
+                "source": "https://github.com/mix-php/grpc/tree/v3.0.4"
+            },
+            "time": "2021-09-02T07:43:18+00:00"
         },
         {
             "name": "monolog/monolog",

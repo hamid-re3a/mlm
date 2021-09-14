@@ -22,6 +22,9 @@ class CreateCommissionsTable extends Migration
             $table->foreign('ordered_package_id')->references('id')->on('ordered_packages');
             $table->string('type')->index();
             $table->unsignedDouble('amount')->nullable();
+
+
+            $table->unsignedBigInteger('transaction_id')->nullable();
             $table->boolean('confirmed')->default(false);
             $table->timestamps();
         });

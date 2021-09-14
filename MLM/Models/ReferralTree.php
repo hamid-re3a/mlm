@@ -108,12 +108,13 @@ class ReferralTree extends Model
         return null;
     }
 
-    public function childrenIds() : array
+    public function childrenUserIds() : array
     {
         return $this->children()->pluck('user_id')->toArray();
     }
-    public function descendantsIds() : array
+    public function descendantsUserIds() : array
     {
         return $this->descendants()->pluck('user_id')->toArray();
     }
+
 }

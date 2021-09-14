@@ -4,7 +4,7 @@
 namespace MLM\Repository;
 
 use MLM\Models\Package;
-use Packages\Services\Package as PackageData;
+use Packages\Services\Grpc\Package as PackageData;
 
 class PackageRepository
 {

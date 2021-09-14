@@ -10,9 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
-use Orders\Services\Order;
 use User\Models\User;
-use Wallets\Services\Deposit;
+use Wallets\Services\Grpc\Deposit;
 
 class DirectSellCommissionJob implements ShouldQueue
 {
@@ -48,7 +47,7 @@ class DirectSellCommissionJob implements ShouldQueue
                 $depositService = app(Deposit::class);
                 $depositService->setUserId($this->user->referralTree->parent->user->id);
                 $depositService->setAmount($commission_amount);
-                $depositService->setWalletName('Earning Wallet');
+                $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
                 $depositService->setDescription(serialize([
                     'description' => 'Commission # ' . $this->getType() . $is_eligible_for_quick_start_bonus ? ' - Quick Start bonus ' : ''

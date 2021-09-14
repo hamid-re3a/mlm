@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use MLM\Models\Commission;
 use MLM\Models\OrderedPackage;
 use MLM\Models\Rank;
+use MLM\Models\ResidualBonusSetting;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -66,6 +67,9 @@ use User\database\factories\UserFactory;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereSponsorId($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|OrderedPackage[] $ordered_packages
  * @property-read int|null $ordered_packages_count
+ * @method static \User\database\factories\UserFactory factory(...$parameters)
+ * @property-read \Illuminate\Database\Eloquent\Collection|ResidualBonusSetting[] $residualBonusSetting
+ * @property-read int|null $residual_bonus_setting_count
  */
 class User extends Model
 {
@@ -91,8 +95,9 @@ class User extends Model
 
     public function rank_model()
     {
-        return $this->hasOne(Rank::class,'rank','rank');
+        return $this->hasOne(Rank::class, 'rank', 'rank');
     }
+
     public function commissions()
     {
         return $this->hasMany(Commission::class);
@@ -145,13 +150,13 @@ class User extends Model
      */
     public function getUserService()
     {
-            $user = new \User\Services\User();
-            $user->setId((int)$this->attributes['id']);
-            $user->setFirstName($this->attributes['first_name']);
-            $user->setLastName($this->attributes['last_name']);
-            $user->setUsername($this->attributes['username']);
-            $user->setEmail($this->attributes['email']);
-            return $user;
+        $user = new \User\Services\User();
+        $user->setId((int)$this->attributes['id']);
+        $user->setFirstName($this->attributes['first_name']);
+        $user->setLastName($this->attributes['last_name']);
+        $user->setUsername($this->attributes['username']);
+        $user->setEmail($this->attributes['email']);
+        return $user;
     }
 
     public function biggestActivePackage(): ?OrderedPackage
@@ -189,20 +194,24 @@ class User extends Model
         $left_binary_children = $this->binaryTree->leftSideChildrenIds();
         $right_binary_children = $this->binaryTree->rightSideChildrenIds();
 
-        $referral_children = $this->referralTree->childrenIds();
+        $referral_children = $this->referralTree->childrenUserIds();
 
         $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
         $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
 
-        if (self::hasAtLeastOnActiveUserWithRank($left_binary_sponsored_children) && self::hasAtLeastOnActiveUserWithRank($right_binary_sponsored_children))
+        if (self::hasLeastChildrenWithRank($left_binary_sponsored_children) && self::hasLeastChildrenWithRank($right_binary_sponsored_children))
             return true;
 
         return false;
     }
 
-    public static function hasAtLeastOnActiveUserWithRank(array $children, $rank  = 1): bool
+    public static function hasLeastChildrenWithRank(array $children, $rank = 1, $number_of_children = 1): bool
     {
-        return User::query()->whereIn('id',$children)->where('rank','>=',$rank)->exists();
+        return User::query()->whereIn('id', $children)->where('rank', '>=', $rank)->count() > $number_of_children;
     }
 
+    public function residualBonusSetting()
+    {
+        return $this->hasMany(ResidualBonusSetting::class,'rank','rank');
+    }
 }

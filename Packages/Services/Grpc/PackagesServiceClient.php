@@ -1,11 +1,11 @@
 <?php
 // GENERATED CODE -- DO NOT EDIT!
 
-namespace User\Services;
+namespace Packages\Services\Grpc;
 
 /**
  */
-class UserServiceClient extends \Grpc\BaseStub {
+class PackagesServiceClient extends \Grpc\BaseStub {
 
     /**
      * @param string $hostname hostname
@@ -17,16 +17,16 @@ class UserServiceClient extends \Grpc\BaseStub {
     }
 
     /**
-     * @param \User\Services\Id $argument input argument
+     * @param \Packages\Services\Grpc\Id $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \User\Services\User
+     * @return \Packages\Services\Grpc\Package
      */
-    public function getUserById(\User\Services\Id $argument,
+    public function packageById(\Packages\Services\Grpc\Id $argument,
       $metadata = [], $options = []) {
-        return $this->_simpleRequest('/user.services.UserService/getUserById',
+        return $this->_simpleRequest('/packages.services.grpc.PackagesService/packageById',
         $argument,
-        ['\User\Services\User', 'decode'],
+        ['\Packages\Services\Grpc\Package', 'decode'],
         $metadata, $options);
     }
 
