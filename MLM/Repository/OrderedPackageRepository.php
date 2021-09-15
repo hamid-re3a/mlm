@@ -5,7 +5,7 @@ namespace MLM\Repository;
 
 
 use MLM\Models\OrderedPackage;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
 
 class OrderedPackageRepository
 {

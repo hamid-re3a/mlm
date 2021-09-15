@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use MLM\Services\OrderResolver;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
 use Orders\Services\OrderService;
 
 class MLMOrderJob implements ShouldQueue

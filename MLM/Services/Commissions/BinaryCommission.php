@@ -3,17 +3,11 @@
 
 namespace MLM\Services\Commissions;
 
-use App\Jobs\Wallet\WalletDepositJob;
 use MLM\Interfaces\Commission;
 use MLM\Jobs\BinaryCommissionJob;
-use MLM\Jobs\DirectSellCommissionJob;
-use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
-use MLM\Models\OrderedPackagesIndirectCommission;
-use MLM\Models\Rank;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
 use User\Models\User;
-use Wallets\Services\Deposit;
 
 class BinaryCommission implements Commission
 {

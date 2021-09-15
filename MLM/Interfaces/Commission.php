@@ -2,7 +2,7 @@
 namespace MLM\Interfaces;
 
 
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
 
 interface Commission {
 

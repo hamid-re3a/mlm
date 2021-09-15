@@ -31,9 +31,24 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Rank whereUpdatedAt($value)
  * @property int $condition_direct_or_indirect
  * @method static \Illuminate\Database\Eloquent\Builder|Rank whereConditionDirectOrIndirect($value)
+ * @property int $withdrawal_limit
+ * @property int $condition_number_of_left_children
+ * @property int $condition_number_of_right_children
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereConditionNumberOfLeftChildren($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereConditionNumberOfRightChildren($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereWithdrawalLimit($value)
+ * @property string $rank_name
+ * @property-read \Illuminate\Database\Eloquent\Collection|\MLM\Models\ResidualBonusSetting[] $residualBonusSettings
+ * @property-read int|null $residual_bonus_settings_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereRankName($value)
  */
 class Rank extends Model
 {
     protected $guarded = [];
+
+    public function residualBonusSettings()
+    {
+        return $this->hasMany(ResidualBonusSetting::class,'rank','rank');
+    }
 
 }

@@ -10,9 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
-use MLM\Services\PackageService;
 use User\Models\User;
-use Wallets\Services\Deposit;
+use Wallets\Services\Grpc\Deposit;
 
 class TrainerBonusCommissionJob implements ShouldQueue
 {
@@ -39,7 +38,7 @@ class TrainerBonusCommissionJob implements ShouldQueue
                     $left_binary_children = $parent->binaryTree->leftSideChildrenIds();
                     $right_binary_children = $parent->binaryTree->rightSideChildrenIds();
 
-                    $referral_children = $parent->referralTree->childrenIds();
+                    $referral_children = $parent->referralTree->childrenUserIds();
 
                     $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
                     $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
@@ -51,7 +50,7 @@ class TrainerBonusCommissionJob implements ShouldQueue
                         $depositService = app(Deposit::class);
                         $depositService->setUserId($parent->id);
                         $depositService->setAmount($commission_amount);
-                        $depositService->setWalletName('Earning Wallet');
+                        $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
                         $depositService->setDescription(serialize([
                             'description' => 'Commission # ' . $this->getType()

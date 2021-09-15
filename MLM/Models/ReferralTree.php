@@ -5,6 +5,7 @@ namespace MLM\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kalnoy\Nestedset\NodeTrait;
+use MLM\database\factories\ReferralTreeFactory;
 use User\Models\User;
 
 /**
@@ -83,6 +84,11 @@ class ReferralTree extends Model
     use NodeTrait;
     protected $guarded = [];
 
+
+    protected static function newFactory()
+    {
+        return ReferralTreeFactory::new();
+    }
     /**
      * scopes
      */
@@ -108,12 +114,13 @@ class ReferralTree extends Model
         return null;
     }
 
-    public function childrenIds() : array
+    public function childrenUserIds() : array
     {
         return $this->children()->pluck('user_id')->toArray();
     }
-    public function descendantsIds() : array
+    public function descendantsUserIds() : array
     {
         return $this->descendants()->pluck('user_id')->toArray();
     }
+
 }

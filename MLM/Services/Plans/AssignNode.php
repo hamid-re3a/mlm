@@ -1,10 +1,8 @@
 <?php
 namespace MLM\Services\Plans;
 
-use MLM\Interfaces\Plan;
 use Illuminate\Support\Collection;
-use MLM\Services\Commissions\DirectSellCommission;
-use MLM\Services\Commissions\IndirectSellCommission;
+use MLM\Interfaces\Plan;
 
 class AssignNode implements Plan
 {
