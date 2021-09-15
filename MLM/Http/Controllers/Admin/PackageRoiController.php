@@ -35,6 +35,8 @@ class PackageRoiController extends Controller
     }
 
     /**
+     * @group
+     * Admin MLM > PackageRoi > index
      * @return \Illuminate\Http\JsonResponse
      */
     public function index()
