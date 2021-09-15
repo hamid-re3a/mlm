@@ -51,6 +51,8 @@ class PackageRoiController extends Controller
      * @group
      * Admin MLM > PackageRoi > show
      * @param Request $request
+     * @queryParam package_id,due_date
+
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Request $request)
