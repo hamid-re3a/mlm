@@ -39,7 +39,6 @@ class PackageRoiService
 
     public function getAll()
     {
-
         return $this->package_roi_repository->getAll();
 
     }
