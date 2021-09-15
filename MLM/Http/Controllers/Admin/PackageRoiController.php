@@ -35,6 +35,7 @@ class PackageRoiController extends Controller
     }
 
     /**
+     * get all PackageRois
      * @group
      * Admin MLM > PackageRoi > index
      * @return \Illuminate\Http\JsonResponse
@@ -48,6 +49,7 @@ class PackageRoiController extends Controller
     }
 
     /**
+     * get PackageRoi by package_id and due_date
      * @group
      * Admin MLM > PackageRoi > show
      * @param Request $request
