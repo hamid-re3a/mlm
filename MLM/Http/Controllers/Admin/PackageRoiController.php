@@ -113,7 +113,7 @@ class PackageRoiController extends Controller
     }
 
     /**
-     * update a list of packageRoi
+     * update a list of packageRois
      * @group
      * Admin MLM > PackageRoi > bulk update
      * @param PackageRoiBulkUpdateRequest $request
