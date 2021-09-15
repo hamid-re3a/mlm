@@ -4,9 +4,9 @@
 namespace User\Services;
 
 
-use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use User\Repository\UserRepository;
+use User\Services\Grpc\User;
 
 class UserService
 {

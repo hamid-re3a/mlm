@@ -3,18 +3,21 @@
 namespace MLM\Commands;
 
 use Illuminate\Console\Command;
+use MLM\Jobs\ResidualBonusCommissionJob;
 use MLM\Jobs\TradingProfitCommissionJob;
 use MLM\Models\OrderedPackage;
 use MLM\Models\PackageRoi;
+use MLM\Models\ResidualBonusSetting;
+use User\Models\User;
 
-class RoiCommand extends Command
+class ResidualBonusCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'roi:regular';
+    protected $signature = 'roi:residual';
 
     /**
      * The console command description.
@@ -40,24 +43,31 @@ class RoiCommand extends Command
      */
     public function handle()
     {
+
         if(!PackageRoi::query()->today()->exists()){
             $this->info(PHP_EOL . 'Admin has not set any ROI for today.' . PHP_EOL);
             return;
         }
 
-        $ordered_packages = OrderedPackage::query()->active()->canGetRoi()->get();
-        $bar = $this->output->createProgressBar($ordered_packages->count());
-        $this->info(PHP_EOL . 'Start trading profits');
+
+        $min_rank =ResidualBonusSetting::query()->min('rank');
+
+        $users = User::query()->where('rank','>=',$min_rank)->get();
+
+
+
+        $bar = $this->output->createProgressBar($users->count());
+        $this->info(PHP_EOL . 'Start residual bonus commissions');
         $bar->start();
 
-        foreach ($ordered_packages as $item) {
-            TradingProfitCommissionJob::dispatch($item);
+        foreach ($users as $item) {
+            ResidualBonusCommissionJob::dispatch($item);
             $bar->advance();
         }
 
 
         $bar->finish();
-        $this->info(PHP_EOL . 'Trading profits completed successfully' . PHP_EOL);
+        $this->info(PHP_EOL . 'Residual bonus commissions completed successfully' . PHP_EOL);
 
     }
 

@@ -4,6 +4,7 @@
 namespace MLM\tests;
 
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use MLM\MLMConfigure;
 use MLM\Models\Tree;
 use Illuminate\Support\Facades\Artisan;
@@ -15,14 +16,14 @@ use User\UserConfigure;
 class MLMTest extends TestCase
 {
     use CreatesApplication;
-//    use RefreshDatabase;
+    use RefreshDatabase;
 
     public function setUp() : void
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
-        MLMConfigure::seed();
         UserConfigure::seed();
+        MLMConfigure::seed();
 
         $this->app->setLocale('en');
     }

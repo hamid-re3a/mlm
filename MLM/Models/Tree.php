@@ -93,6 +93,7 @@ use User\Models\User;
  * @property int $is_active
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereIsActive($value)
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree wherePackagesPrice($value)
+ * @method static \MLM\database\factories\TreeFactory factory(...$parameters)
  */
 class Tree extends Model
 {
@@ -273,4 +274,6 @@ class Tree extends Model
 
         return $right_child->descendants()->sum('packages_price');
     }
+
+
 }

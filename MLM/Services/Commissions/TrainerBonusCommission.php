@@ -4,15 +4,11 @@
 namespace MLM\Services\Commissions;
 
 
-use App\Jobs\Wallet\WalletDepositJob;
 use MLM\Interfaces\Commission;
-use MLM\Jobs\DirectSellCommissionJob;
 use MLM\Jobs\TrainerBonusCommissionJob;
-use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
 use User\Models\User;
-use Wallets\Services\Deposit;
 
 class TrainerBonusCommission implements Commission
 {

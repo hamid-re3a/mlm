@@ -4,3 +4,31 @@ User Feature (User\tests\Feature\UserFeature)
  [x] Default binary position is correct enum value for editing binary position
  [x] User should login before calling binary position
 
+Order (MLM\tests\UnitTest\Order\Order)
+ [ ] Add user to both tree with valid ordered package
+
+Binary Tree (MLM\tests\UnitTest\Tree\BinaryTree)
+ [x] Tree can add root
+ [x] Adding node to left and right of root
+ [x] Cannot add more than two children to a node
+ [x] Cannot add two left children to a node
+ [x] Tree has method to add node to left or right side
+ [x] Tree can count left and right side children count
+ [x] Find sub set of nodes
+ [x] It belongs to user
+
+Package Roi Feature (MLM\tests\Feature\PackageRoiFeature)
+ [x] User can create packageRoi
+ [x] Only super admin and mlm admin can create packageRoi
+ [x] Package id is required for creating packageRoi
+ [x] Roi percentage is required for creating packageRoi
+ [x] Roi percentage should be numeric for creating packageRoi
+ [x] Due date is required for creating packageRoi
+ [x] Package id should be integer for creating packageRoi
+ [x] User can update packageRoi
+ [x] Only super admin and mlm admin can update packageRoi
+ [x] Package id is required for updating packageRoi
+ [x] Due date is required for updating packageRoi
+ [x] Roi percentage is required for updating packageRoi
+ [x] Roi percentage should be numeric for updating packageRoi
+
