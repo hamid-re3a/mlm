@@ -48,10 +48,10 @@ class PackageRoiRepository
 
     }
 
-    public function delete(PackageRoiData $packageRoi)
+    public function delete($packageId,$dueDate)
     {
         $packageRoi_entity = new $this->entity_name;
-        $packageRoi_find = $packageRoi_entity->query()->where('package_id',$packageRoi->getPackageId())->where( 'due_date', $packageRoi->getDueDate())->first();
+        $packageRoi_find = $packageRoi_entity->query()->where('package_id',$packageId)->where( 'due_date',$dueDate)->first();
         $packageRoi_find->delete();
 
     }

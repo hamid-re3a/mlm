@@ -6,6 +6,7 @@ namespace MLM\Http\Controllers\Admin;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use MLM\Http\Requests\PackageRoiDestroyRequest;
 use MLM\Http\Requests\PackageRoiStoreRequest;
 use MLM\Http\Requests\PackageRoiUpdateRequest;
 use MLM\Http\Resources\PackageRoi\PackageRoiResource;
@@ -105,16 +106,16 @@ class PackageRoiController extends Controller
     }
 
     /**
-     * delete package roi
+     * delete packageRoi by package_id and due_date
      * @group
      * Admin MLM > PackageRoi > delete
-     * @param Request $request
+     * @param PackageRoiDestroyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request)
+    public function destroy(PackageRoiDestroyRequest $request)
     {
         try {
-          $this->packageRoiService->destroy($this->PackageRoi($request));
+          $this->packageRoiService->destroy($request['package_id'],$request['due_date']);
 
             return api()->success(trans('responses.ok'));
         } catch (\Throwable $e) {
