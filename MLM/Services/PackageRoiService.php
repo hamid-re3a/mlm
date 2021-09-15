@@ -29,6 +29,12 @@ class PackageRoiService
         return $this->package_roi_repository->update($packageRoi);
 
     }
+    public function bulkUpdate(PackageRoi $packageRoi)
+    {
+
+        return $this->package_roi_repository->update($packageRoi);
+
+    }
 
     public function destroy($packageId,$dueDate)
     {

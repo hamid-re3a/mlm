@@ -6,6 +6,9 @@ namespace MLM\Http\Controllers\Admin;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use MLM\Http\Requests\PackageRoiBulkUpdateRequest;
 use MLM\Http\Requests\PackageRoiDestroyRequest;
 use MLM\Http\Requests\PackageRoiStoreRequest;
 use MLM\Http\Requests\PackageRoiUpdateRequest;
@@ -43,7 +46,7 @@ class PackageRoiController extends Controller
      */
     public function index()
     {
-        $packageRois=PackageRoiResource::collection($this->packageRoiService->getAll());
+        $packageRois = PackageRoiResource::collection($this->packageRoiService->getAll());
 
         return api()->success(trans('responses.ok'), $packageRois);
 
@@ -55,12 +58,13 @@ class PackageRoiController extends Controller
      * Admin MLM > PackageRoi > show
      * @param Request $request
      * @queryParam package_id,due_date
-
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Request $request)
     {
-        $packageRois= new PackageRoiResource($this->packageRoiService->getByPackageIdDueDate($request->package_id,$request->due_date));
+        $this->handleValidation($request->all());
+
+        $packageRois = new PackageRoiResource($this->packageRoiService->getByPackageIdDueDate($request->package_id, $request->due_date));
 
         return api()->success(trans('responses.ok'), $packageRois);
 
@@ -75,6 +79,8 @@ class PackageRoiController extends Controller
      */
     public function store(PackageRoiStoreRequest $request)
     {
+        $this->handleValidation($request->all());
+
         try {
             $packageRoi = $this->packageRoiService->store($this->PackageRoi($request));
 
@@ -94,10 +100,40 @@ class PackageRoiController extends Controller
      */
     public function update(PackageRoiUpdateRequest $request)
     {
+        $this->handleValidation($request->all());
         try {
             $packageRoi = $this->packageRoiService->update($this->PackageRoi($request));
 
             return api()->success(trans('responses.ok'), $packageRoi);
+        } catch (\Throwable $e) {
+            return api()->error($e->getMessage(), null);
+
+        }
+
+    }
+
+    /**
+     * update a list of packageRois
+     * @group
+     * Admin MLM > PackageRoi > bulk update
+     * @param PackageRoiBulkUpdateRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bulkUpdate(PackageRoiBulkUpdateRequest $request)
+    {
+        $this->handleValidation($request->all(),true);
+
+        try {
+            $updatedPackageRois=[];
+            foreach($request->package_id as $packageId){
+                foreach ($request->due_date as $dueDate){
+                    $packageRoi= $this->PackageRoi(['package_id'=>$packageId ,'due_date'=>$dueDate,'roi_percentage'=>$request->roi_percentage]);
+                    $updatedPackageRoi=$this->packageRoiService->bulkUpdate($packageRoi);
+                    $updatedPackageRois[]=$updatedPackageRoi;
+                }
+            }
+
+            return api()->success(trans('responses.ok'),$updatedPackageRois);
         } catch (\Throwable $e) {
             return api()->error($e->getMessage(), null);
 
@@ -114,8 +150,10 @@ class PackageRoiController extends Controller
      */
     public function destroy(PackageRoiDestroyRequest $request)
     {
+        $this->handleValidation($request->all());
+
         try {
-          $this->packageRoiService->destroy($request['package_id'],$request['due_date']);
+            $this->packageRoiService->destroy($request['package_id'], $request['due_date']);
 
             return api()->success(trans('responses.ok'));
         } catch (\Throwable $e) {
@@ -139,6 +177,19 @@ class PackageRoiController extends Controller
         $packageRoi->setDueDate($request['due_date']);
 
         return $packageRoi;
+    }
+
+
+    public function handleValidation($request, $bulk = false)
+    {
+        $field = $bulk ? 'package_id.*' : 'package_id';
+        $validator = Validator::make($request, [
+            $field => 'exists:packages,id',
+        ]);
+        if ($validator->fails()) {
+            throw (new ValidationException($validator));
+        }
+
     }
 
 

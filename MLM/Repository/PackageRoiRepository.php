@@ -21,6 +21,7 @@ class PackageRoiRepository
             "due_date" => $packageRoi->getDueDate()
         ]);
         $packageRoi = $packageRoi->fresh();
+
         return $packageRoi;
     }
 
@@ -59,6 +60,7 @@ class PackageRoiRepository
     public function getAll()
     {
         $packageRoi_entity = new $this->entity_name;
+
         return $packageRoi_entity->query()->get();
 
     }
