@@ -53,7 +53,7 @@ class PackageRoiController extends Controller
      */
     public function show(Request $request)
     {
-        $packageRois=PackageRoiResource::collection($this->packageRoiService->getByPackageIdDueDate($request->package_id,$request->due_date));
+        $packageRois= new PackageRoiResource($this->packageRoiService->getByPackageIdDueDate($request->package_id,$request->due_date));
 
         return api()->success(trans('responses.ok'), $packageRois);
 
