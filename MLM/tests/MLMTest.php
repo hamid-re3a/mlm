@@ -22,8 +22,8 @@ class MLMTest extends TestCase
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
-        MLMConfigure::seed();
         UserConfigure::seed();
+        MLMConfigure::seed();
 
         $this->app->setLocale('en');
     }
