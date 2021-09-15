@@ -126,7 +126,7 @@ class PackageRoiFeatureTest extends MLMTest
 
         $packageRoi = PackageRoi::factory()->create();
 
-        $resp = $this->put(route('packagesRoi.store'), [
+        $resp = $this->put(route('packagesRoi.update'), [
             'package_id' => $packageRoi->package_id,
             'due_date' => $packageRoi->due_date,
             'roi_percentage' => mt_rand(0, 1000) / 10
@@ -326,8 +326,6 @@ class PackageRoiFeatureTest extends MLMTest
             'due_date' => $packageRoi->due_date,
         ])->assertStatus(403);
 
-
-
     }
 
     /**
@@ -350,6 +348,30 @@ class PackageRoiFeatureTest extends MLMTest
         $this->delete(route('packagesRoi.destroy'), [
             'package_id' => $packageRoi->package_id,
         ])->assertStatus(422);
+
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_bulk_update_packageRoi()
+    {
+        $this->withHeaders($this->getHeaders());
+
+        $packageRois = PackageRoi::factory()->count(2)->create([
+            'roi_percentage' => 20
+        ]);
+        $this->put(route('packagesRoi.bulkUpdate'), [
+            'package_id' => $packageRois->pluck('package_id')->toArray(),
+            'due_date' => $packageRois->pluck('due_date')->toArray(),
+            'roi_percentage' =>80
+        ])->assertOk();
+
+        $this->assertDatabaseHas('package_rois', [
+            'package_id' => $packageRois[0]->package_id,
+            'due_date' => $packageRois[1]->due_date,
+            'roi_percentage' => 80,
+        ]);
 
     }
 
