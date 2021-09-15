@@ -110,7 +110,7 @@ class PackageRoiController extends Controller
     public function destroy(Request $request)
     {
         try {
-          $this->packageRoiService->destroy($request->id);
+          $this->packageRoiService->destroy($this->PackageRoi($request));
 
             return api()->success(trans('responses.ok'));
         } catch (\Throwable $e) {
