@@ -296,6 +296,11 @@ class PackageRoiFeatureTest extends MLMTest
 
     }
 
+    public function user_can_delete_packageRoi()
+    {
+        
+    }
+
 
 
 }

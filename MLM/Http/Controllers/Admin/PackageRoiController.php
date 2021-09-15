@@ -51,6 +51,8 @@ class PackageRoiController extends Controller
      * @group
      * Admin MLM > PackageRoi > show
      * @param Request $request
+     * @queryParam package_id,due_date
+
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Request $request)
@@ -110,7 +112,7 @@ class PackageRoiController extends Controller
     public function destroy(Request $request)
     {
         try {
-          $this->packageRoiService->destroy($request->id);
+          $this->packageRoiService->destroy($this->PackageRoi($request));
 
             return api()->success(trans('responses.ok'));
         } catch (\Throwable $e) {

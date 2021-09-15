@@ -30,10 +30,10 @@ class PackageRoiService
 
     }
 
-    public function destroy($id)
+    public function destroy(PackageRoi $packageRoi)
     {
 
-        $this->package_roi_repository->delete($id);
+        $this->package_roi_repository->delete($packageRoi);
 
     }
 
