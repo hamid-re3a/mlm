@@ -82,7 +82,7 @@ class PackageRoiController extends Controller
         $this->handleValidation($request->all());
 
         try {
-            $packageRoi = $this->packageRoiService->store($this->PackageRoi($request));
+            $packageRoi = $this->packageRoiService->store($this->PackageRoi($request->all()));
 
             return api()->success(trans('responses.ok'), $packageRoi);
         } catch (\Throwable $e) {
@@ -102,7 +102,7 @@ class PackageRoiController extends Controller
     {
         $this->handleValidation($request->all());
         try {
-            $packageRoi = $this->packageRoiService->update($this->PackageRoi($request));
+            $packageRoi = $this->packageRoiService->update($this->PackageRoi($request->all()));
 
             return api()->success(trans('responses.ok'), $packageRoi);
         } catch (\Throwable $e) {
@@ -163,12 +163,11 @@ class PackageRoiController extends Controller
 
     }
 
-
     /**
      * @param $request
      * @return PackageRoi
      */
-    private function PackageRoi($request)
+    private function PackageRoi(array $request)
     {
 
         $packageRoi = new PackageRoi();
@@ -180,11 +179,16 @@ class PackageRoiController extends Controller
     }
 
 
-    public function handleValidation($request, $bulk = false)
+    /**
+     * @param array $request
+     * @param bool $bulk
+     * @throws ValidationException
+     */
+    public function handleValidation(array $request, bool $bulk = false)
     {
         $field = $bulk ? 'package_id.*' : 'package_id';
         $validator = Validator::make($request, [
-            $field => 'exists:packages,id',
+            $field => 'integer|exists:packages,id',
         ]);
         if ($validator->fails()) {
             throw (new ValidationException($validator));
