@@ -41,7 +41,7 @@ class PackageRoiController extends Controller
     /**
      * get all PackageRois
      * @group
-     * Admin MLM > PackageRoi > index
+     * Admin MLM > PackageRoi
      * @return \Illuminate\Http\JsonResponse
      */
     public function index()
@@ -55,7 +55,7 @@ class PackageRoiController extends Controller
     /**
      * get PackageRoi by package_id and due_date
      * @group
-     * Admin MLM > PackageRoi > show
+     * Admin MLM > PackageRoi
      * @param Request $request
      * @queryParam package_id,due_date
      * @return \Illuminate\Http\JsonResponse
@@ -73,7 +73,7 @@ class PackageRoiController extends Controller
     /**
      * store new package roi
      * @group
-     * Admin MLM > PackageRoi > create
+     * Admin MLM > PackageRoi
      * @param PackageRoiStoreRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -94,7 +94,7 @@ class PackageRoiController extends Controller
     /**
      * update package roi
      * @group
-     * Admin MLM > PackageRoi > update
+     * Admin MLM > PackageRoi
      * @param PackageRoiUpdateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -115,7 +115,7 @@ class PackageRoiController extends Controller
     /**
      * update a list of packageRois
      * @group
-     * Admin MLM > PackageRoi > bulk update
+     * Admin MLM > PackageRoi
      * @param PackageRoiBulkUpdateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -144,7 +144,7 @@ class PackageRoiController extends Controller
     /**
      * delete packageRoi by package_id and due_date
      * @group
-     * Admin MLM > PackageRoi > delete
+     * Admin MLM > PackageRoi
      * @param PackageRoiDestroyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
