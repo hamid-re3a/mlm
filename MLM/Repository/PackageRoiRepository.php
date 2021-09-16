@@ -49,7 +49,7 @@ class PackageRoiRepository
 
     }
 
-    public function delete($packageId,$dueDate)
+    public function delete(int $packageId,string $dueDate)
     {
         $packageRoi_entity = new $this->entity_name;
         $packageRoi_find = $packageRoi_entity->query()->where('package_id',$packageId)->where( 'due_date',$dueDate)->first();
@@ -65,7 +65,7 @@ class PackageRoiRepository
 
     }
 
-    public function getByPackageIdDueDate($packageId, $dueDate)
+    public function getByPackageIdDueDate(int $packageId, string $dueDate)
     {
         $packageRoi_entity = new $this->entity_name;
 

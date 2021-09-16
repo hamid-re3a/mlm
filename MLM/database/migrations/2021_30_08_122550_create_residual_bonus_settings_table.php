@@ -19,7 +19,7 @@ class CreateResidualBonusSettingsTable extends Migration
             $table->unsignedBigInteger('rank');
 
             $table->integer('level');
-            $table->integer('percentage');
+            $table->double('percentage');
 
             $table->unique(['rank', 'level']);
 

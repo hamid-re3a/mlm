@@ -36,7 +36,7 @@ class PackageRoiService
 
     }
 
-    public function destroy($packageId,$dueDate)
+    public function destroy(int $packageId,string $dueDate)
     {
 
         $this->package_roi_repository->delete($packageId,$dueDate);
@@ -49,7 +49,7 @@ class PackageRoiService
 
     }
 
-    public function getByPackageIdDueDate($packageId,$dueDate)
+    public function getByPackageIdDueDate(int $packageId,string $dueDate)
     {
 
         return $this->package_roi_repository->getByPackageIdDueDate($packageId,$dueDate);

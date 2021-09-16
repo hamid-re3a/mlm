@@ -26,11 +26,20 @@ class PackageRoiFactory extends Factory
     {
         $package = Package::factory()->create();
         $user = User::factory()->create();
+        $days=1;
+        //in case duplication on mix of package_id and due_date , the date should be changed
+        $dueDate=PackageRoi::whereDueDate($this->date($days))->wherePackageId($package->id)->count()>0?$this->date($days+1):$this->date($days);
         return [
             'package_id' => $package->id,
-            'due_date' => $this->faker->date('Y-m-d','now'),
+            'due_date' => $dueDate,
             'user_id' =>  $user->id,
             'roi_percentage' => (mt_rand(0, 1000) / 10),
         ];
+    }
+
+    private function date($days)
+    {
+        return $this->faker->dateTimeInInterval($startDate = '-'.$days.' days', $interval = '-'.$days.' days', $timezone = null)->format('Y-m-d');
+
     }
 }

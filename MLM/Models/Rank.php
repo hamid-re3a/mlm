@@ -2,7 +2,9 @@
 
 namespace MLM\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MLM\database\factories\RankFactory;
 
 /**
  * MLM\Models\Rank
@@ -44,11 +46,18 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Rank extends Model
 {
+    use HasFactory;
     protected $guarded = [];
 
     public function residualBonusSettings()
     {
         return $this->hasMany(ResidualBonusSetting::class,'rank','rank');
     }
+
+    protected static function newFactory()
+    {
+        return RankFactory::new();
+    }
+
 
 }
