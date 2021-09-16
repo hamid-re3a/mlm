@@ -38,7 +38,7 @@ class ResidualBonusSettingController extends Controller
     /**
      * get all Residual Bonuses Settings
      * @group
-     * Admin MLM > ResidualBonusSetting > index
+     * Admin MLM > ResidualBonusSetting
      * @return \Illuminate\Http\JsonResponse
      */
     public function index()
@@ -52,7 +52,7 @@ class ResidualBonusSettingController extends Controller
     /**
      * get  Residual Bonus Setting by id
      * @group
-     * Admin MLM > ResidualBonusSetting > show
+     * Admin MLM > ResidualBonusSetting
      * @param Request $request
      * @queryParam id
      * @return \Illuminate\Http\JsonResponse
@@ -68,7 +68,7 @@ class ResidualBonusSettingController extends Controller
     /**
      * create new  Residual Bonuses Setting
      * @group
-     * Admin MLM > ResidualBonusSetting > create
+     * Admin MLM > ResidualBonusSetting
      * @param ResidualBonusSettingStoreRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -87,7 +87,7 @@ class ResidualBonusSettingController extends Controller
     /**
      * update Residual Bonuses Setting
      * @group
-     * Admin MLM > ResidualBonusSetting > update
+     * Admin MLM > ResidualBonusSetting
      * @param ResidualBonusSettingUpdateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -107,7 +107,7 @@ class ResidualBonusSettingController extends Controller
     /**
      * delete Residual Bonuses Setting
      * @group
-     * Admin MLM > ResidualBonusSetting > delete
+     * Admin MLM > ResidualBonusSetting
      * @param ResidualBonusSettingDestroyRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
