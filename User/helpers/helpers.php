@@ -34,10 +34,9 @@ const USER_ROLES = [
 ];
 
 
-
 if (!function_exists('user')) {
 
-    function user(int $id ) : ?\User\Services\Grpc\User
+    function user(int $id): ?\User\Services\Grpc\User
     {
         $user_db = \User\Models\User::query()->find($id);
 
@@ -53,20 +52,26 @@ if (!function_exists('user')) {
 }
 
 
-if (!function_exists('updateUserFromGrpcServer')) {
-
-    function updateUserFromGrpcServer($id): ?\User\Services\Grpc\User
+if (!function_exists('getUserGrpcServerClient')) {
+    function getUserGrpcServerClient()
     {
-        if(!is_numeric($id))
-            return null;
-        $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
+        return new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
+    }
+}
+if (!function_exists('updateUserFromGrpcServer')) {
+
+    function updateUserFromGrpcServer($user_id): ?\User\Services\Grpc\User
+    {
+        if (!is_numeric($user_id))
+            return null;
+
         $id = new \User\Services\Grpc\Id();
-        $id->setId((int)$id);
+        $id->setId((int)$user_id);
         try {
             /** @var $user \User\Services\Grpc\User */
-            list($user, $status) = $client->getUserById($id)->wait();
+            list($user, $status) = getUserGrpcServerClient()->getUserById($id)->wait();
             if ($status->code == 0) {
                 app(UserService::class)->userUpdate($user);
                 return $user;

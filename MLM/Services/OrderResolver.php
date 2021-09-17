@@ -8,6 +8,7 @@ use MLM\Interfaces\Commission;
 use MLM\Models\OrderedPackage;
 use MLM\Services\Plans\RegisterOder;
 use Orders\Services\Grpc\Order;
+use Orders\Services\Grpc\OrderPlans;
 
 class OrderResolver
 {
@@ -17,7 +18,7 @@ class OrderResolver
      */
     private $plan;
 
-    public function __construct(Order &$order)
+    public function __construct(Order $order)
     {
         $this->order = $order;
         $this->plan = app(RegisterOder::class);
@@ -74,7 +75,7 @@ class OrderResolver
             $problem_level = 1;
         }
 
-        DB::rollBack(0);
+        DB::rollBack();
         return [false, $msg ?? 'resolve', $problem_level];
     }
 
@@ -109,7 +110,7 @@ class OrderResolver
     {
         if (!$this->order->getIsCommissionResolvedAt()) {
             $isItOk = true;
-            try {
+//            try {
                 DB::beginTransaction();
                 /** @var  $commission Commission */
                 foreach ($this->plan->getCommissions() as $commission)
@@ -121,10 +122,10 @@ class OrderResolver
 
                 DB::commit();
                 $this->order->setIsCommissionResolvedAt(now()->toString());
-            } catch (\Throwable $e) {
-                DB::rollBack();
-                return [false, trans('responses.resolveCommission')];
-            }
+//            } catch (\Throwable $e) {
+//                DB::rollBack();
+//                return [false, trans('responses.resolveCommission')];
+//            }
 
         }
         return [true, trans('responses.resolveCommission')];
@@ -135,6 +136,12 @@ class OrderResolver
      */
     public function isValid(): array
     {
+
+//        if ($this->order->getPlan() != OrderPlans::ORDER_PLAN_START) {
+//            $check_start_plan = request()->user->paidOrders()->where('plan', '=', ORDER_PLAN_START)->count();
+//            if (!$check_start_plan)
+//                return [false, trans('order.responses.you-should-order-starter-plan-first')];
+//        }
         // check user if he is in tree
         return [true, trans('responses.isValid')];
     }
@@ -149,6 +156,5 @@ class OrderResolver
     {
         return (new AssignNodeResolver($this->order))->handle($simulate);
     }
-
 
 }

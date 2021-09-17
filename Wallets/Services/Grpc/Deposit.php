@@ -50,9 +50,9 @@ class Deposit extends \Google\Protobuf\Internal\Message
      */
     protected $confirmed = false;
     /**
-     * Generated from protobuf field <code>int64 transaction_id = 10;</code>
+     * Generated from protobuf field <code>string transaction_id = 10;</code>
      */
-    protected $transaction_id = 0;
+    protected $transaction_id = '';
 
     /**
      * Constructor.
@@ -69,7 +69,7 @@ class Deposit extends \Google\Protobuf\Internal\Message
      *     @type string $service_name
      *     @type int|string $payload_id
      *     @type bool $confirmed
-     *     @type int|string $transaction_id
+     *     @type string $transaction_id
      * }
      */
     public function __construct($data = NULL) {
@@ -276,8 +276,8 @@ class Deposit extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 transaction_id = 10;</code>
-     * @return int|string
+     * Generated from protobuf field <code>string transaction_id = 10;</code>
+     * @return string
      */
     public function getTransactionId()
     {
@@ -285,13 +285,13 @@ class Deposit extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 transaction_id = 10;</code>
-     * @param int|string $var
+     * Generated from protobuf field <code>string transaction_id = 10;</code>
+     * @param string $var
      * @return $this
      */
     public function setTransactionId($var)
     {
-        GPBUtil::checkInt64($var);
+        GPBUtil::checkString($var, True);
         $this->transaction_id = $var;
 
         return $this;

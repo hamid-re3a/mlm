@@ -2,7 +2,7 @@
 
 namespace MLM\Jobs;
 
-use App\Jobs\Wallet\WalletDepositJob;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -68,30 +68,20 @@ class BinaryCommissionJob implements ShouldQueue
                         if ($convert_amount > 0) {
                             $commission_amount = $convert_amount * $biggest_active_package->binary_percentage;
 
-                            /** @var $depositService  Deposit */
-                            $depositService = app(Deposit::class);
-                            $depositService->setUserId($this->user->referralTree->parent->user->id);
-                            $depositService->setAmount($commission_amount);
-                            $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+                            /** @var $deposit_service_object  Deposit */
+                            $deposit_service_object = app(Deposit::class);
+                            $deposit_service_object->setUserId($this->user->referralTree->parent->user->id);
+                            $deposit_service_object->setAmount($commission_amount);
+                            $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
-                            $depositService->setDescription(serialize([
+                            $deposit_service_object->setDescription(serialize([
                                 'description' => 'Commission # ' . $this->getType()
                             ]));
-                            $depositService->setType('Commission');
-                            $depositService->setSubType('Binary');
-                            $depositService->setServiceName('mlm');
+                            $deposit_service_object->setType('Commission');
+                            $deposit_service_object->setSubType('Binary');
+                            $deposit_service_object->setServiceName('mlm');
 
-
-                            $commission = $parent->commissions()->create([
-                                'amount' => $commission_amount,
-                                'ordered_package_id' => $this->package->id,
-                                'type' => $this->getType(),
-                            ]);
-                            if ($commission) {
-                                $depositService->setPayloadId($commission->id);
-                                WalletDepositJob::dispatch($depositService)->onConnection('rabbit')->onQueue('subscriptions');
-
-                            }
+                            payCommission($deposit_service_object,$parent,$this->package,$this->getType());
 
                         }
 

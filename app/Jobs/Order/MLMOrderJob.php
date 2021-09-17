@@ -34,7 +34,7 @@ class MLMOrderJob implements ShouldQueue
         /** @var Order $order */
         $order = unserialize($this->data);
 
-        $order_service->updateOrder($order);
+        $order_service->updateOrderAndPackage($order);
 
         list($bool, $msg) = (new OrderResolver($order))->handle();
         if ($bool) {

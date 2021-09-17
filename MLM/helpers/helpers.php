@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+use MLM\Models\OrderedPackage;
 use User\Models\User;
+use Wallets\Services\Grpc\Deposit;
 const BF_TO_BB_RATIO = 5;
 
 const TRADING_PROFIT_COMMISSION = 'trading-profit-commission';
@@ -376,6 +379,63 @@ if (!function_exists('getRank')) {
     }
 }
 
+if (!function_exists('payCommission')) {
+    /**
+     * @param Deposit $deposit_service_object
+     * @param User $user
+     * @param $type
+     * @param null $package_id
+     * @throws Exception
+     */
+    function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
+    {
+        if (app()->environment() != 'testing') {
+            DB::beginTransaction();
+            try {
+                $commission = $user->commissions()->create([
+                    'amount' => $deposit_service_object->getAmount(),
+                    'ordered_package_id' => $package_id,
+                    'type' => $type,
+                ]);
+                if ($commission) {
+                    $deposit_service_object->setPayloadId($commission->id);
+                    /** @var $deposit_response  Deposit */
+                    list($deposit_response, $error) = getWalletGrpcClient()->deposit($deposit_service_object)->wait();
+                    if ($error != 0) {
+                        throw new \Exception('Wallet Service Error');
+                    }
+
+                    $commission->transaction_id = $deposit_response->getTransactionId();
+                    $commission->save();
+                } else {
+                    throw new \Exception('Commission Failed Error');
+                }
+            } catch (\Exception $exception) {
+                DB::rollBack();
+                throw new \Exception('Commission Error => ' . $exception->getMessage());
+            }
+
+            DB::commit();
+        }
+
+    }
+}
+if (!function_exists('getPackageGrpcClient')) {
+    function getPackageGrpcClient()
+    {
+        return new \Packages\Services\Grpc\PackagesServiceClient('staging-api-gateway.janex.org:9596', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+if (!function_exists('getWalletGrpcClient')) {
+    function getWalletGrpcClient()
+    {
+        return new \Wallets\Services\Grpc\WalletServiceClient('staging-api-gateway.janex.org:9596', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
 if (!function_exists('getAndUpdateUserRank')) {
 
     function getAndUpdateUserRank(\User\Models\User $user): \MLM\Models\Rank
@@ -407,3 +467,5 @@ if (!function_exists('getAndUpdateUserRank')) {
 
     }
 }
+
+

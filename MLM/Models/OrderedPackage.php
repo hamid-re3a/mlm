@@ -57,23 +57,30 @@ use User\Models\User;
  * @property-read User $user
  * @property string|null $plan
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage wherePlan($value)
+ * @property int|null $package_id
+ * @property-read \MLM\Models\Package|null $package
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage wherePackageId($value)
  */
 class OrderedPackage extends Model
 {
     use HasFactory;
     protected $guarded = [];
 
-    public function scopeActive($query){
-        return $query->whereRaw("CURRENT_TIMESTAMP < DATE_ADD(is_paid_at, INTERVAL validity_in_days DAY)");
+    public function scopeActive($query)
+    {
+        return $query->whereDate("expires_at", ">", now()->toDate());
     }
 
-    public function scopeCanGetRoi($query){
-        return $query->where('plan','!=','Special');
+    public function scopeCanGetRoi($query)
+    {
+        return $query->where('plan', '!=', 'Special');
     }
 
-    public function scopeBiggest($query){
-        return $query->orderBy('price','desc')->first();
+    public function scopeBiggest($query)
+    {
+        return $query->orderBy('price', 'desc');
     }
+
     public function packageIndirectCommission()
     {
         return $this->hasMany(OrderedPackagesIndirectCommission::class);
@@ -88,6 +95,12 @@ class OrderedPackage extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+
+    public function package()
+    {
+        return $this->belongsTo(Package::class);
     }
 
 

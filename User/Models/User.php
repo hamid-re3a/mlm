@@ -161,7 +161,7 @@ class User extends Model
 
     public function biggestActivePackage(): ?OrderedPackage
     {
-        return $this->ordered_packages()->active()->biggest();
+        return $this->ordered_packages()->active()->biggest()->first();
     }
 
     public function hasActivePackage()
@@ -182,7 +182,7 @@ class User extends Model
     {
         $oldest_package = $this->ordered_packages()->oldest()->first();
 
-        if (now()->diffInDays(Carbon::make($oldest_package->createdAt())) <= 30) {
+        if ($oldest_package && now()->diffInDays(Carbon::make($oldest_package->created_at)) <= 30) {
             return true;
         }
         return false;

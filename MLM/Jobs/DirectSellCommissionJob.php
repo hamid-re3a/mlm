@@ -2,7 +2,7 @@
 
 namespace MLM\Jobs;
 
-use App\Jobs\Wallet\WalletDepositJob;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -43,30 +43,21 @@ class DirectSellCommissionJob implements ShouldQueue
                 $commission_amount = ($this->package->price * $percentage / 100);
 
 
-                /** @var $depositService  Deposit */
-                $depositService = app(Deposit::class);
-                $depositService->setUserId($this->user->referralTree->parent->user->id);
-                $depositService->setAmount($commission_amount);
-                $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+                /** @var $deposit_service_object  Deposit */
+                $deposit_service_object = app(Deposit::class);
+                $deposit_service_object->setUserId($this->user->referralTree->parent->user->id);
+                $deposit_service_object->setAmount($commission_amount);
+                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
-                $depositService->setDescription(serialize([
+                $deposit_service_object->setDescription(serialize([
                     'description' => 'Commission # ' . $this->getType() . $is_eligible_for_quick_start_bonus ? ' - Quick Start bonus ' : ''
                 ]));
-                $depositService->setType('Commission');
-                $depositService->setSubType('Direct Sell');
-                $depositService->setServiceName('mlm');
+                $deposit_service_object->setType('Commission');
+                $deposit_service_object->setSubType('Direct Sell');
+                $deposit_service_object->setServiceName('mlm');
 
-                /** @var $commission CommissionModel */
-                $commission = $this->user->referralTree->parent->user->commissions()->create([
-                    'amount' => $commission_amount,
-                    'ordered_package_id' => $this->package->id,
-                    'type' => $this->getType(),
-                ]);
+                payCommission($deposit_service_object,$this->user->referralTree->parent->user,$this->getType(),$this->package->id);
 
-                if ($commission) {
-                    $depositService->setPayloadId($commission->id);
-                    WalletDepositJob::dispatch($depositService)->onConnection('rabbit')->onQueue('subscriptions');
-                }
             }
         }
     }

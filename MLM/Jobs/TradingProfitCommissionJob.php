@@ -2,7 +2,7 @@
 
 namespace MLM\Jobs;
 
-use App\Jobs\Wallet\WalletDepositJob;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -38,41 +38,29 @@ class TradingProfitCommissionJob implements ShouldQueue
             ->where('ordered_package_id', $this->ordered_package->id)->exists()) {
 
 
-            $package = $package_service->findPackageByShortName($this->ordered_package->short_name);
-
 
             /** @var  $roi PackageRoi */
-            $roi = $package->rois()->today()->first();
+            $roi = $this->ordered_package->package()->rois()->today()->first();
             if ($roi) {
                 $percentage = $roi->roi_percentage;
 
                 $commission_amount = ($percentage / 100) * $this->ordered_package->price;
 
 
-                /** @var $depositService  Deposit */
-                $depositService = app(Deposit::class);
-                $depositService->setUserId($this->ordered_package->user->id);
-                $depositService->setAmount($commission_amount);
-                $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+                /** @var $deposit_service_object  Deposit */
+                $deposit_service_object = app(Deposit::class);
+                $deposit_service_object->setUserId($this->ordered_package->user->id);
+                $deposit_service_object->setAmount($commission_amount);
+                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
-                $depositService->setDescription(serialize([
+                $deposit_service_object->setDescription(serialize([
                     'description' => 'Commission # ' . TRADING_PROFIT_COMMISSION
                 ]));
-                $depositService->setType('Commission');
-                $depositService->setSubType('Trading Profit');
-                $depositService->setServiceName('mlm');
+                $deposit_service_object->setType('Commission');
+                $deposit_service_object->setSubType('Trading Profit');
+                $deposit_service_object->setServiceName('mlm');
 
-                /** @var $commission CommissionModel */
-                $commission = $this->ordered_package->user->commissions()->create([
-                    'amount' => $commission_amount,
-                    'ordered_package_id' => $this->ordered_package->id,
-                    'type' => TRADING_PROFIT_COMMISSION,
-                ]);
-
-                if ($commission) {
-                    $depositService->setPayloadId($commission->id);
-                    WalletDepositJob::dispatch($depositService)->onConnection('rabbit')->onQueue('subscriptions');
-                }
+                payCommission($deposit_service_object,$this->ordered_package->user,TRADING_PROFIT_COMMISSION,$this->ordered_package->id);
 
 
             }

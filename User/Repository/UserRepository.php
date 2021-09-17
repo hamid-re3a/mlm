@@ -9,11 +9,18 @@ use User\Services\Grpc\User;
 class UserRepository
 {
     protected $entity_name = UserModel::class;
+    /** @var $user_entity \User\Models\User */
+    private $user_entity;
+
+    public function __construct()
+    {
+        $this->user_entity = new $this->entity_name;
+    }
 
     public function editOrCreate(User $user)
     {
-        $user_entity = new $this->entity_name;
-        $user_find = $user_entity->whereId($user->getId())->firstOrNew();
+
+        $user_find = $this->user_entity->query()->firstOrCreate(['id'=>$user->getId()]);
         $user_find->first_name = $user->getFirstName() ? $user->getFirstName() : $user_find->first_name;
         $user_find->last_name = $user->getLastName() ? $user->getLastName() : $user_find->last_name;
         $user_find->username = $user->getUsername() ? $user->getUsername() : $user_find->username;
@@ -35,6 +42,13 @@ class UserRepository
         $user = $user_entity::findOrFail($id);
         $user->default_binary_position = $position;
         $user->save();
+    }
+
+    public function findById(int $id)
+    {
+
+        $user_entity = new $this->entity_name;
+        return $user_entity::find($id);
     }
 
 

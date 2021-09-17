@@ -11,6 +11,7 @@ use MLM\Models\Tree;
 use MLM\Services\Plans\AssignNode;
 use Orders\Services\Grpc\Order;
 use User\Models\User;
+use User\Services\UserService;
 
 class AssignNodeResolver
 {
@@ -31,8 +32,9 @@ class AssignNodeResolver
     public function __construct(Order $order)
     {
         $this->order = $order;
-        $this->user = User::query()->findOrFail($order->getUserId());
-        $this->to_user = User::query()->findOrFail($order->getToUserId());
+        $user_service = app(UserService::class) ;
+        $this->user = $user_service->findByIdOrFail($order->getUserId());
+        $this->to_user = $user_service->findByIdOrFail($this->user->sponsor_id);
         $this->plan = app(AssignNode::class);
     }
 
@@ -47,7 +49,7 @@ class AssignNodeResolver
                 // add user to binary tree
                 $this->attachUserToBinary($this->to_user->binaryTree, $position);
                 // add user to referral tree
-                $this->to_user->referralTree->append($this->user->buildReferralTreeNode());
+                $this->to_user->referralTree->appendNode($this->user->buildReferralTreeNode());
 
 
                 if ($this->resolve($simulate)) {

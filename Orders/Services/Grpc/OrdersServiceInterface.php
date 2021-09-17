@@ -6,6 +6,7 @@ namespace Orders\Services\Grpc;
 
 use Mix\Grpc;
 use Mix\Grpc\Context;
+use User\Services\Grpc;
 
 interface OrdersServiceInterface extends Grpc\ServiceInterface
 {
