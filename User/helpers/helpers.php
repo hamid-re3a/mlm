@@ -55,15 +55,15 @@ if (!function_exists('user')) {
 
 if (!function_exists('updateUserFromGrpcServer')) {
 
-    function updateUserFromGrpcServer($id): ?\User\Services\Grpc\User
+    function updateUserFromGrpcServer($user_id): ?\User\Services\Grpc\User
     {
-        if(!is_numeric($id))
+        if(!is_numeric($user_id))
             return null;
         $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
         $id = new \User\Services\Grpc\Id();
-        $id->setId((int)$id);
+        $id->setId((int)$user_id);
         try {
             /** @var $user \User\Services\Grpc\User */
             list($user, $status) = $client->getUserById($id)->wait();
