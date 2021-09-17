@@ -4,6 +4,7 @@ namespace MLM\Http\Controllers\Admin;
 
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -15,6 +16,7 @@ use MLM\Http\Requests\PackageRoiUpdateRequest;
 use MLM\Http\Resources\PackageRoi\PackageRoiResource;
 use MLM\Services\Grpc\PackageRoi;
 use MLM\Services\PackageRoiService;
+use Throwable;
 
 /**
  * Class PackageRoiController
@@ -40,9 +42,8 @@ class PackageRoiController extends Controller
 
     /**
      * get all PackageRois
-     * @group
-     * Admin MLM > PackageRoi
-     * @return \Illuminate\Http\JsonResponse
+     * @group Admin User > PackageRoi
+     * @return JsonResponse
      */
     public function index()
     {
@@ -54,11 +55,11 @@ class PackageRoiController extends Controller
 
     /**
      * get PackageRoi by package_id and due_date
-     * @group
-     * Admin MLM > PackageRoi
+     * @group Admin User > PackageRoi
      * @param Request $request
+     * @return JsonResponse
+     * @throws ValidationException
      * @queryParam package_id,due_date
-     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Request $request)
     {
@@ -72,10 +73,10 @@ class PackageRoiController extends Controller
 
     /**
      * store new package roi
-     * @group
-     * Admin MLM > PackageRoi
+     * @group Admin User > PackageRoi
      * @param PackageRoiStoreRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function store(PackageRoiStoreRequest $request)
     {
@@ -85,7 +86,7 @@ class PackageRoiController extends Controller
             $packageRoi = $this->packageRoiService->store($this->PackageRoi($request->all()));
 
             return api()->success(trans('responses.ok'), $packageRoi);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return api()->error($e->getMessage(), null);
 
         }
@@ -93,10 +94,10 @@ class PackageRoiController extends Controller
 
     /**
      * update package roi
-     * @group
-     * Admin MLM > PackageRoi
+     * @group Admin User > PackageRoi
      * @param PackageRoiUpdateRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function update(PackageRoiUpdateRequest $request)
     {
@@ -105,7 +106,7 @@ class PackageRoiController extends Controller
             $packageRoi = $this->packageRoiService->update($this->PackageRoi($request->all()));
 
             return api()->success(trans('responses.ok'), $packageRoi);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return api()->error($e->getMessage(), null);
 
         }
@@ -114,10 +115,10 @@ class PackageRoiController extends Controller
 
     /**
      * update a list of packageRois
-     * @group
-     * Admin MLM > PackageRoi
+     * @group Admin User > PackageRoi
      * @param PackageRoiBulkUpdateRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function bulkUpdate(PackageRoiBulkUpdateRequest $request)
     {
@@ -134,7 +135,7 @@ class PackageRoiController extends Controller
             }
 
             return api()->success(trans('responses.ok'),$updatedPackageRois);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return api()->error($e->getMessage(), null);
 
         }
@@ -143,10 +144,10 @@ class PackageRoiController extends Controller
 
     /**
      * delete packageRoi by package_id and due_date
-     * @group
-     * Admin MLM > PackageRoi
+     * @group Admin User > PackageRoi
      * @param PackageRoiDestroyRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
+     * @throws ValidationException
      */
     public function destroy(PackageRoiDestroyRequest $request)
     {
@@ -156,7 +157,7 @@ class PackageRoiController extends Controller
             $this->packageRoiService->destroy($request['package_id'], $request['due_date']);
 
             return api()->success(trans('responses.ok'));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return api()->error($e->getMessage(), null);
 
         }
@@ -184,7 +185,7 @@ class PackageRoiController extends Controller
      * @param bool $bulk
      * @throws ValidationException
      */
-    public function handleValidation(array $request, bool $bulk = false)
+    public function handleValidation(array $request, bool $bulk = null)
     {
         $field = $bulk ? 'package_id.*' : 'package_id';
         $validator = Validator::make($request, [

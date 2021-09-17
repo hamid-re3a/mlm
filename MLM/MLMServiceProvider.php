@@ -34,6 +34,10 @@ class MLMServiceProvider extends ServiceProvider
             __DIR__ . '/database/migrations' => database_path('migrations'),
         ], $this->name . '-migrations');
 
+        $this->publishes([
+            __DIR__ . '/resources/lang' => resource_path('lang'),
+        ], 'mlm-resources');
+
     }
 
     /**
