@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use MLM\Http\Controllers\Admin\PackageRoiController;
 use MLM\Http\Controllers\Admin\RankController;
 use MLM\Http\Controllers\Admin\ResidualBonusSettingController;
+use MLM\Http\Controllers\Admin\SettingController as AdminSettingController;
 
 Route::middleware(['auth'])->group(function () {
 
@@ -33,6 +34,11 @@ Route::middleware(['auth'])->group(function () {
             Route::post('', [RankController::class, 'store'])->name('store');
             Route::patch('', [RankController::class, 'update'])->name('update');
             Route::delete('', [RankController::class, 'delete'])->name('delete');
+        });
+
+        Route::name('settings.')->prefix('settings')->group(function () {
+            Route::get('', [AdminSettingController::class, 'index'])->name('list');
+            Route::patch('', [AdminSettingController::class, 'update'])->name('update');
         });
     });
 
