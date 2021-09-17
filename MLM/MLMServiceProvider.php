@@ -5,7 +5,9 @@ namespace MLM;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use MLM\Commands\RoiCommand;
+use MLM\Models\Setting;
 use MLM\Models\Tree;
+use MLM\Observers\SettingObserver;
 use MLM\Observers\TreeObserver;
 
 class MLMServiceProvider extends ServiceProvider
@@ -50,6 +52,7 @@ class MLMServiceProvider extends ServiceProvider
 
 
         Tree::observe(TreeObserver::class);
+        Setting::observe(SettingObserver::class);
         $this->setupConfig();
 
         $this->registerHelpers();
@@ -87,6 +90,10 @@ class MLMServiceProvider extends ServiceProvider
     protected function registerHelpers()
     {
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
+            require_once $helperFile;
+        }
+
+        if (file_exists($helperFile = __DIR__ . '/helpers/constant.php')) {
             require_once $helperFile;
         }
     }
