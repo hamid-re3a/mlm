@@ -19,7 +19,7 @@ class PackageRoiDeleteFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $packageRoi = PackageRoi::factory()->create();
-        $this->delete(route('packagesRoi.destroy'), [
+        $this->delete(route('admin.packagesRoi.destroy'), [
             'package_id' => $packageRoi->package_id,
             'due_date' => $packageRoi->due_date,
         ])->assertOk();
@@ -37,7 +37,7 @@ class PackageRoiDeleteFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
         $packageRoi = PackageRoi::factory()->create();
-        $this->delete(route('packagesRoi.destroy'), [
+        $this->delete(route('admin.packagesRoi.destroy'), [
             'package_id' => $packageRoi->package_id,
             'due_date' => $packageRoi->due_date,
         ])->assertStatus(403);
@@ -50,7 +50,7 @@ class PackageRoiDeleteFeatureTest extends MLMTest
     public function package_id_is_required_for_deleting_packageRoi()
     {
         $this->withHeaders($this->getHeaders());
-        $this->delete(route('packagesRoi.destroy'), [
+        $this->delete(route('admin.packagesRoi.destroy'), [
             'due_date' =>'2021-08-02'
         ])->assertStatus(422);
 
@@ -61,7 +61,7 @@ class PackageRoiDeleteFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $packageRoi = PackageRoi::factory()->create();
-        $this->delete(route('packagesRoi.destroy'), [
+        $this->delete(route('admin.packagesRoi.destroy'), [
             'package_id' => $packageRoi->package_id,
         ])->assertStatus(422);
 

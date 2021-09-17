@@ -73,6 +73,7 @@ class MLMTest extends TestCase
             $query->where('id', $id);
         })->first();
 
+        $user->roles()->detach();
         $user->assignRole($role ? $role : USER_ROLE_SUPER_ADMIN);
         $user->save();
         $hash = md5(serialize($user->getUserService()));

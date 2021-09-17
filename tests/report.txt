@@ -1,3 +1,87 @@
+User Feature (User\tests\Feature\UserFeature)
+ [x] User can edit binary position
+ [x] Default binary position is required for editing binary position
+ [x] Default binary position is correct enum value for editing binary position
+ [x] User should login before calling binary position
+
 Order (MLM\tests\UnitTest\Order\Order)
+ [x] Add user to both tree with valid ordered package
+ [x] Add four user to same sponsor cause no problem
  [x] User activate binary after adding new member to each side of binary tree
+ [x] Direct sell to father package
+ [x] Indirect sell to father package
+
+Binary Tree (MLM\tests\UnitTest\Tree\BinaryTree)
+ [x] Tree can add root
+ [x] Adding node to left and right of root
+ [x] Cannot add more than two children to a node
+ [x] Cannot add two left children to a node
+ [x] Tree has method to add node to left or right side
+ [x] Tree can count left and right side children count
+ [x] Find sub set of nodes
+ [x] It belongs to user
+
+Package Roi Create Feature (MLM\tests\Feature\PackageRoiCreateFeature)
+ [x] User can create packageRoi
+ [x] Only super admin and mlm admin can create packageRoi
+ [x] Package id is required for creating packageRoi
+ [x] Roi percentage is required for creating packageRoi
+ [x] Roi percentage should be numeric for creating packageRoi
+ [x] Due date is required for creating packageRoi
+ [x] Package id should be integer for creating packageRoi
+ [x] Package id and due date should be unique for updating packageRoi
+
+Package Roi Delete Feature (MLM\tests\Feature\PackageRoiDeleteFeature)
+ [x] User can delete packageRoi
+ [x] Only super admin and mlm admin can delete packageRois
+ [x] Package id is required for deleting packageRoi
+ [x] Due date is required for deleting packageRoi
+
+Package Roi Fetch Feature (MLM\tests\Feature\PackageRoiFetchFeature)
+ [x] User can get packageRois
+ [x] Only super admin and mlm admin can get packageRois
+ [x] User can get packageRoi by package id due date
+ [x] Only super admin and mlm admin can get packageRoi by package id due date
+
+Package Roi Update Feature (MLM\tests\Feature\PackageRoiUpdateFeature)
+ [x] User can update packageRoi
+ [x] Only super admin and mlm admin can update packageRoi
+ [x] Package id is required for updating packageRoi
+ [x] Due date is required for updating packageRoi
+ [x] Roi percentage is required for updating packageRoi
+ [x] Roi percentage should be numeric for updating packageRoi
+
+Residual Bonus Setting Create Feature (MLM\tests\Feature\ResidualBonusSettingCreateFeature)
+ [x] User can create residualBonusSetting
+ [x] Only super admin create residualBonusSetting
+ [x] Level is required for creating residualBonusSetting
+ [x] Rank is required for creating residualBonusSetting
+ [x] Percentage is required for creating residualBonusSetting
+ [x] Rank and level should be unique for creating residualBonusSetting
+ [x] Percentage should be numeric for creating residualBonusSetting
+ [x] Rank should be integer for creating residualBonusSetting
+ [x] Level should be integer for creating residualBonusSetting
+
+Residual Bonus Setting Delete Feature (MLM\tests\Feature\ResidualBonusSettingDeleteFeature)
+ [x] User can delete residualBonusSetting
+ [x] Only super admin can delete residualBonusSetting
+ [x] Id is required for deleting residualBonusSetting
+
+Residual Bonus Setting Fetch Data Feature (MLM\tests\Feature\ResidualBonusSettingFetchDataFeature)
+ [x] User can get residualBonusSetting
+ [x] Only super admin can get residualBonusSetting
+ [x] User can get residualBonusSetting by id
+ [x] Only super admin can get residualBonusSetting by id
+
+Residual Bonus Setting Update Feature (MLM\tests\Feature\ResidualBonusSettingUpdateFeature)
+ [x] User can update residualBonusSetting
+ [x] Only super admin update residualBonusSetting
+ [x] Level is required for updating residualBonusSetting
+ [x] Rank is required for updating residualBonusSetting
+ [x] Percentage is required for updating residualBonusSetting
+ [x] Id is required for updating residualBonusSetting
+ [x] Rank and level should be unique for updating residualBonusSetting
+ [x] Percentage should be numeric for updating residualBonusSetting
+ [x] Rank should be integer for updating residualBonusSetting
+ [x] Level should be integer for creating residualBonusSetting
 

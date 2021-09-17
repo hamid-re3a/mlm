@@ -23,7 +23,7 @@ class RankFactory extends Factory
     {
 
         return [
-            'rank' =>  $this->faker->unique(true)->numberBetween(1, 16),
+            'rank' =>  $this->faker->unique(true)->numberBetween(1, 1600000000),
             'rank_name' => $this->faker->text(20),
             'condition_converted_in_bp' =>  mt_rand(0, 100),
             'condition_sub_rank' => mt_rand(0, 100),
