@@ -2,7 +2,10 @@
 
 namespace MLM\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MLM\database\factories\PackageRoiFactory;
+use MLM\database\factories\ResidualBonusSettingFactory;
 
 /**
  * MLM\Models\ResidualBonusSetting
@@ -26,6 +29,17 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ResidualBonusSetting extends Model
 {
+    use HasFactory;
     protected $guarded = [];
+
+    protected static function newFactory()
+    {
+        return ResidualBonusSettingFactory::new();
+    }
+
+    public function rankCollection()
+    {
+        return $this->belongsTo(Rank::class,'rank','rank');
+    }
 
 }

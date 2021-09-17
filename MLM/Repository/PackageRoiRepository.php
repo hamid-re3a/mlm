@@ -21,6 +21,7 @@ class PackageRoiRepository
             "due_date" => $packageRoi->getDueDate()
         ]);
         $packageRoi = $packageRoi->fresh();
+
         return $packageRoi;
     }
 
@@ -48,10 +49,10 @@ class PackageRoiRepository
 
     }
 
-    public function delete($id)
+    public function delete(int $packageId,string $dueDate)
     {
         $packageRoi_entity = new $this->entity_name;
-        $packageRoi_find = $packageRoi_entity->query()->find($id);
+        $packageRoi_find = $packageRoi_entity->query()->where('package_id',$packageId)->where( 'due_date',$dueDate)->first();
         $packageRoi_find->delete();
 
     }
@@ -59,11 +60,12 @@ class PackageRoiRepository
     public function getAll()
     {
         $packageRoi_entity = new $this->entity_name;
-        return $packageRoi_entity->query()->all();
+
+        return $packageRoi_entity->query()->get();
 
     }
 
-    public function getByPackageIdDueDate($packageId, $dueDate)
+    public function getByPackageIdDueDate(int $packageId, string $dueDate)
     {
         $packageRoi_entity = new $this->entity_name;
 

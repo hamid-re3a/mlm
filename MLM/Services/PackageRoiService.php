@@ -29,22 +29,27 @@ class PackageRoiService
         return $this->package_roi_repository->update($packageRoi);
 
     }
-
-    public function destroy($id)
+    public function bulkUpdate(PackageRoi $packageRoi)
     {
 
-        $this->package_roi_repository->delete($id);
+        return $this->package_roi_repository->update($packageRoi);
+
+    }
+
+    public function destroy(int $packageId,string $dueDate)
+    {
+
+        $this->package_roi_repository->delete($packageId,$dueDate);
 
     }
 
     public function getAll()
     {
-
         return $this->package_roi_repository->getAll();
 
     }
 
-    public function getByPackageIdDueDate($packageId,$dueDate)
+    public function getByPackageIdDueDate(int $packageId,string $dueDate)
     {
 
         return $this->package_roi_repository->getByPackageIdDueDate($packageId,$dueDate);

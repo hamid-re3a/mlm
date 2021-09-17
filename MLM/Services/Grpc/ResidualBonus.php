@@ -14,15 +14,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class ResidualBonus extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Generated from protobuf field <code>int64 rank = 1;</code>
+     * Generated from protobuf field <code>int64 id = 1;</code>
+     */
+    protected $id = 0;
+    /**
+     * Generated from protobuf field <code>int64 rank = 2;</code>
      */
     protected $rank = 0;
     /**
-     * Generated from protobuf field <code>int64 level = 2;</code>
+     * Generated from protobuf field <code>int64 level = 3;</code>
      */
     protected $level = 0;
     /**
-     * Generated from protobuf field <code>double percentage = 3;</code>
+     * Generated from protobuf field <code>double percentage = 4;</code>
      */
     protected $percentage = 0.0;
 
@@ -32,6 +36,7 @@ class ResidualBonus extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
+     *     @type int|string $id
      *     @type int|string $rank
      *     @type int|string $level
      *     @type float $percentage
@@ -43,7 +48,29 @@ class ResidualBonus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 rank = 1;</code>
+     * Generated from protobuf field <code>int64 id = 1;</code>
+     * @return int|string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 id = 1;</code>
+     * @param int|string $var
+     * @return $this
+     */
+    public function setId($var)
+    {
+        GPBUtil::checkInt64($var);
+        $this->id = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>int64 rank = 2;</code>
      * @return int|string
      */
     public function getRank()
@@ -52,7 +79,7 @@ class ResidualBonus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 rank = 1;</code>
+     * Generated from protobuf field <code>int64 rank = 2;</code>
      * @param int|string $var
      * @return $this
      */
@@ -65,7 +92,7 @@ class ResidualBonus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 level = 2;</code>
+     * Generated from protobuf field <code>int64 level = 3;</code>
      * @return int|string
      */
     public function getLevel()
@@ -74,7 +101,7 @@ class ResidualBonus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 level = 2;</code>
+     * Generated from protobuf field <code>int64 level = 3;</code>
      * @param int|string $var
      * @return $this
      */
@@ -87,7 +114,7 @@ class ResidualBonus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double percentage = 3;</code>
+     * Generated from protobuf field <code>double percentage = 4;</code>
      * @return float
      */
     public function getPercentage()
@@ -96,7 +123,7 @@ class ResidualBonus extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>double percentage = 3;</code>
+     * Generated from protobuf field <code>double percentage = 4;</code>
      * @param float $var
      * @return $this
      */
