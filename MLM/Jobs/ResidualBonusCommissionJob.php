@@ -63,7 +63,7 @@ class ResidualBonusCommissionJob implements ShouldQueue
         ]));
         $deposit_service_object->setType('Commission');
         $deposit_service_object->setSubType('Trading Profit');
-        $deposit_service_object->setServiceName('mlm');
+
 
 
 

@@ -43,6 +43,7 @@ use MLM\database\factories\RankFactory;
  * @property-read \Illuminate\Database\Eloquent\Collection|\MLM\Models\ResidualBonusSetting[] $residualBonusSettings
  * @property-read int|null $residual_bonus_settings_count
  * @method static \Illuminate\Database\Eloquent\Builder|Rank whereRankName($value)
+ * @method static \MLM\database\factories\RankFactory factory(...$parameters)
  */
 class Rank extends Model
 {

@@ -1,1 +1,3 @@
 Order (MLM\tests\UnitTest\Order\Order)
+ [x] User activate binary after adding new member to each side of binary tree
+

@@ -4,6 +4,8 @@ namespace MLM\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MLM\database\factories\OrderedPackageFactory;
+use MLM\database\factories\PackageFactory;
 use User\Models\User;
 
 /**
@@ -11,17 +13,17 @@ use User\Models\User;
  *
  * @property int $id
  * @property int $order_id
+ * @property int|null $user_id
+ * @property int|null $package_id
  * @property string|null $is_paid_at
  * @property string|null $is_resolved_at
  * @property string|null $is_commission_resolved_at
- * @property int $user_id
- * @property string $name
- * @property string $short_name
- * @property int $validity_in_days
- * @property float $price
- * @property int $roi_percentage
- * @property int $direct_percentage
- * @property int $binary_percentage
+ * @property int|null $plan
+ * @property int|null $validity_in_days
+ * @property float|null $price
+ * @property int|null $direct_percentage
+ * @property int|null $binary_percentage
+ * @property string|null $expires_at
  * @property string|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -29,11 +31,14 @@ use User\Models\User;
  * @property-read int|null $commissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\MLM\Models\OrderedPackagesIndirectCommission[] $indirectCommission
  * @property-read int|null $indirect_commission_count
+ * @property-read \MLM\Models\Package|null $package
  * @property-read \Illuminate\Database\Eloquent\Collection|\MLM\Models\OrderedPackagesIndirectCommission[] $packageIndirectCommission
  * @property-read int|null $package_indirect_commission_count
+ * @property-read User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage active()
- * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage canGetRoi()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage biggest()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage canGetRoi()
+ * @method static \MLM\database\factories\OrderedPackageFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage query()
@@ -41,30 +46,31 @@ use User\Models\User;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereDirectPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereExpiresAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereIsCommissionResolvedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereIsPaidAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereIsResolvedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage wherePackageId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage wherePlan($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereRoiPercentage($value)
- * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereShortName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage whereValidityInDays($value)
  * @mixin \Eloquent
- * @property-read User $user
- * @property string|null $plan
- * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage wherePlan($value)
- * @property int|null $package_id
- * @property-read \MLM\Models\Package|null $package
- * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage wherePackageId($value)
  */
 class OrderedPackage extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+
+
+    protected static function newFactory()
+    {
+        return OrderedPackageFactory::new();
+    }
 
     public function scopeActive($query)
     {

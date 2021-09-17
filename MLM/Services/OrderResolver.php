@@ -5,10 +5,12 @@ namespace MLM\Services;
 
 use Illuminate\Support\Facades\DB;
 use MLM\Interfaces\Commission;
+use MLM\Jobs\UpdateUserRanksJob;
 use MLM\Models\OrderedPackage;
 use MLM\Services\Plans\RegisterOder;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;
+use User\Models\User;
 
 class OrderResolver
 {
@@ -18,7 +20,7 @@ class OrderResolver
      */
     private $plan;
 
-    public function __construct(Order $order)
+    public function __construct(Order &$order)
     {
         $this->order = $order;
         $this->plan = app(RegisterOder::class);
@@ -62,6 +64,8 @@ class OrderResolver
                         ->where('package_id', $this->order->getPackageId())->first();
                     $ordered_package->is_commission_resolved_at = $this->order->getIsCommissionResolvedAt();
                     $ordered_package->save();
+
+                    UpdateUserRanksJob::dispatch(User::query()->find($this->order->getUserId()));
 
                     DB::commit();
                     return [true, 'resolve', $problem_level];

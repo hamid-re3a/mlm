@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use MLM\Services\OrderResolver;
 use Orders\Services\Grpc\Order;
-use Orders\Services\OrderService;
+use MLM\Services\OrderedPackageService;
 
 class MLMOrderJob implements ShouldQueue
 {
@@ -29,7 +29,7 @@ class MLMOrderJob implements ShouldQueue
     }
 
 
-    public function handle(OrderService $order_service)
+    public function handle(OrderedPackageService $order_service)
     {
         /** @var Order $order */
         $order = unserialize($this->data);

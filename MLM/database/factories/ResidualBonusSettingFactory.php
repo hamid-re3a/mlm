@@ -22,8 +22,8 @@ class ResidualBonusSettingFactory extends Factory
     public function definition()
     {
         return [
-            "rank" =>  $this->faker->unique(true)->numberBetween(1, 100),
-            "level" =>$this->faker->unique(true)->numberBetween(1, 100),
+            "rank" =>  $this->faker->unique(true)->numberBetween(1, 16),
+            "level" =>$this->faker->unique(true)->numberBetween(1, 9),
             "percentage" => mt_rand(0,1000)/10,
         ];
     }

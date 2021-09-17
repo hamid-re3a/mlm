@@ -5,6 +5,7 @@ namespace MLM\Services\Commissions;
 
 
 use MLM\Interfaces\Commission;
+use MLM\Jobs\IndirectSellCommissionJob;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
 use Orders\Services\Grpc\Order;
@@ -18,12 +19,7 @@ class IndirectSellCommission implements Commission
     {
         $user = app(UserService::class)->findByIdOrFail($order->getUserId());
         $package = OrderedPackage::query()->where('order_id', $order->getId())->firstOrFail();
-
-        if (!CommissionModel::query()->where('ordered_package_id', $package->id)->type($this->getType())->exists()) {
-
-            $this->indirectCommissionToFather($user, $package);
-        }
-
+        IndirectSellCommissionJob::dispatch($user,$package);
         return true;
     }
 
@@ -37,14 +33,6 @@ class IndirectSellCommission implements Commission
         return INDIRECT_SELL_COMMISSION;
     }
 
-    /**
-     * @param $user
-     * @param $package
-     * @param $level
-     */
-    private function indirectCommissionToFather(User $user, OrderedPackage $package, $level = 0): void
-    {
 
-    }
 
 }

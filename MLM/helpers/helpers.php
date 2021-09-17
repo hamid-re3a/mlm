@@ -389,14 +389,16 @@ if (!function_exists('payCommission')) {
      */
     function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
     {
-        if (app()->environment() != 'testing') {
-            DB::beginTransaction();
-            try {
-                $commission = $user->commissions()->create([
-                    'amount' => $deposit_service_object->getAmount(),
-                    'ordered_package_id' => $package_id,
-                    'type' => $type,
-                ]);
+
+        DB::beginTransaction();
+        try {
+            $commission = $user->commissions()->create([
+                'amount' => $deposit_service_object->getAmount(),
+                'ordered_package_id' => $package_id,
+                'type' => $type,
+            ]);
+
+            if (app()->environment() != 'testing') {
                 if ($commission) {
                     $deposit_service_object->setPayloadId($commission->id);
                     /** @var $deposit_response  Deposit */
@@ -410,13 +412,13 @@ if (!function_exists('payCommission')) {
                 } else {
                     throw new \Exception('Commission Failed Error');
                 }
-            } catch (\Exception $exception) {
-                DB::rollBack();
-                throw new \Exception('Commission Error => ' . $exception->getMessage());
             }
-
-            DB::commit();
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw new \Exception('Commission Error => ' . $exception->getMessage());
         }
+
+        DB::commit();
 
     }
 }
@@ -438,7 +440,7 @@ if (!function_exists('getWalletGrpcClient')) {
 }
 if (!function_exists('getAndUpdateUserRank')) {
 
-    function getAndUpdateUserRank(\User\Models\User $user): \MLM\Models\Rank
+    function getAndUpdateUserRank(\User\Models\User $user): ?\MLM\Models\Rank
     {
         $ranks = \MLM\Models\Rank::query()->orderBy('rank', 'asc')->get();
         foreach ($ranks as $rank) {

@@ -58,7 +58,7 @@ class TradingProfitCommissionJob implements ShouldQueue
                 ]));
                 $deposit_service_object->setType('Commission');
                 $deposit_service_object->setSubType('Trading Profit');
-                $deposit_service_object->setServiceName('mlm');
+
 
                 payCommission($deposit_service_object,$this->ordered_package->user,TRADING_PROFIT_COMMISSION,$this->ordered_package->id);
 

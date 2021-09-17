@@ -33,7 +33,6 @@ class DirectSellCommissionJob implements ShouldQueue
             /** @var  $biggest_active_package OrderedPackage */
             $biggest_active_package = $this->user->referralTree->parent->user->biggestActivePackage();
             if ($biggest_active_package) {
-
                 $is_eligible_for_quick_start_bonus = false;
                 if ($this->user->referralTree->parent->user->eligibleForQuickStartBonus()) {
                     $is_eligible_for_quick_start_bonus = true;
@@ -54,7 +53,7 @@ class DirectSellCommissionJob implements ShouldQueue
                 ]));
                 $deposit_service_object->setType('Commission');
                 $deposit_service_object->setSubType('Direct Sell');
-                $deposit_service_object->setServiceName('mlm');
+
 
                 payCommission($deposit_service_object,$this->user->referralTree->parent->user,$this->getType(),$this->package->id);
 

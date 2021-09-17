@@ -190,7 +190,7 @@ class User extends Model
 
     public function hasCompletedBinaryLegs(): bool
     {
-
+        $this->refresh();
         $left_binary_children = $this->binaryTree->leftSideChildrenIds();
         $right_binary_children = $this->binaryTree->rightSideChildrenIds();
 
@@ -205,9 +205,9 @@ class User extends Model
         return false;
     }
 
-    public static function hasLeastChildrenWithRank(array $children, $rank = 1, $number_of_children = 1): bool
+    public static function hasLeastChildrenWithRank(array $children, $rank = 0, $number_of_children = 1): bool
     {
-        return User::query()->whereIn('id', $children)->where('rank', '>=', $rank)->count() > $number_of_children;
+        return User::query()->whereIn('id', $children)->where('rank', '>=', $rank)->count() >= $number_of_children;
     }
 
     public function residualBonusSetting()

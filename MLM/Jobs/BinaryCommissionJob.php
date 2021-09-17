@@ -79,7 +79,7 @@ class BinaryCommissionJob implements ShouldQueue
                             ]));
                             $deposit_service_object->setType('Commission');
                             $deposit_service_object->setSubType('Binary');
-                            $deposit_service_object->setServiceName('mlm');
+
 
                             payCommission($deposit_service_object,$parent,$this->package,$this->getType());
 

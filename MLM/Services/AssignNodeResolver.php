@@ -32,7 +32,7 @@ class AssignNodeResolver
     public function __construct(Order $order)
     {
         $this->order = $order;
-        $user_service = app(UserService::class) ;
+        $user_service = app(UserService::class);
         $this->user = $user_service->findByIdOrFail($order->getUserId());
         $this->to_user = $user_service->findByIdOrFail($this->user->sponsor_id);
         $this->plan = app(AssignNode::class);
@@ -62,7 +62,6 @@ class AssignNodeResolver
             } else {
                 $msg = trans('responses.not-valid-sponsor-user-failed');
             }
-
 
 
         } catch (\Throwable $e) {
@@ -115,19 +114,30 @@ class AssignNodeResolver
         return true;
     }
 
-    private function attachUserToBinary(Tree $to_user, string $string)
+    private function attachUserToBinary(Tree $to_user, string $string, $call = 1)
     {
-        if ($string == Tree::LEFT)
+        if ($string == Tree::LEFT) {
+
+//            Do not remove this comment
+
+//            $lefty = Tree::query()->whereRaw('_rgt - _lft = 3')->where('position','left')->orderBy('_lft','asc')->descendantsAndSelf(1)->first();
+//            $leaf_lefty = Tree::query()->whereRaw('_rgt - _lft = 1')->where('position','left')->orderBy('_lft','asc')->descendantsAndSelf(1)->first();
+//            if(is_null($lefty) || $lefty->_lft >= $leaf_lefty->_lft || $lefty->hasLeftChild()){
+//                $nominee = $leaf_lefty;
+//            } else {
+//                $nominee = $lefty;
+//            }
+
             if (!$to_user->hasLeftChild()) {
                 return $to_user->appendAsLeftNode($this->user->buildBinaryTreeNode());
             } else {
-                return $this->attachUserToBinary($to_user->leftChild(), $string);
+                return $this->attachUserToBinary($to_user->children()->left()->first(), $string, ++$call);
             }
-        else
+        } else
             if (!$to_user->hasRightChild()) {
                 return $to_user->appendAsRightNode($this->user->buildBinaryTreeNode());
             } else {
-                return $this->attachUserToBinary($to_user->rightChild(), $string);
+                return $this->attachUserToBinary($to_user->children()->right()->first(), $string,++$call);
             }
 
     }

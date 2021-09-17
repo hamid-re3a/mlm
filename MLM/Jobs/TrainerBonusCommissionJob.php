@@ -57,7 +57,7 @@ class TrainerBonusCommissionJob implements ShouldQueue
                         ]));
                         $deposit_service_object->setType('Commission');
                         $deposit_service_object->setSubType('Trainer Bonus');
-                        $deposit_service_object->setServiceName('mlm');
+
                         payCommission($deposit_service_object,$this->user->referralTree->parent->user,$this->getType(),$this->package->id);
 
 

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Orders\Services;
+namespace MLM\Services;
 
 
 use MLM\Repository\OrderedPackageRepository;
@@ -10,7 +10,7 @@ use Orders\Services\Grpc\Order;
 use Packages\Services\Grpc\Id;
 use Packages\Services\Grpc\Package;
 
-class OrderService
+class OrderedPackageService
 {
 
     /**
