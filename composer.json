@@ -12,7 +12,7 @@
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "google/protobuf": "^3.17",
-        "grpc/grpc": "^1.39",
+        "grpc/grpc": "^1.40.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "kalnoy/nestedset": "^5.0",
         "laravel/framework": "^8.12",
