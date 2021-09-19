@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use MLM\Models\OrderedPackage;
 use MLM\Models\OrderedPackagesIndirectCommission;
 use User\Models\User;
+use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
 
 class IndirectSellCommissionJob implements ShouldQueue
@@ -31,12 +32,13 @@ class IndirectSellCommissionJob implements ShouldQueue
     }
 
 
-    public function handle()
+    public function handle(UserService $user_service)
     {
 
-        if (is_null($this->user->referralTree->parent) || is_null($this->user->referralTree->parent->user))
+        if (is_null($this->user->referralTree->parent) || is_null($this->user->referralTree->parent->user_id))
             return;
-        $biggest_active_package = $this->user->referralTree->parent->user->biggestActivePackage();
+        $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
+        $biggest_active_package = $parent->biggestActivePackage();
         if ($biggest_active_package) {
             /** @var  $indirect_found OrderedPackagesIndirectCommission */
             $indirect_found = $biggest_active_package->indirectCommission()->where('level', $this->level)->first();
@@ -45,7 +47,7 @@ class IndirectSellCommissionJob implements ShouldQueue
 
                 /** @var $deposit_service_object  Deposit*/
                 $deposit_service_object = app(Deposit::class);
-                $deposit_service_object->setUserId($this->user->referralTree->parent->user->id);
+                $deposit_service_object->setUserId($parent->id);
                 $deposit_service_object->setAmount($commission_amount);
                 $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
@@ -57,14 +59,14 @@ class IndirectSellCommissionJob implements ShouldQueue
 
 
 
-                payCommission($deposit_service_object,$this->user->referralTree->parent->user,$this->getType(),$this->package->id);
+                payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);
 
             }
         }
 
         if ($this->level == 9)
             return;
-        IndirectSellCommissionJob::dispatch($this->user->referralTree->parent->user, $this->package, ++$this->level);
+        IndirectSellCommissionJob::dispatch($parent, $this->package, ++$this->level);
 
     }
 

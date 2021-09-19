@@ -26,9 +26,9 @@ class TreeObserver
         if ($parent)
             if ($parent->children()->count() > 1) {
                 throw new TreeMaxChildrenExceededException();
-            } else if ($parent->children()->left()->count() >= 1 && $node->isLeftChild()){
+            } else if ($parent->children()->left()->whereNot('user_id',$node->id)->count() >= 1 && $node->isLeftChild()){
                 throw new TreeMaxLeftChildExceededException();
-            } else if ($parent->children()->right()->count() >= 1 && $node->isRightChild()){
+            } else if ($parent->children()->right()->whereNot('user_id',$node->id)->count() >= 1 && $node->isRightChild()){
                 throw new TreeMaxRightChildExceededException();
             }
     }

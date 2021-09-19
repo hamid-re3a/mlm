@@ -217,12 +217,7 @@ class Tree extends Model
 
     public function leftSideChildrenPackagePrice() : int
     {
-        /** @var  $left_child Tree*/
-        $left_child = $this->children()->left()->first();
-        if(is_null($left_child))
-            return 0;
-
-        return $left_child->descendants()->sum('packages_price');
+        return OrderedPackage::query()->whereIn('user_id',$this->leftSideChildrenIds())->sum('price');
     }
 
     public function leftSideChildrenIds() : array
@@ -267,12 +262,7 @@ class Tree extends Model
 
     public function rightSideChildrenPackagePrice() : int
     {
-        /** @var  $right_child Tree*/
-        $right_child = $this->children()->right()->first();
-        if(is_null($right_child))
-            return 0;
-
-        return $right_child->descendants()->sum('packages_price');
+        return OrderedPackage::query()->whereIn('user_id',$this->rightSideChildrenIds())->sum('price');
     }
 
 

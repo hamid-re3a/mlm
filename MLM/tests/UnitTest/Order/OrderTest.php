@@ -3,18 +3,14 @@
 namespace MLM\tests\UnitTest\Order;
 
 
-use GPBMetadata\User;
-use Illuminate\Support\Facades\App;
-use MLM\Models\Commission;
 use MLM\Models\OrderedPackage;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
+use MLM\Services\Commissions\BinaryCommission;
 use MLM\Services\OrderResolver;
 use MLM\tests\MLMTest;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;
-use MLM\Services\OrderedPackageService;
-use Packages\Services\Grpc\Package;
 
 class OrderTest extends MLMTest
 {
@@ -56,16 +52,16 @@ class OrderTest extends MLMTest
     {
 
         //register first user
-        list($user, $bool) = $this->registerUser();
+        $user = $this->registerUser();
 
         //register second user
-        list($second_user, $bool) = $this->registerUser();
+        $second_user = $this->registerUser();
 
         // register $third_user
-        list($third_user, $bool) = $this->registerUser();
+        $third_user = $this->registerUser();
 
         // register fourth_user
-        list($fourth_user, $bool) = $this->registerUser();
+        $fourth_user = $this->registerUser();
 
     }
 
@@ -77,31 +73,106 @@ class OrderTest extends MLMTest
     {
 
         //register first user
-        /** @var $user \User\Models\User */
-        list($user, $bool) = $this->registerUser();
+        $user = $this->registerUser();
 
         $this->assertFalse($user->hasCompletedBinaryLegs());
         //register second user
-        list($second_user, $bool) = $this->registerUser($user->id);
+        $second_user = $this->registerUser($user->id);
 
         $user->default_binary_position = "right";
         $user->save();
         // register $third_user
-        list($third_user, $bool) = $this->registerUser($user->id);
-
+        $third_user = $this->registerUser($user->id);
 
         $this->assertTrue($user->hasCompletedBinaryLegs());
+    }
+
+
+    /**
+     * @test
+     */
+    public function trainer_bonus_to_our_very_diligent_user_because_of_his_team()
+    {
+
+
+        $user = $this->registerUser();
+
+        $second_user = $this->registerUser($user->id);
+
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+
+
+        $fourth_user = $this->registerUser($second_user->id);
+        $second_user->default_binary_position = "right";
+        $second_user->save();
+        $fifth_user = $this->registerUser($second_user->id);
+
+
+        $sixth_user = $this->registerUser($third_user->id);
+        $third_user->default_binary_position = "right";
+        $third_user->save();
+        $seventh_user = $this->registerUser($third_user->id);
+
+
+        $this->assertEquals(1, $user->commissions()->type(TRAINER_BONUS_COMMISSION)->count(), 'Number of trainer bonus commissions');
+
+        $this->assertEquals(231.68, $user->commissions()->sum('amount'), 'Sum of earned commissions');
 
     }
 
     /**
      * @test
      */
+    public function binary_commission_to_first_user()
+    {
+
+
+        $user = $this->registerUser();
+
+        $second_user = $this->registerUser($user->id);
+
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+
+        $this->assertEquals(1, $user->commissions()->type(BINARY_COMMISSION)->count(), 'Number of binary commissions');
+        $this->assertEquals(7.92,$user->commissions()->type(BINARY_COMMISSION)->sum('amount'));
+        $this->assertEquals($user->binaryTree->converted_points,99);
+
+    }
+    /**
+     * @test
+     */
+    public function binary_commission_cap()
+    {
+
+
+        $user = $this->registerUser();
+
+        $second_user = $this->registerUser($user->id,RANK_6_EXECUTIVE['condition_converted_in_bp']);
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id,RANK_6_EXECUTIVE['condition_converted_in_bp']);
+
+        $this->assertEquals(1, $user->commissions()->type(BINARY_COMMISSION)->count(), 'Number of binary commissions');
+        $this->assertEquals(RANK_6_EXECUTIVE['cap'],$user->commissions()->type(BINARY_COMMISSION)->sum('amount'));
+        $this->assertEquals(RANK_6_EXECUTIVE['condition_converted_in_bp'] - RANK_6_EXECUTIVE['cap'],$user->commissions()->type('cap-commission')->sum('amount'));
+        $this->assertEquals($user->binaryTree->converted_points,RANK_6_EXECUTIVE['condition_converted_in_bp']);
+
+    }
+    /**
+     * @test
+     */
     public function direct_sell_to_father_package()
     {
-        list($user, $bool) = $this->registerUser();
+        $user = $this->registerUser();
 
-        list($second_user, $bool) = $this->registerUser($user->id);
+        $second_user = $this->registerUser($user->id);
 
         $this->assertEquals(1, $user->commissions()->type(DIRECT_SELL_COMMISSION)->count(), 'Number of direct commissions');
         $this->assertEquals(7.92, $user->commissions()->sum('amount'), 'Sum of earned commissions');
@@ -113,13 +184,13 @@ class OrderTest extends MLMTest
     public function indirect_sell_to_father_package()
     {
         //register first user
-        list($user, $bool) = $this->registerUser();
+        $user = $this->registerUser();
 
         //register second user
-        list($second_user, $bool) = $this->registerUser($user->id);
+        $second_user = $this->registerUser($user->id);
 
         //register second user
-        list($third_user, $bool) = $this->registerUser($second_user->id);
+        $third_user = $this->registerUser($second_user->id);
 
         $this->assertEquals(1, $user->commissions()->type(INDIRECT_SELL_COMMISSION)->count(), 'Number of direct commissions');
     }
@@ -127,14 +198,16 @@ class OrderTest extends MLMTest
 
     /**
      * @param \User\Models\User $user
+     * @param int $package_price
      * @return Order
      */
-    private function createOrderWithUser(\User\Models\User $user): Order
+    private function createOrderWithUser(\User\Models\User $user,$package_price = 99): Order
     {
 
 
         $order_entity = OrderedPackage::factory()->create([
             'user_id' => $user->id,
+            'price' => $package_price
         ]);
 
         $order_entity->packageIndirectCommission()->create([
@@ -151,19 +224,20 @@ class OrderTest extends MLMTest
     }
 
     /**
-     * @param int $id
-     * @return array
+     * @param int $sponsor_id
+     * @param int $package_price
+     * @return \User\Models\User
      */
-    private function registerUser($id = 1): array
+    private function registerUser($sponsor_id = 1,$package_price = 99): \User\Models\User
     {
         $user = \User\Models\User::factory()->create([
-            'sponsor_id' => $id
+            'sponsor_id' => $sponsor_id
         ]);
-        $order = $this->createOrderWithUser($user);
+        $order = $this->createOrderWithUser($user,$package_price);
 
         list($bool, $msg) = (new OrderResolver($order))->handle();
         $this->assertTrue($bool);
-        return array($user, $bool);
+        return $user;
     }
 
 

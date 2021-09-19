@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
 use User\Models\User;
+use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
 
 class DirectSellCommissionJob implements ShouldQueue
@@ -27,14 +28,18 @@ class DirectSellCommissionJob implements ShouldQueue
         $this->user = $user;
     }
 
-    public function handle()
+    public function handle(UserService $user_service)
     {
         if (!CommissionModel::query()->where('ordered_package_id', $this->package->id)->type($this->getType())->exists()) {
+
+            $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
+
+
             /** @var  $biggest_active_package OrderedPackage */
-            $biggest_active_package = $this->user->referralTree->parent->user->biggestActivePackage();
+            $biggest_active_package = $parent->biggestActivePackage();
             if ($biggest_active_package) {
                 $is_eligible_for_quick_start_bonus = false;
-                if ($this->user->referralTree->parent->user->eligibleForQuickStartBonus()) {
+                if ($parent->eligibleForQuickStartBonus()) {
                     $is_eligible_for_quick_start_bonus = true;
                 }
 
@@ -44,7 +49,7 @@ class DirectSellCommissionJob implements ShouldQueue
 
                 /** @var $deposit_service_object  Deposit */
                 $deposit_service_object = app(Deposit::class);
-                $deposit_service_object->setUserId($this->user->referralTree->parent->user->id);
+                $deposit_service_object->setUserId($parent->id);
                 $deposit_service_object->setAmount($commission_amount);
                 $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
@@ -55,7 +60,7 @@ class DirectSellCommissionJob implements ShouldQueue
                 $deposit_service_object->setSubType('Direct Sell');
 
 
-                payCommission($deposit_service_object,$this->user->referralTree->parent->user,$this->getType(),$this->package->id);
+                payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);
 
             }
         }

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
-use MLM\Models\OrderedPackage;
 use User\Models\User;
+use Wallets\Services\Grpc\Deposit;
 
 if (!function_exists('subset')) {
 
@@ -44,7 +44,6 @@ if (!function_exists('payCommission')) {
      */
     function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
     {
-
         DB::beginTransaction();
         try {
             $commission = $user->commissions()->create([
@@ -93,6 +92,14 @@ if (!function_exists('getWalletGrpcClient')) {
         ]);
     }
 }
+
+
+if (!function_exists('userRankBasedOnConvertedPoint')) {
+    function userRankBasedOnConvertedPoint($converted_point): \MLM\Models\Rank
+    {
+        return \MLM\Models\Rank::query()->where('condition_converted_in_bp', '<=', $converted_point)->orderBy('rank', 'desc')->first();
+    }
+}
 if (!function_exists('getAndUpdateUserRank')) {
 
     function getAndUpdateUserRank(\User\Models\User $user): ?\MLM\Models\Rank
@@ -131,19 +138,19 @@ if (!function_exists('getMLMSetting')) {
     function getSetting($key)
     {
         //Check if settings are available in cache
-        if(cache()->has('mlm_settings'))
-            if($setting = collect(cache('mlm_settings'))->where('name', $key)->first())
+        if (cache()->has('mlm_settings'))
+            if ($setting = collect(cache('mlm_settings'))->where('name', $key)->first())
                 return $setting['value'];
 
-        $setting = \MLM\Models\Setting::query()->where('name',$key)->first();
-        if($setting)
+        $setting = \MLM\Models\Setting::query()->where('name', $key)->first();
+        if ($setting)
             return $setting->value;
 
 
-        if(defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) AND array_key_exists($key,MLM_SETTINGS))
+        if (defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) AND array_key_exists($key, MLM_SETTINGS))
             return MLM_SETTINGS[$key]['value'];
 
         \Illuminate\Support\Facades\Log::error('mlmSetting => ' . $key);
-        throw new Exception(trans('mlm.responses.settings.key-doesnt-exists',['key' => $key]));
+        throw new Exception(trans('mlm.responses.settings.key-doesnt-exists', ['key' => $key]));
     }
 }

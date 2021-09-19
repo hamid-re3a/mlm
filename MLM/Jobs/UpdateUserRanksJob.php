@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use MLM\Models\OrderedPackage;
 use MLM\Models\Rank;
 use User\Models\User;
+use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
 
 class UpdateUserRanksJob implements ShouldQueue
@@ -26,11 +27,12 @@ class UpdateUserRanksJob implements ShouldQueue
         $this->user = $user;
     }
 
-    public function handle()
+    public function handle(UserService $user_service)
     {
         getAndUpdateUserRank($this->user);
-        if (!is_null($this->user->referralTree->parent) && !is_null($this->user->referralTree->parent->user)) {
-            UpdateUserRanksJob::dispatch($this->user->referralTree->parent->user);
+        if (!is_null($this->user->referralTree->parent) && !is_null($this->user->referralTree->parent->user_id)) {
+            $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
+            UpdateUserRanksJob::dispatch($parent);
         }
     }
 

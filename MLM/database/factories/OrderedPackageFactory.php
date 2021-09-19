@@ -29,7 +29,7 @@ class OrderedPackageFactory extends Factory
             'order_id' => $this->faker->unique(true)->numberBetween(1, 1000000),
             'package_id' => $package_id,
             'price' => 99,
-            'user_id' => User::factory()->create()->id,
+            'user_id' => User::query()->inRandomOrder()->first()->id,
             'is_paid_at' => now(),
             'plan' => OrderPlans::ORDER_PLAN_START,
             'expires_at' => now()->addDays(200),
