@@ -36,8 +36,7 @@ class OrderTest extends MLMTest
         $this->assertNull($user->referralTree);
 
         list($bool, $msg) = (new OrderResolver($order))->handle();
-
-        $this->assertTrue($bool);
+        $this->assertTrue($bool,$msg);
 
         $user->refresh();
         $this->assertNotNull($user->binaryTree);
@@ -302,7 +301,8 @@ class OrderTest extends MLMTest
         $order_entity = OrderedPackage::factory()->create([
             'user_id' => $user->id,
             'price' => $package_price,
-            'package_id' => $package_id
+            'package_id' => $package_id,
+            'plan' => OrderPlans::ORDER_PLAN_START
         ]);
 
         $order_entity->packageIndirectCommission()->create([

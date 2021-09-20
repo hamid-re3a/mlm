@@ -54,6 +54,15 @@ class PackageRepository
         return $this->package_instant->query()->find($package_id);
     }
 
+    public function getPackageGrpc(int $package_id)
+    {
+        $package = $this->findPackageById($package_id);
+        $package_grpc = new PackageGrpc;
+        $package_grpc->setId($package->id);
+        $package_grpc->setName($package->name);
+        $package_grpc->setShortName($package->short_name);
 
+        return $package_grpc;
+    }
 
 }

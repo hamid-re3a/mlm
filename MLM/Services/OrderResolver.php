@@ -3,6 +3,7 @@
 namespace MLM\Services;
 
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use MLM\Interfaces\Commission;
 use MLM\Jobs\UpdateUserRanksJob;
@@ -25,11 +26,21 @@ class OrderResolver
      */
     private $user_service;
 
+    /**
+     * @var $user User
+     */
+    private $user;
+
     public function __construct(Order &$order)
     {
         $this->order = $order;
         $this->plan = app(RegisterOder::class);
         $this->user_service = app(UserService::class);
+        try {
+            $this->user = $this->user_service->findByIdOrFail($this->order->getUserId());
+        } catch (\Exception $e) {
+            return [false, trans('order.responses.user-not-valid')];
+        }
     }
 
 
@@ -59,16 +70,16 @@ class OrderResolver
         DB::beginTransaction();
         $problem_level = 0;
 
-
         list($bool, $msg) = $this->isValid();
         if ($bool) {
+
             list($bool, $msg) = $this->addUserToNetwork();
             if ($bool) {
                 list($bool, $msg) = $this->resolveCommission();
                 if ($bool) {
                     $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId())
-                        ->where('package_id', $this->order->getPackageId())->first();
-                    $ordered_package->is_commission_resolved_at = $this->order->getIsCommissionResolvedAt();
+                        ->first();
+                    $ordered_package->is_commission_resolved_at = Carbon::make($this->order->getIsCommissionResolvedAt());
                     $ordered_package->save();
 
                     UpdateUserRanksJob::dispatch(User::query()->find($this->order->getUserId()));
@@ -101,13 +112,13 @@ class OrderResolver
         if ($bool) {
             list($bool, $msg) = $this->addUserToNetwork(true);
             if ($bool) {
-                DB::rollBack(0);
+                DB::rollBack();
                 return [true, 'resolve'];
             }
 
         }
 
-        DB::rollBack(0);
+        DB::rollBack();
         return [false, $msg ?? 'resolve'];
 
     }
@@ -119,22 +130,22 @@ class OrderResolver
     {
         if (!$this->order->getIsCommissionResolvedAt()) {
             $isItOk = true;
-//            try {
-            DB::beginTransaction();
-            /** @var  $commission Commission */
-            foreach ($this->plan->getCommissions() as $commission)
-                $isItOk = $isItOk && $commission->calculate($this->order);
-            if (!$isItOk) {
+            try {
+                DB::beginTransaction();
+                /** @var  $commission Commission */
+                foreach ($this->plan->getCommissions() as $commission)
+                    $isItOk = $isItOk && $commission->calculate($this->order);
+                if (!$isItOk) {
+                    DB::rollBack();
+                    return [false, trans('responses.resolveCommission')];
+                }
+
+                DB::commit();
+                $this->order->setIsCommissionResolvedAt(now()->toString());
+            } catch (\Throwable $e) {
                 DB::rollBack();
                 return [false, trans('responses.resolveCommission')];
             }
-
-            DB::commit();
-            $this->order->setIsCommissionResolvedAt(now()->toString());
-//            } catch (\Throwable $e) {
-//                DB::rollBack();
-//                return [false, trans('responses.resolveCommission')];
-//            }
 
         }
         return [true, trans('responses.resolveCommission')];
@@ -145,16 +156,15 @@ class OrderResolver
      */
     public function isValid(): array
     {
-
         if ($this->order->getPlan() != OrderPlans::ORDER_PLAN_START) {
-            try {
-                $user = $this->user_service->findByIdOrFail($this->order->getUserId());
-            } catch (\Exception $e) {
-                return [false, trans('order.responses.user-not-valid')];
-            }
-            if (!$user->hasAnyValidOrder())
+
+            if (!$this->user->hasAnyValidOrder())
+                return [false, trans('order.responses.you-should-order-starter-plan-first')];
+        } else {
+            if ($this->user->hasAnyValidOrder())
                 return [false, trans('order.responses.you-should-order-starter-plan-first')];
         }
+
         // check user if he is in tree
         return [true, trans('responses.isValid')];
     }
@@ -167,7 +177,9 @@ class OrderResolver
 
     private function addUserToNetwork($simulate = false): array
     {
-        return (new AssignNodeResolver($this->order))->handle($simulate);
+        if ($this->order->getPlan() == OrderPlans::ORDER_PLAN_START)
+            return (new AssignNodeResolver($this->order))->handle($simulate);
+        return [true, trans('responses.isValid')];
     }
 
 }

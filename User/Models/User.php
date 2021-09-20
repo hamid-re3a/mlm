@@ -189,7 +189,7 @@ class User extends Model
     }
     public function hasAnyValidOrder()
     {
-        return $this->ordered_packages()->exists();
+        return $this->ordered_packages()->whereNotNull('is_commission_resolved_at')->exists();
     }
 
     public function eligibleForQuickStartBonus()
