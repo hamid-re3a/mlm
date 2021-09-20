@@ -51,15 +51,6 @@ if (!function_exists('user')) {
     }
 }
 
-
-if (!function_exists('getUserGrpcServerClient')) {
-    function getUserGrpcServerClient()
-    {
-        return new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
 if (!function_exists('updateUserFromGrpcServer')) {
 
     function updateUserFromGrpcServer($input_id): ?\User\Services\Grpc\User
