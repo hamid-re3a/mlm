@@ -65,7 +65,7 @@ class UserServiceProvider extends ServiceProvider
                  * error code 470 is for data user not exist log for development
                  */
                 if (is_null($user)) {
-                    $service_user = updateUserFromGrpcServer($request);
+                    $service_user = updateUserFromGrpcServer($request->header('X-user-id'));
                     if (is_null($service_user))
                         throw new Exception('please try another time!', 470);
 
@@ -80,7 +80,7 @@ class UserServiceProvider extends ServiceProvider
                  * error code 471 is for data user not update log for development
                  */
                 if ($hash_user_service != $user_hash_request) {
-                    $service_user = updateUserFromGrpcServer($request);
+                    $service_user = updateUserFromGrpcServer($request->header('X-user-id'));
                     $hash_user_service = md5(serialize($service_user));
                     if ($hash_user_service != $user_hash_request) {
                         throw new Exception('please try another time!', 471);
