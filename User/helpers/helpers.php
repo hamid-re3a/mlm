@@ -1,13 +1,11 @@
 <?php
 
-
-use Illuminate\Http\Request;
-use User\Services\UserService;
-
-
 /**
  * user_roles
  */
+
+use Illuminate\Http\Request;
+use User\Services\UserService;
 const USER_ROLE_SUPER_ADMIN = 'super-admin';
 const USER_ROLE_ADMIN_GATEWAY = 'user-gateway-admin';
 const USER_ROLE_ADMIN_KYC = 'kyc-admin';
@@ -33,23 +31,6 @@ const USER_ROLES = [
     USER_ROLE_HELP_DESK,
 ];
 
-
-if (!function_exists('user')) {
-
-    function user(int $id): ?\User\Services\Grpc\User
-    {
-        $user_db = \User\Models\User::query()->find($id);
-
-        $user = new \User\Services\Grpc\User();
-        $user->setId((int)$user_db->id);
-        $user->setFirstName($user_db->first_name);
-        $user->setLastName($user_db->last_name);
-        $user->setUsername($user_db->username);
-        $user->setEmail($user_db->email);
-        return $user;
-
-    }
-}
 
 if (!function_exists('updateUserFromGrpcServer')) {
 
