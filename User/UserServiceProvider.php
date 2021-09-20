@@ -55,8 +55,8 @@ class UserServiceProvider extends ServiceProvider
                 && is_numeric($request->header('X-user-id'))
             ) {
 
-                Log::info($request->hasHeader('X-user-id'));
-                Log::info($request->hasHeader('X-user-hash'));
+                Log::info($request->header('X-user-id'));
+                Log::info($request->header('X-user-hash'));
                 $user_update = new UserUpdate();
                 $user_update->setId($request->header('X-user-id'));
                 $user_update->setQueueName('subscriptions');
