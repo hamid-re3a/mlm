@@ -17,22 +17,22 @@ class CreateOrderedPackagesTable extends Migration
             $table->id();
 
             $table->unsignedBigInteger('order_id')->unique();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('package_id')->nullable();
 
             $table->timestamp('is_paid_at')->nullable();
             $table->timestamp('is_resolved_at')->nullable();
             $table->timestamp('is_commission_resolved_at')->nullable();
-            $table->string('plan')->nullable();
+            $table->integer('plan')->nullable();
 
-            $table->unsignedBigInteger('user_id');
 
-            $table->string('name');
-            $table->string('short_name',20);
-            $table->integer('validity_in_days');
-            $table->double('price');
+            $table->integer('validity_in_days')->nullable();
+            $table->double('price')->nullable();
 
-            $table->integer('roi_percentage');
-            $table->integer('direct_percentage');
-            $table->integer('binary_percentage');
+            $table->integer('direct_percentage')->nullable();
+            $table->integer('binary_percentage')->nullable();
+
+            $table->timestamp('expires_at')->nullable();
 
             $table->softDeletes();
             $table->timestamps();

@@ -2,7 +2,7 @@
 
 namespace MLM\Jobs;
 
-use App\Jobs\Wallet\WalletDepositJob;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -31,13 +31,11 @@ class ResidualBonusCommissionJob implements ShouldQueue
             ->where('type', RESIDUAL_BONUS_COMMISSION)
             ->whereDate('created_at', now()->toDate())->exists())
             return;
-
         $tree = ReferralTree::withDepth()->where('user_id', $this->user->id)->first();
         $depth = $tree->depth;
         $commission_amount = (double)0;
         foreach ($this->user->residualBonusSetting as $residual_bonus_setting) {
 
-            $this->user->$residual_bonus_setting['level'];
             $users = ReferralTree::withDepth()->descendantsAndSelf($tree->id)
                 ->where('depth', $depth + $residual_bonus_setting->level)
                 ->pluck('user_id')->toArray();
@@ -52,30 +50,23 @@ class ResidualBonusCommissionJob implements ShouldQueue
 
 
 
-        /** @var $depositService  Deposit */
-        $depositService = app(Deposit::class);
-        $depositService->setUserId($this->user->id);
-        $depositService->setAmount($commission_amount);
-        $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+        /** @var $deposit_service_object  Deposit */
+        $deposit_service_object = app(Deposit::class);
+        $deposit_service_object->setUserId($this->user->id);
+        $deposit_service_object->setAmount($commission_amount);
+        $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
-        $depositService->setDescription(serialize([
+        $deposit_service_object->setDescription(serialize([
             'description' => 'Commission # ' . RESIDUAL_BONUS_COMMISSION
         ]));
-        $depositService->setType('Commission');
-        $depositService->setSubType('Trading Profit');
-        $depositService->setServiceName('mlm');
-
-        /** @var $commission CommissionModel */
-        $commission = $this->user->commissions()->create([
-            'amount' => $commission_amount,
-            'type' => RESIDUAL_BONUS_COMMISSION,
-        ]);
+        $deposit_service_object->setType('Commission');
+        $deposit_service_object->setSubType('Trading Profit');
 
 
-        if ($commission) {
-            $depositService->setPayloadId($commission->id);
-            WalletDepositJob::dispatch($depositService)->onConnection('rabbit')->onQueue('subscriptions');
-        }
+
+
+        payCommission($deposit_service_object,$this->user,RESIDUAL_BONUS_COMMISSION);
+
 
 
     }

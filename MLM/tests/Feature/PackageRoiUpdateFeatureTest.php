@@ -21,7 +21,7 @@ class PackageRoiUpdateFeatureTest extends MLMTest
 
         $packageRoi = PackageRoi::factory()->create();
 
-        $resp = $this->put(route('packagesRoi.update'), [
+        $resp = $this->put(route('admin.packagesRoi.update'), [
             'package_id' => $packageRoi->package_id,
             'due_date' => $packageRoi->due_date,
             'roi_percentage' => mt_rand(0, 1000) / 10
@@ -42,7 +42,7 @@ class PackageRoiUpdateFeatureTest extends MLMTest
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
         $packageRoi = PackageRoi::factory()->create();
 
-        $this->put(route('packagesRoi.store'), [
+        $this->put(route('admin.packagesRoi.store'), [
             'package_id' => $packageRoi->package_id,
             'due_date' => $packageRoi->due_date,
             'roi_percentage' => mt_rand(0, 1000) / 10
@@ -58,7 +58,7 @@ class PackageRoiUpdateFeatureTest extends MLMTest
         $this->withHeaders($this->getHeaders());
         $packageRoi = PackageRoi::factory()->create();
 
-        $this->put(route('packagesRoi.store'), [
+        $this->put(route('admin.packagesRoi.store'), [
             'due_date' => $packageRoi->due_date,
             'roi_percentage' => mt_rand(0, 1000) / 10
         ])->assertStatus(422);
@@ -72,7 +72,7 @@ class PackageRoiUpdateFeatureTest extends MLMTest
         $this->withHeaders($this->getHeaders());
         $packageRoi = PackageRoi::factory()->create();
 
-        $this->put(route('packagesRoi.store'), [
+        $this->put(route('admin.packagesRoi.store'), [
             'package_id' => $packageRoi->package_id,
             'roi_percentage' => mt_rand(0, 1000) / 10
         ])->assertStatus(422);
@@ -85,7 +85,7 @@ class PackageRoiUpdateFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $packageRoi = PackageRoi::factory()->create();
-        $this->put(route('packagesRoi.store'), [
+        $this->put(route('admin.packagesRoi.store'), [
             'package_id' => $packageRoi->package_id,
             'due_date' => $packageRoi->due_date,
         ])->assertStatus(422);
@@ -98,7 +98,7 @@ class PackageRoiUpdateFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $packageRoi = PackageRoi::factory()->create();
-        $this->put(route('packagesRoi.store'), [
+        $this->put(route('admin.packagesRoi.store'), [
             'package_id' => $packageRoi->package_id,
             'due_date' => $packageRoi->due_date,
             'roi_percentage' => 'tets'

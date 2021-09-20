@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kalnoy\Nestedset\NodeTrait;
 use MLM\database\factories\TreeFactory;
-use phpDocumentor\Reflection\Types\Integer;
 use User\database\factories\UserFactory;
 use User\Models\User;
 
@@ -201,7 +200,6 @@ class Tree extends Model
         return true;
     }
 
-
     public function leftChildCount()
     {
         $left_child = $this->children()->left()->first();
@@ -216,14 +214,9 @@ class Tree extends Model
         $this->save();
     }
 
-    public function leftSideChildrenPackagePrice() : Integer
+    public function leftSideChildrenPackagePrice() : int
     {
-        /** @var  $left_child Tree*/
-        $left_child = $this->children()->left()->first();
-        if(is_null($left_child))
-            return 0;
-
-        return $left_child->descendants()->sum('packages_price');
+        return OrderedPackage::query()->whereIn('user_id',$this->leftSideChildrenIds())->sum('price');
     }
 
     public function leftSideChildrenIds() : array
@@ -234,7 +227,8 @@ class Tree extends Model
             return [];
 
         $children = $left_child->descendants()->pluck('user_id')->toArray();
-        return  array_merge([$left_child->id],$children);
+
+        return  array_merge([$left_child->user_id],$children);
     }
 
     public function hasRightChild()
@@ -262,17 +256,12 @@ class Tree extends Model
             return [];
 
         $children = $right_child->descendants()->pluck('user_id')->toArray();
-        return  array_merge([$right_child->id],$children);
+        return  array_merge([$right_child->user_id],$children);
     }
 
-    public function rightSideChildrenPackagePrice() : Integer
+    public function rightSideChildrenPackagePrice() : int
     {
-        /** @var  $right_child Tree*/
-        $right_child = $this->children()->right()->first();
-        if(is_null($right_child))
-            return 0;
-
-        return $right_child->descendants()->sum('packages_price');
+        return OrderedPackage::query()->whereIn('user_id',$this->rightSideChildrenIds())->sum('price');
     }
 
 

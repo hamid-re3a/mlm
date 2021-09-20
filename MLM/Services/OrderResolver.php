@@ -5,9 +5,13 @@ namespace MLM\Services;
 
 use Illuminate\Support\Facades\DB;
 use MLM\Interfaces\Commission;
+use MLM\Jobs\UpdateUserRanksJob;
 use MLM\Models\OrderedPackage;
 use MLM\Services\Plans\RegisterOder;
 use Orders\Services\Grpc\Order;
+use Orders\Services\Grpc\OrderPlans;
+use User\Models\User;
+use User\Services\UserService;
 
 class OrderResolver
 {
@@ -16,11 +20,16 @@ class OrderResolver
      * @var RegisterOder
      */
     private $plan;
+    /**
+     * @var $user_service UserService
+     */
+    private $user_service;
 
     public function __construct(Order &$order)
     {
         $this->order = $order;
         $this->plan = app(RegisterOder::class);
+        $this->user_service = app(UserService::class);
     }
 
 
@@ -28,7 +37,7 @@ class OrderResolver
     {
 
         $processed = [true, 'handle'];
-        if ($this->order->getIsResolvedAt())
+        if ($this->order->getIsCommissionResolvedAt())
             return $processed;
         if ($this->order->getIsPaidAt()) {
 
@@ -62,6 +71,8 @@ class OrderResolver
                     $ordered_package->is_commission_resolved_at = $this->order->getIsCommissionResolvedAt();
                     $ordered_package->save();
 
+                    UpdateUserRanksJob::dispatch(User::query()->find($this->order->getUserId()));
+
                     DB::commit();
                     return [true, 'resolve', $problem_level];
                 } else {
@@ -74,14 +85,13 @@ class OrderResolver
             $problem_level = 1;
         }
 
-        DB::rollBack(0);
+        DB::rollBack();
         return [false, $msg ?? 'resolve', $problem_level];
     }
 
 
     /**
      * @return array [bool,string]
-     * @throws \Throwable
      */
     public function simulateValidation(): array
     {
@@ -109,22 +119,22 @@ class OrderResolver
     {
         if (!$this->order->getIsCommissionResolvedAt()) {
             $isItOk = true;
-            try {
-                DB::beginTransaction();
-                /** @var  $commission Commission */
-                foreach ($this->plan->getCommissions() as $commission)
-                    $isItOk = $isItOk && $commission->calculate($this->order);
-                if (!$isItOk) {
-                    DB::rollBack();
-                    return [false, trans('responses.resolveCommission')];
-                }
-
-                DB::commit();
-                $this->order->setIsCommissionResolvedAt(now()->toString());
-            } catch (\Throwable $e) {
+//            try {
+            DB::beginTransaction();
+            /** @var  $commission Commission */
+            foreach ($this->plan->getCommissions() as $commission)
+                $isItOk = $isItOk && $commission->calculate($this->order);
+            if (!$isItOk) {
                 DB::rollBack();
                 return [false, trans('responses.resolveCommission')];
             }
+
+            DB::commit();
+            $this->order->setIsCommissionResolvedAt(now()->toString());
+//            } catch (\Throwable $e) {
+//                DB::rollBack();
+//                return [false, trans('responses.resolveCommission')];
+//            }
 
         }
         return [true, trans('responses.resolveCommission')];
@@ -135,6 +145,16 @@ class OrderResolver
      */
     public function isValid(): array
     {
+
+        if ($this->order->getPlan() != OrderPlans::ORDER_PLAN_START) {
+            try {
+                $user = $this->user_service->findByIdOrFail($this->order->getUserId());
+            } catch (\Exception $e) {
+                return [false, trans('order.responses.user-not-valid')];
+            }
+            if (!$user->hasAnyValidOrder())
+                return [false, trans('order.responses.you-should-order-starter-plan-first')];
+        }
         // check user if he is in tree
         return [true, trans('responses.isValid')];
     }
@@ -149,6 +169,5 @@ class OrderResolver
     {
         return (new AssignNodeResolver($this->order))->handle($simulate);
     }
-
 
 }

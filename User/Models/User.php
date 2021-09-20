@@ -150,25 +150,47 @@ class User extends Model
      */
     public function getUserService()
     {
+        $this->fresh();
         $user = new \User\Services\Grpc\User();
-        $user->setId((int)$this->attributes['id']);
+        $user->setId($this->attributes['id']);
         $user->setFirstName($this->attributes['first_name']);
         $user->setLastName($this->attributes['last_name']);
         $user->setUsername($this->attributes['username']);
         $user->setEmail($this->attributes['email']);
+        $user->setMemberId($this->attributes['member_id']);
+        if (isset($this->attributes['sponsor_id']) AND !empty($this->attributes['sponsor_id']))
+            $user->setSponsorId($this->attributes['sponsor_id']);
+
+        if (isset($this->attributes['block_type']) AND !empty($this->attributes['block_type']))
+            $user->setBlockType($this->attributes['block_type']);
+
+        if (isset($this->attributes['is_deactivate']))
+            $user->setIsDeactivate($this->attributes['is_deactivate']);
+
+        if (isset($this->attributes['is_freeze']))
+            $user->setIsFreeze($this->attributes['is_freeze']);
+
+        if ($this->getRoleNames()->count()) {
+            $role_name = implode(",", $this->getRoleNames()->toArray());
+            $user->setRole($role_name);
+        }
+
         return $user;
     }
 
     public function biggestActivePackage(): ?OrderedPackage
     {
-        return $this->ordered_packages()->active()->biggest();
+        return $this->ordered_packages()->active()->biggest()->first();
     }
 
     public function hasActivePackage()
     {
         return is_null($this->ordered_packages()->active()->first()) ? false : true;
     }
-
+    public function hasAnyValidOrder()
+    {
+        return $this->ordered_packages()->exists();
+    }
 
     public function eligibleForQuickStartBonus()
     {
@@ -182,7 +204,7 @@ class User extends Model
     {
         $oldest_package = $this->ordered_packages()->oldest()->first();
 
-        if (now()->diffInDays(Carbon::make($oldest_package->createdAt())) <= 30) {
+        if ($oldest_package && now()->diffInDays(Carbon::make($oldest_package->created_at)) <= 30) {
             return true;
         }
         return false;
@@ -190,7 +212,7 @@ class User extends Model
 
     public function hasCompletedBinaryLegs(): bool
     {
-
+        $this->refresh();
         $left_binary_children = $this->binaryTree->leftSideChildrenIds();
         $right_binary_children = $this->binaryTree->rightSideChildrenIds();
 
@@ -205,9 +227,9 @@ class User extends Model
         return false;
     }
 
-    public static function hasLeastChildrenWithRank(array $children, $rank = 1, $number_of_children = 1): bool
+    public static function hasLeastChildrenWithRank(array $children, $rank = 0, $number_of_children = 1): bool
     {
-        return User::query()->whereIn('id', $children)->where('rank', '>=', $rank)->count() > $number_of_children;
+        return User::query()->whereIn('id', $children)->where('rank', '>=', $rank)->count() >= $number_of_children;
     }
 
     public function residualBonusSetting()

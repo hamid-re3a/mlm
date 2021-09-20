@@ -38,25 +38,13 @@ class Transfer extends \Google\Protobuf\Internal\Message
      */
     protected $to_wallet_name = 0;
     /**
-     * Generated from protobuf field <code>string service_name = 7;</code>
+     * Generated from protobuf field <code>string deposit_transaction_id = 7;</code>
      */
-    protected $service_name = '';
+    protected $deposit_transaction_id = '';
     /**
-     * Generated from protobuf field <code>int64 payload_id = 8;</code>
+     * Generated from protobuf field <code>string withdraw_transaction_id = 8;</code>
      */
-    protected $payload_id = 0;
-    /**
-     * Generated from protobuf field <code>bool confirmed = 9;</code>
-     */
-    protected $confirmed = false;
-    /**
-     * Generated from protobuf field <code>int64 deposit_transaction_id = 10;</code>
-     */
-    protected $deposit_transaction_id = 0;
-    /**
-     * Generated from protobuf field <code>int64 withdraw_transaction_id = 11;</code>
-     */
-    protected $withdraw_transaction_id = 0;
+    protected $withdraw_transaction_id = '';
 
     /**
      * Constructor.
@@ -70,11 +58,8 @@ class Transfer extends \Google\Protobuf\Internal\Message
      *     @type string $description
      *     @type int $from_wallet_name
      *     @type int $to_wallet_name
-     *     @type string $service_name
-     *     @type int|string $payload_id
-     *     @type bool $confirmed
-     *     @type int|string $deposit_transaction_id
-     *     @type int|string $withdraw_transaction_id
+     *     @type string $deposit_transaction_id
+     *     @type string $withdraw_transaction_id
      * }
      */
     public function __construct($data = NULL) {
@@ -215,74 +200,8 @@ class Transfer extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>string service_name = 7;</code>
+     * Generated from protobuf field <code>string deposit_transaction_id = 7;</code>
      * @return string
-     */
-    public function getServiceName()
-    {
-        return $this->service_name;
-    }
-
-    /**
-     * Generated from protobuf field <code>string service_name = 7;</code>
-     * @param string $var
-     * @return $this
-     */
-    public function setServiceName($var)
-    {
-        GPBUtil::checkString($var, True);
-        $this->service_name = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>int64 payload_id = 8;</code>
-     * @return int|string
-     */
-    public function getPayloadId()
-    {
-        return $this->payload_id;
-    }
-
-    /**
-     * Generated from protobuf field <code>int64 payload_id = 8;</code>
-     * @param int|string $var
-     * @return $this
-     */
-    public function setPayloadId($var)
-    {
-        GPBUtil::checkInt64($var);
-        $this->payload_id = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>bool confirmed = 9;</code>
-     * @return bool
-     */
-    public function getConfirmed()
-    {
-        return $this->confirmed;
-    }
-
-    /**
-     * Generated from protobuf field <code>bool confirmed = 9;</code>
-     * @param bool $var
-     * @return $this
-     */
-    public function setConfirmed($var)
-    {
-        GPBUtil::checkBool($var);
-        $this->confirmed = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>int64 deposit_transaction_id = 10;</code>
-     * @return int|string
      */
     public function getDepositTransactionId()
     {
@@ -290,21 +209,21 @@ class Transfer extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 deposit_transaction_id = 10;</code>
-     * @param int|string $var
+     * Generated from protobuf field <code>string deposit_transaction_id = 7;</code>
+     * @param string $var
      * @return $this
      */
     public function setDepositTransactionId($var)
     {
-        GPBUtil::checkInt64($var);
+        GPBUtil::checkString($var, True);
         $this->deposit_transaction_id = $var;
 
         return $this;
     }
 
     /**
-     * Generated from protobuf field <code>int64 withdraw_transaction_id = 11;</code>
-     * @return int|string
+     * Generated from protobuf field <code>string withdraw_transaction_id = 8;</code>
+     * @return string
      */
     public function getWithdrawTransactionId()
     {
@@ -312,13 +231,13 @@ class Transfer extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>int64 withdraw_transaction_id = 11;</code>
-     * @param int|string $var
+     * Generated from protobuf field <code>string withdraw_transaction_id = 8;</code>
+     * @param string $var
      * @return $this
      */
     public function setWithdrawTransactionId($var)
     {
-        GPBUtil::checkInt64($var);
+        GPBUtil::checkString($var, True);
         $this->withdraw_transaction_id = $var;
 
         return $this;

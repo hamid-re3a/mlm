@@ -26,6 +26,8 @@ use MLM\database\factories\ResidualBonusSettingFactory;
  * @method static \Illuminate\Database\Eloquent\Builder|ResidualBonusSetting whereRank($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ResidualBonusSetting whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \MLM\Models\Rank $rankCollection
+ * @method static \MLM\database\factories\ResidualBonusSettingFactory factory(...$parameters)
  */
 class ResidualBonusSetting extends Model
 {

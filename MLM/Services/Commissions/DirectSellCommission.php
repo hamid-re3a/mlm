@@ -8,13 +8,14 @@ use MLM\Jobs\DirectSellCommissionJob;
 use MLM\Models\OrderedPackage;
 use Orders\Services\Grpc\Order;
 use User\Models\User;
+use User\Services\UserService;
 
 class DirectSellCommission implements Commission
 {
 
     public function calculate(Order $order): bool
     {
-        $user = User::query()->findOrFail($order->getUserId());
+        $user = app(UserService::class)->findByIdOrFail($order->getUserId());
         $package = OrderedPackage::query()->where('order_id', $order->getId())->firstOrFail();
         DirectSellCommissionJob::dispatch($user,$package);
         return true;

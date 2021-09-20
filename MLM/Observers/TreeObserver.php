@@ -22,13 +22,13 @@ class TreeObserver
 
     public function checkSiblingCount(Tree $node): void
     {
-        $parent = $node->parent()->first();
+        $parent = $node->parent;
         if ($parent)
-            if ($parent->children()->count() > 1) {
+            if ($parent->children()->where('id','!=',$node->id)->count() > 1) {
                 throw new TreeMaxChildrenExceededException();
-            } else if ($parent->children()->left()->count() >= 1 && $node->isLeftChild()){
+            } else if ($parent->children()->left()->where('id','!=',$node->id)->count() >= 1 && $node->isLeftChild()){
                 throw new TreeMaxLeftChildExceededException();
-            } else if ($parent->children()->right()->count() >= 1 && $node->isRightChild()){
+            } else if ($parent->children()->right()->where('id','!=',$node->id)->count() >= 1 && $node->isRightChild()){
                 throw new TreeMaxRightChildExceededException();
             }
     }

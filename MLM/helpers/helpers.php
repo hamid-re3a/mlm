@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use User\Models\User;
+use Wallets\Services\Grpc\Deposit;
 
 if (!function_exists('subset')) {
 
@@ -32,13 +34,81 @@ if (!function_exists('getRank')) {
     }
 }
 
+if (!function_exists('payCommission')) {
+    /**
+     * @param Deposit $deposit_service_object
+     * @param User $user
+     * @param $type
+     * @param null $package_id
+     * @throws Exception
+     */
+    function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
+    {
+        DB::beginTransaction();
+        try {
+            $commission = $user->commissions()->create([
+                'amount' => $deposit_service_object->getAmount(),
+                'ordered_package_id' => $package_id,
+                'type' => $type,
+            ]);
+
+            if (app()->environment() != 'testing') {
+                if ($commission) {
+                    $deposit_service_object->setPayloadId($commission->id);
+                    /** @var $deposit_response  Deposit */
+                    list($deposit_response, $error) = getWalletGrpcClient()->deposit($deposit_service_object)->wait();
+                    if ($error != 0) {
+                        throw new \Exception('Wallet Service Error');
+                    }
+
+                    $commission->transaction_id = $deposit_response->getTransactionId();
+                    $commission->save();
+                } else {
+                    throw new \Exception('Commission Failed Error');
+                }
+            }
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            throw new \Exception('Commission Error => ' . $exception->getMessage());
+        }
+
+        DB::commit();
+
+    }
+}
+if (!function_exists('getPackageGrpcClient')) {
+    function getPackageGrpcClient()
+    {
+        return new \Packages\Services\Grpc\PackagesServiceClient('staging-api-gateway.janex.org:9596', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+if (!function_exists('getWalletGrpcClient')) {
+    function getWalletGrpcClient()
+    {
+        return new \Wallets\Services\Grpc\WalletServiceClient('staging-api-gateway.janex.org:9596', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+
+if (!function_exists('userRankBasedOnConvertedPoint')) {
+    function userRankBasedOnConvertedPoint($converted_point): \MLM\Models\Rank
+    {
+        return \MLM\Models\Rank::query()->where('condition_converted_in_bp', '<=', $converted_point / BF_TO_BB_RATIO)->orderBy('rank', 'desc')->first();
+    }
+}
 if (!function_exists('getAndUpdateUserRank')) {
 
-    function getAndUpdateUserRank(\User\Models\User $user): \MLM\Models\Rank
+    function getAndUpdateUserRank(\User\Models\User $user): ?\MLM\Models\Rank
     {
-        $ranks = \MLM\Models\Rank::query()->orderBy('rank', 'asc')->get();
+        $ranks = \MLM\Models\Rank::query()->orderBy('rank', 'desc')->get();
         foreach ($ranks as $rank) {
-            if ($rank->condition_converted_in_bp >= (BF_TO_BB_RATIO * $user->binaryTree->converted_points)) {
+            if ($user->binaryTree->converted_points >= BF_TO_BB_RATIO * $rank->condition_converted_in_bp) {
+
+
                 $left_binary_children = $user->binaryTree->leftSideChildrenIds();
                 $right_binary_children = $user->binaryTree->rightSideChildrenIds();
                 if ($rank->condition_direct_or_indirect) {
@@ -70,19 +140,19 @@ if (!function_exists('getMLMSetting')) {
     function getSetting($key)
     {
         //Check if settings are available in cache
-        if(cache()->has('mlm_settings'))
-            if($setting = collect(cache('mlm_settings'))->where('name', $key)->first())
+        if (cache()->has('mlm_settings'))
+            if ($setting = collect(cache('mlm_settings'))->where('name', $key)->first())
                 return $setting['value'];
 
-        $setting = \MLM\Models\Setting::query()->where('name',$key)->first();
-        if($setting)
+        $setting = \MLM\Models\Setting::query()->where('name', $key)->first();
+        if ($setting)
             return $setting->value;
 
 
-        if(defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) AND array_key_exists($key,MLM_SETTINGS))
+        if (defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) AND array_key_exists($key, MLM_SETTINGS))
             return MLM_SETTINGS[$key]['value'];
 
         \Illuminate\Support\Facades\Log::error('mlmSetting => ' . $key);
-        throw new Exception(trans('mlm.responses.settings.key-doesnt-exists',['key' => $key]));
+        throw new Exception(trans('mlm.responses.settings.key-doesnt-exists', ['key' => $key]));
     }
 }

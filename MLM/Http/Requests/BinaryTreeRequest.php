@@ -4,7 +4,7 @@ namespace MLM\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ReferralTreeRequest extends FormRequest
+class BinaryTreeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,6 @@ class ReferralTreeRequest extends FormRequest
     {
         return [
             'id' => 'sometimes|exists:users',
-            'page' => 'sometimes|numeric',
         ];
     }
 }

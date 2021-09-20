@@ -2,15 +2,17 @@
 
 namespace MLM\Jobs;
 
-use App\Jobs\Wallet\WalletDepositJob;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use MLM\Models\OrderedPackage;
 use MLM\Models\Rank;
 use User\Models\User;
+use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
 
 class BinaryCommissionJob implements ShouldQueue
@@ -27,11 +29,10 @@ class BinaryCommissionJob implements ShouldQueue
         $this->user = $user;
     }
 
-    public function handle()
+    public function handle(UserService $user_service)
     {
-
-        if (!is_null($this->user->binaryTree->parent) && !is_null($this->user->binaryTree->parent->user)) {
-            $parent = $this->user->binaryTree->parent->user;
+        if (!is_null($this->user->binaryTree->parent) && !is_null($this->user->binaryTree->parent->user_id)) {
+            $parent = $user_service->findByIdOrFail($this->user->binaryTree->parent->user_id);
             if ($parent->hasCompletedBinaryLegs()) {
 
                 $biggest_active_package = $parent->biggestActivePackage();
@@ -39,64 +40,65 @@ class BinaryCommissionJob implements ShouldQueue
                     $left_binary_children_price = $parent->binaryTree->leftSideChildrenPackagePrice();
                     $right_binary_children_price = $parent->binaryTree->rightSideChildrenPackagePrice();
                     $weaker_leg_price = $left_binary_children_price >= $right_binary_children_price ? $right_binary_children_price : $left_binary_children_price;
+                    $requested_commission_amount = (int)$weaker_leg_price - (int)$parent->binaryTree->converted_points;
 
-                    $first_convert_amount = $weaker_leg_price - $parent->binaryTree->converted_points;
-                    if ($first_convert_amount > 0) {
+                    if ($requested_commission_amount > 0) {
 
                         /** @var $rank Rank */
                         $rank = getAndUpdateUserRank($parent);
 
-                        $amount = $parent->commissions()->where('type', $this->getType())
+                        $amount_paid_today = $parent->commissions()->where('type', $this->getType())
                             ->whereDate('created_at', now()->toDate())->sum('amount');
-                        if ($first_convert_amount + $amount > $rank->cap) {
-
-                            $convert_amount = $rank->cap - $amount;
-                            $convert_amount = ($convert_amount < 0) ? 0 : $convert_amount;
 
 
-                            $cap_amount = $first_convert_amount - $convert_amount;
+                        $rank_based_on_converted_points = userRankBasedOnConvertedPoint($weaker_leg_price);
 
-                            $parent->commissions()->create([
-                                'amount' => $cap_amount,
-                                'ordered_package_id' => $this->package->id,
-                                'type' => 'Cap',
-                            ]);
-                        } else {
-                            $convert_amount = $first_convert_amount;
-                        }
+                        DB::beginTransaction();
+                        try {
 
-                        if ($convert_amount > 0) {
-                            $commission_amount = $convert_amount * $biggest_active_package->binary_percentage;
+                            if ($requested_commission_amount + $amount_paid_today > $rank_based_on_converted_points->cap) {
 
-                            /** @var $depositService  Deposit */
-                            $depositService = app(Deposit::class);
-                            $depositService->setUserId($this->user->referralTree->parent->user->id);
-                            $depositService->setAmount($commission_amount);
-                            $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
-
-                            $depositService->setDescription(serialize([
-                                'description' => 'Commission # ' . $this->getType()
-                            ]));
-                            $depositService->setType('Commission');
-                            $depositService->setSubType('Binary');
-                            $depositService->setServiceName('mlm');
+                                $payable_amount = $rank_based_on_converted_points->cap - $amount_paid_today;
+                                $payable_amount = ($payable_amount < 0) ? 0 : $payable_amount;
 
 
-                            $commission = $parent->commissions()->create([
-                                'amount' => $commission_amount,
-                                'ordered_package_id' => $this->package->id,
-                                'type' => $this->getType(),
-                            ]);
-                            if ($commission) {
-                                $depositService->setPayloadId($commission->id);
-                                WalletDepositJob::dispatch($depositService)->onConnection('rabbit')->onQueue('subscriptions');
+                                $cap_amount = $requested_commission_amount - $payable_amount;
 
+                                $parent->commissions()->create([
+                                    'amount' => $cap_amount * $biggest_active_package->binary_percentage / 100,
+                                    'ordered_package_id' => $this->package->id,
+                                    'type' => 'cap-commission',
+                                ]);
+                            } else {
+                                $payable_amount = $requested_commission_amount;
+                            }
+                            if ($payable_amount > 0) {
+                                $commission_amount = $payable_amount * $biggest_active_package->binary_percentage / 100;
+
+                                /** @var $deposit_service_object  Deposit */
+                                $deposit_service_object = app(Deposit::class);
+                                $deposit_service_object->setUserId($parent->id);
+                                $deposit_service_object->setAmount($commission_amount);
+                                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+
+                                $deposit_service_object->setDescription(serialize([
+                                    'description' => 'Commission # ' . $this->getType()
+                                ]));
+                                $deposit_service_object->setType('Commission');
+                                $deposit_service_object->setSubType('Binary');
+
+                                payCommission($deposit_service_object, $parent, $this->getType(), $this->package->id);
                             }
 
-                        }
 
-                        $parent->binaryTree->converted_points = $weaker_leg_price;
-                        $parent->binaryTree->save();
+                            $parent->binaryTree->converted_points = $weaker_leg_price;
+                            $parent->binaryTree->save();
+
+                            DB::commit();
+                        } catch (\Exception $exception) {
+                            DB::rollBack();
+                            throw $exception;
+                        }
                     }
                 }
             }

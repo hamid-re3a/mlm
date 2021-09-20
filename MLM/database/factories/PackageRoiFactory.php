@@ -25,7 +25,7 @@ class PackageRoiFactory extends Factory
     public function definition()
     {
         $package = Package::factory()->create();
-        $user = User::factory()->create();
+        $user = User::query()->inRandomOrder()->first();
         $days=1;
         //in case duplication on mix of package_id and due_date , the date should be changed
         $dueDate=PackageRoi::whereDueDate($this->date($days))->wherePackageId($package->id)->count()>0?$this->date($days+1):$this->date($days);
