@@ -187,7 +187,10 @@ class User extends Model
     {
         return is_null($this->ordered_packages()->active()->first()) ? false : true;
     }
-
+    public function hasAnyValidOrder()
+    {
+        return $this->ordered_packages()->exists();
+    }
 
     public function eligibleForQuickStartBonus()
     {
