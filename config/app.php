@@ -179,6 +179,11 @@ return [
         \ResponseTransformer\ResponseTransformerServiceProvider::class,
         \User\UserServiceProvider::class,
         \MLM\MLMServiceProvider::class,
+        /*
+         * Package Service Providers...
+         */
+        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
+
     ],
 
     /*

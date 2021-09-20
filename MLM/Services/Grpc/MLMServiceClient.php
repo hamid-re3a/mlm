@@ -1,11 +1,11 @@
 <?php
 // GENERATED CODE -- DO NOT EDIT!
 
-namespace Orders\Services\Grpc;
+namespace MLM\Services\Grpc;
 
 /**
  */
-class OrdersServiceClient extends \Grpc\BaseStub {
+class MLMServiceClient extends \Grpc\BaseStub {
 
     /**
      * @param string $hostname hostname
@@ -20,13 +20,13 @@ class OrdersServiceClient extends \Grpc\BaseStub {
      * @param \User\Services\Grpc\User $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Orders\Services\Grpc\Acknowledge
+     * @return \MLM\Services\Grpc\Acknowledge
      */
     public function hasValidPackage(\User\Services\Grpc\User $argument,
       $metadata = [], $options = []) {
-        return $this->_simpleRequest('/orders.services.grpc.OrdersService/hasValidPackage',
+        return $this->_simpleRequest('/MLM.services.grpc.MLMService/hasValidPackage',
         $argument,
-        ['\Orders\Services\Grpc\Acknowledge', 'decode'],
+        ['\MLM\Services\Grpc\Acknowledge', 'decode'],
         $metadata, $options);
     }
 
@@ -34,13 +34,13 @@ class OrdersServiceClient extends \Grpc\BaseStub {
      * @param \Orders\Services\Grpc\Order $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Orders\Services\Grpc\Acknowledge
+     * @return \MLM\Services\Grpc\Acknowledge
      */
     public function simulateOrder(\Orders\Services\Grpc\Order $argument,
       $metadata = [], $options = []) {
-        return $this->_simpleRequest('/orders.services.grpc.OrdersService/simulateOrder',
+        return $this->_simpleRequest('/MLM.services.grpc.MLMService/simulateOrder',
         $argument,
-        ['\Orders\Services\Grpc\Acknowledge', 'decode'],
+        ['\MLM\Services\Grpc\Acknowledge', 'decode'],
         $metadata, $options);
     }
 
@@ -48,13 +48,13 @@ class OrdersServiceClient extends \Grpc\BaseStub {
      * @param \Orders\Services\Grpc\Order $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Orders\Services\Grpc\Acknowledge
+     * @return \MLM\Services\Grpc\Acknowledge
      */
     public function submitOrder(\Orders\Services\Grpc\Order $argument,
       $metadata = [], $options = []) {
-        return $this->_simpleRequest('/orders.services.grpc.OrdersService/submitOrder',
+        return $this->_simpleRequest('/MLM.services.grpc.MLMService/submitOrder',
         $argument,
-        ['\Orders\Services\Grpc\Acknowledge', 'decode'],
+        ['\MLM\Services\Grpc\Acknowledge', 'decode'],
         $metadata, $options);
     }
 
