@@ -20,7 +20,7 @@ class PackageRoiCreateFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $package = Package::factory()->create();
-        $resp = $this->post(route('packagesRoi.store'), [
+        $resp = $this->post(route('admin.packagesRoi.store'), [
             'package_id' => $package->id,
             'roi_percentage' => mt_rand(0, 1000) / 10,
             'due_date' => '2021-08-02'
@@ -41,7 +41,7 @@ class PackageRoiCreateFeatureTest extends MLMTest
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
 
         $package = Package::factory()->create();
-        $this->post(route('packagesRoi.store'), [
+        $this->post(route('admin.packagesRoi.store'), [
             'package_id' => $package->id,
             'roi_percentage' => mt_rand(0, 1000) / 10,
             'due_date' => '2021-08-02'
@@ -55,7 +55,7 @@ class PackageRoiCreateFeatureTest extends MLMTest
     public function package_id_is_required_for_creating_packageRoi()
     {
         $this->withHeaders($this->getHeaders());
-        $this->post(route('packagesRoi.store'), [
+        $this->post(route('admin.packagesRoi.store'), [
             'roi_percentage' => mt_rand(0, 1000) / 10,
             'due_date' => '2021-08-02'
         ])->assertStatus(422);
@@ -69,7 +69,7 @@ class PackageRoiCreateFeatureTest extends MLMTest
         $package = Package::factory()->create();
 
         $this->withHeaders($this->getHeaders());
-        $this->post(route('packagesRoi.store'), [
+        $this->post(route('admin.packagesRoi.store'), [
             'package_id' => $package->id,
             'due_date' => '2021-08-02'
         ])->assertStatus(422);
@@ -83,7 +83,7 @@ class PackageRoiCreateFeatureTest extends MLMTest
         $package = Package::factory()->create();
 
         $this->withHeaders($this->getHeaders());
-        $this->post(route('packagesRoi.store'), [
+        $this->post(route('admin.packagesRoi.store'), [
             'package_id' => $package->id,
             'due_date' => '2021-08-02',
             'roi_percentage' => 'test',
@@ -98,7 +98,7 @@ class PackageRoiCreateFeatureTest extends MLMTest
         $package = Package::factory()->create();
 
         $this->withHeaders($this->getHeaders());
-        $this->post(route('packagesRoi.store'), [
+        $this->post(route('admin.packagesRoi.store'), [
             'package_id' => $package->id,
             'roi_percentage' => mt_rand(0, 1000) / 10,
         ])->assertStatus(422);
@@ -110,7 +110,7 @@ class PackageRoiCreateFeatureTest extends MLMTest
     public function package_id_should_be_integer_for_creating_packageRoi()
     {
         $this->withHeaders($this->getHeaders());
-        $this->post(route('packagesRoi.store'), [
+        $this->post(route('admin.packagesRoi.store'), [
             'package_id' => ' ',
             'roi_percentage' => mt_rand(0, 1000) / 10,
             'due_date' => '2021-08-02'
@@ -123,7 +123,7 @@ class PackageRoiCreateFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $packageRoi = PackageRoi::factory()->create();
-        $resp = $this->post(route('packagesRoi.store'), [
+        $resp = $this->post(route('admin.packagesRoi.store'), [
             'package_id' => $packageRoi->package_id,
             'due_date' => $packageRoi->due_date,
             'roi_percentage' => mt_rand(0, 1000) / 10

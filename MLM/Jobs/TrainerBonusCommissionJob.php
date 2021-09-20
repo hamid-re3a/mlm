@@ -2,7 +2,7 @@
 
 namespace MLM\Jobs;
 
-use App\Jobs\Wallet\WalletDepositJob;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
 use User\Models\User;
+use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
 
 class TrainerBonusCommissionJob implements ShouldQueue
@@ -28,52 +29,47 @@ class TrainerBonusCommissionJob implements ShouldQueue
         $this->user = $user;
     }
 
-    public function handle()
+    public function handle(UserService $user_service)
     {
-        if (!is_null($this->user->referralTree->parent) && !is_null($this->user->referralTree->parent->user)) {
-            $parent = $this->user->referralTree->parent->user;
-            if (!CommissionModel::query()->where('user_id', $parent->id)->type($this->getType())->exists())
-                if ($parent->eligibleForQuickStartBonus()) {
+        if (!is_null($this->user->referralTree->parent) && !is_null($this->user->referralTree->parent->user_id)) {
+            $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
+            if (!is_null($parent->referralTree->parent) && !is_null($parent->referralTree->parent->user_id)) {
+                $grand_parent = $user_service->findByIdOrFail($parent->referralTree->parent->user_id);
 
-                    $left_binary_children = $parent->binaryTree->leftSideChildrenIds();
-                    $right_binary_children = $parent->binaryTree->rightSideChildrenIds();
+                if (!CommissionModel::query()->where('user_id', $grand_parent->id)->type($this->getType())->exists())
+                    if ($grand_parent->eligibleForQuickStartBonus()) {
 
-                    $referral_children = $parent->referralTree->childrenUserIds();
+                        $left_binary_children = $grand_parent->binaryTree->leftSideChildrenIds();
+                        $right_binary_children = $grand_parent->binaryTree->rightSideChildrenIds();
 
-                    $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
-                    $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
+                        $referral_children = $grand_parent->referralTree->childrenUserIds();
 
-                    if ($this->hasAtLeastOnEligibleForQuickStartUser($left_binary_sponsored_children) &&
-                        $this->hasAtLeastOnEligibleForQuickStartUser($right_binary_sponsored_children)) {
-                        $commission_amount = 200;
-                        /** @var $depositService  Deposit */
-                        $depositService = app(Deposit::class);
-                        $depositService->setUserId($parent->id);
-                        $depositService->setAmount($commission_amount);
-                        $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+                        $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
+                        $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
 
-                        $depositService->setDescription(serialize([
-                            'description' => 'Commission # ' . $this->getType()
-                        ]));
-                        $depositService->setType('Commission');
-                        $depositService->setSubType('Trainer Bonus');
-                        $depositService->setServiceName('mlm');
+                        if ($this->hasAtLeastOnEligibleForQuickStartUser($left_binary_sponsored_children) &&
+                            $this->hasAtLeastOnEligibleForQuickStartUser($right_binary_sponsored_children)) {
+                            $commission_amount = 200;
+                            /** @var $deposit_service_object  Deposit */
+                            $deposit_service_object = app(Deposit::class);
+                            $deposit_service_object->setUserId($grand_parent->id);
+                            $deposit_service_object->setAmount($commission_amount);
+                            $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+
+                            $deposit_service_object->setDescription(serialize([
+                                'description' => 'Commission # ' . $this->getType()
+                            ]));
+                            $deposit_service_object->setType('Commission');
+                            $deposit_service_object->setSubType('Trainer Bonus');
+
+                            payCommission($deposit_service_object, $grand_parent, $this->getType(), $this->package->id);
 
 
-                        $commission = $this->user->referralTree->parent->user->commissions()->create([
-                            'amount' => $commission_amount,
-                            'ordered_package_id' => $this->package->id,
-                            'type' => $this->getType(),
-                        ]);
-                        if ($commission) {
-                            $depositService->setPayloadId($commission->id);
-                            WalletDepositJob::dispatch($depositService)->onConnection('rabbit')->onQueue('subscriptions');
                         }
 
                     }
 
-
-                }
+            }
 
         }
     }

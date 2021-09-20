@@ -9,6 +9,7 @@ use MLM\Jobs\TrainerBonusCommissionJob;
 use MLM\Models\OrderedPackage;
 use Orders\Services\Grpc\Order;
 use User\Models\User;
+use User\Services\UserService;
 
 class TrainerBonusCommission implements Commission
 {
@@ -16,7 +17,7 @@ class TrainerBonusCommission implements Commission
     public function calculate(Order $order): bool
     {
 
-        $user = User::query()->findOrFail($order->getUserId());
+        $user = app(UserService::class)->findByIdOrFail($order->getUserId());
         $package = OrderedPackage::query()->where('order_id', $order->getId())->firstOrFail();
         TrainerBonusCommissionJob::dispatch($user,$package);
         return true;

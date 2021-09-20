@@ -77,6 +77,7 @@ use User\Models\User;
  * @method static \Kalnoy\Nestedset\QueryBuilder|ReferralTree whereUserId($value)
  * @method static \Kalnoy\Nestedset\QueryBuilder|ReferralTree withDepth(string $as = 'depth')
  * @method static \Kalnoy\Nestedset\QueryBuilder|ReferralTree withoutRoot()
+ * @method static \MLM\database\factories\ReferralTreeFactory factory(...$parameters)
  */
 class ReferralTree extends Model
 {

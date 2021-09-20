@@ -18,7 +18,7 @@ class MLMTest extends TestCase
     use CreatesApplication;
     use RefreshDatabase;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
@@ -58,7 +58,7 @@ class MLMTest extends TestCase
         }
     }
 
-    public function getHeaders($id = null,$role=null)
+    public function getHeaders($id = null, $role = null)
     {
         User::query()->firstOrCreate([
             'id' => '1',
@@ -73,7 +73,8 @@ class MLMTest extends TestCase
             $query->where('id', $id);
         })->first();
 
-        $user->assignRole($role?$role:USER_ROLE_SUPER_ADMIN);
+        $user->roles()->detach();
+        $user->assignRole($role ? $role : USER_ROLE_SUPER_ADMIN);
         $user->save();
         $hash = md5(serialize($user->getUserService()));
         return [

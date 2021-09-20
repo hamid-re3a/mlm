@@ -29,6 +29,9 @@ use MLM\database\factories\PackageRoiFactory;
  * @method static \Illuminate\Database\Eloquent\Builder|PackageRoi whereUpdatedAt($value)
  * @mixin \Eloquent
  * @method static \Illuminate\Database\Eloquent\Builder|PackageRoi today()
+ * @property int $user_id
+ * @method static \MLM\database\factories\PackageRoiFactory factory(...$parameters)
+ * @method static \Illuminate\Database\Eloquent\Builder|PackageRoi whereUserId($value)
  */
 class PackageRoi extends Model
 {

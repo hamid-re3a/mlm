@@ -43,7 +43,11 @@ Route::middleware(['auth'])->group(function () {
     });
 
     //Client routes
-    Route::middleware(['role :' . USER_ROLE_CLIENT])->name('customer')->group(function () {
+    Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer')->group(function () {
+        Route::name('trees.')->prefix('trees')->group(function () {
+            Route::get('binary', [\MLM\Http\Controllers\Front\TreeController::class, 'getBinaryTree'])->name('binary');
+            Route::get('referral', [\MLM\Http\Controllers\Front\TreeController::class, 'getUserReferralTree'])->name('referral');
+        });
     });
 
 });

@@ -2,7 +2,7 @@
 
 namespace MLM\Jobs;
 
-use App\Jobs\Wallet\WalletDepositJob;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
 use User\Models\User;
+use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
 
 class DirectSellCommissionJob implements ShouldQueue
@@ -27,15 +28,18 @@ class DirectSellCommissionJob implements ShouldQueue
         $this->user = $user;
     }
 
-    public function handle()
+    public function handle(UserService $user_service)
     {
         if (!CommissionModel::query()->where('ordered_package_id', $this->package->id)->type($this->getType())->exists()) {
-            /** @var  $biggest_active_package OrderedPackage */
-            $biggest_active_package = $this->user->referralTree->parent->user->biggestActivePackage();
-            if ($biggest_active_package) {
 
+            $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
+
+
+            /** @var  $biggest_active_package OrderedPackage */
+            $biggest_active_package = $parent->biggestActivePackage();
+            if ($biggest_active_package) {
                 $is_eligible_for_quick_start_bonus = false;
-                if ($this->user->referralTree->parent->user->eligibleForQuickStartBonus()) {
+                if ($parent->eligibleForQuickStartBonus()) {
                     $is_eligible_for_quick_start_bonus = true;
                 }
 
@@ -43,30 +47,21 @@ class DirectSellCommissionJob implements ShouldQueue
                 $commission_amount = ($this->package->price * $percentage / 100);
 
 
-                /** @var $depositService  Deposit */
-                $depositService = app(Deposit::class);
-                $depositService->setUserId($this->user->referralTree->parent->user->id);
-                $depositService->setAmount($commission_amount);
-                $depositService->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+                /** @var $deposit_service_object  Deposit */
+                $deposit_service_object = app(Deposit::class);
+                $deposit_service_object->setUserId($parent->id);
+                $deposit_service_object->setAmount($commission_amount);
+                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
-                $depositService->setDescription(serialize([
+                $deposit_service_object->setDescription(serialize([
                     'description' => 'Commission # ' . $this->getType() . $is_eligible_for_quick_start_bonus ? ' - Quick Start bonus ' : ''
                 ]));
-                $depositService->setType('Commission');
-                $depositService->setSubType('Direct Sell');
-                $depositService->setServiceName('mlm');
+                $deposit_service_object->setType('Commission');
+                $deposit_service_object->setSubType('Direct Sell');
 
-                /** @var $commission CommissionModel */
-                $commission = $this->user->referralTree->parent->user->commissions()->create([
-                    'amount' => $commission_amount,
-                    'ordered_package_id' => $this->package->id,
-                    'type' => $this->getType(),
-                ]);
 
-                if ($commission) {
-                    $depositService->setPayloadId($commission->id);
-                    WalletDepositJob::dispatch($depositService)->onConnection('rabbit')->onQueue('subscriptions');
-                }
+                payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);
+
             }
         }
     }

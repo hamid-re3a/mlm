@@ -4,6 +4,7 @@ namespace MLM;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use MLM\Commands\ResidualBonusCommand;
 use MLM\Commands\RoiCommand;
 use MLM\Models\Setting;
 use MLM\Models\Tree;
@@ -66,7 +67,8 @@ class MLMServiceProvider extends ServiceProvider
             $this->seed();
 
             $this->commands([
-                RoiCommand::class
+                RoiCommand::class,
+                ResidualBonusCommand::class
             ]);
             $this->publishes([
                 __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),

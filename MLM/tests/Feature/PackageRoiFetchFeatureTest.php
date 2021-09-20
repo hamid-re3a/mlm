@@ -25,7 +25,7 @@ class PackageRoiFetchFeatureTest extends MLMTest
             'due_date' => '2021-08-02'
         ]);
         $packagesRois = PackageRoi::factory()->count(3)->create();
-        $response = $this->get(route('packagesRoi.index'))
+        $response = $this->get(route('admin.packagesRoi.index'))
             ->assertOk();
         $response->assertJsonStructure(
             [
@@ -36,7 +36,7 @@ class PackageRoiFetchFeatureTest extends MLMTest
         );
         $response->assertJsonCount(count($packagesRois) + 1, 'data');
         $response->assertJsonFragment([
-            'package_id' => $package->id,
+            'package_id' => "$package->id",
             'due_date' => '2021-08-02'
         ]);
 
@@ -49,7 +49,7 @@ class PackageRoiFetchFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
         PackageRoi::factory()->count(3)->create();
-        $this->get(route('packagesRoi.index'))
+        $this->get(route('admin.packagesRoi.index'))
             ->assertStatus(403);
 
 
@@ -67,7 +67,7 @@ class PackageRoiFetchFeatureTest extends MLMTest
             'roi_percentage' => mt_rand(0, 1000) / 10,
             'due_date' => '2021-08-02'
         ]);
-        $response = $this->get(route('packagesRoi.show', [
+        $response = $this->get(route('admin.packagesRoi.show', [
             'package_id' => $package->id,
             'due_date' => '2021-08-02'
         ]))->assertOk();
@@ -79,7 +79,7 @@ class PackageRoiFetchFeatureTest extends MLMTest
             ]
         );
         $response->assertJsonFragment([
-            'package_id' => $package->id,
+            'package_id' => "$package->id",
             'due_date' => '2021-08-02'
         ]);
 
@@ -92,7 +92,7 @@ class PackageRoiFetchFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
         PackageRoi::factory()->create();
-        $this->get(route('packagesRoi.show'))
+        $this->get(route('admin.packagesRoi.show'))
             ->assertStatus(403);
 
 

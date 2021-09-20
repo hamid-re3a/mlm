@@ -6,6 +6,7 @@ namespace Orders\Services\Grpc;
 
 use Mix\Grpc;
 use Mix\Grpc\Context;
+use User\Services\Grpc as UserGrpc;
 
 interface OrdersServiceInterface extends Grpc\ServiceInterface
 {
@@ -14,28 +15,28 @@ interface OrdersServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
-    * @param Id $request
-    * @return Order
+    * @param Grpc\User $request
+    * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
     */
-    public function OrderById(Context $context, Id $request): Order;
+    public function hasValidPackage(Context $context, UserGrpc\User $request): Acknowledge;
 
     /**
     * @param Context $context
     * @param Order $request
-    * @return Order
+    * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
     */
-    public function updateOrder(Context $context, Order $request): Order;
+    public function simulateOrder(Context $context, Order $request): Acknowledge;
 
     /**
     * @param Context $context
-    * @param Grpc\User $request
-    * @return Order
+    * @param Order $request
+    * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
     */
-    public function hasValidPackage(Context $context, Grpc\User $request): Order;
+    public function submitOrder(Context $context, Order $request): Acknowledge;
 }

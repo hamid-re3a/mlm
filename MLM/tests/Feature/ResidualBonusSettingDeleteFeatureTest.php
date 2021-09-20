@@ -18,7 +18,7 @@ class ResidualBonusSettingDeleteFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
-        $this->delete(route('residualBonusSetting.destroy'), [
+        $this->delete(route('admin.residualBonusSetting.destroy'), [
             'id' => $residualBonusSetting->id,
         ])->assertOk();
         $this->assertDatabaseMissing('residual_bonus_settings', [
@@ -34,7 +34,7 @@ class ResidualBonusSettingDeleteFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
-        $this->delete(route('residualBonusSetting.destroy'), [
+        $this->delete(route('admin.residualBonusSetting.destroy'), [
             'id' => $residualBonusSetting->id,
         ])->assertStatus(403);
 
@@ -47,7 +47,7 @@ class ResidualBonusSettingDeleteFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
          ResidualBonusSetting::factory()->create();
-        $this->delete(route('residualBonusSetting.destroy'), [
+        $this->delete(route('admin.residualBonusSetting.destroy'), [
         ])->assertStatus(422);
 
     }

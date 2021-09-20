@@ -18,7 +18,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
-        $resp = $this->put(route('residualBonusSetting.update'), [
+        $resp = $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'rank' => mt_rand(0, 1000),
             'percentage' => mt_rand(0, 1000) / 10,
@@ -40,7 +40,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
 
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'rank' => mt_rand(0, 1000),
             'percentage' => mt_rand(0, 1000) / 10,
@@ -55,7 +55,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'rank' => mt_rand(0, 1000),
             'percentage' => mt_rand(0, 1000) / 10,
@@ -69,7 +69,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'level' => mt_rand(0, 1000),
             'percentage' => mt_rand(0, 1000) / 10,
@@ -83,7 +83,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders());
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'level' => mt_rand(0, 1000),
             'rank' => mt_rand(0, 100),
@@ -96,7 +96,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
     public function id_is_required_for_updating_residualBonusSetting()
     {
         $this->withHeaders($this->getHeaders());
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'level' => mt_rand(0, 1000),
             'rank' => mt_rand(0, 100),
             'percentage' => mt_rand(0, 1000) / 10,
@@ -115,14 +115,14 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
             'percentage' => 20.09,
         ]);
 
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id + 1,
             'level' => 14,
             'rank' => 3,
             'percentage' => 5.5,
         ])->assertStatus(422);
 
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'level' => 14,
             'rank' => 3,
@@ -138,7 +138,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
         $this->withHeaders($this->getHeaders());
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
 
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'level' =>$residualBonusSetting->level,
             'rank' => mt_rand(0, 100),
@@ -155,7 +155,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
         $this->withHeaders($this->getHeaders());
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
 
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'level' =>$residualBonusSetting->level,
             'rank' => mt_rand(0, 99)/100,
@@ -171,7 +171,7 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
         $this->withHeaders($this->getHeaders());
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
 
-        $this->put(route('residualBonusSetting.update'), [
+        $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'rank' =>$residualBonusSetting->rank,
             'level' => mt_rand(0, 99)/100,

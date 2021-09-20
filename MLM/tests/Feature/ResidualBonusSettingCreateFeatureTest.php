@@ -17,7 +17,7 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
     public function user_can_create_residualBonusSetting()
     {
         $this->withHeaders($this->getHeaders());
-        $resp=$this->post(route('residualBonusSetting.store'), [
+        $resp=$this->post(route('admin.residualBonusSetting.store'), [
             'rank' => mt_rand(0,1000),
             'percentage' => mt_rand(0,1000)/10,
             'level' => mt_rand(0,1000)
@@ -36,7 +36,7 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
     {
 
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'rank' =>  mt_rand(0, 100),
             'percentage' =>  mt_rand(0, 1000)/10,
             'level' =>  mt_rand(0, 100)
@@ -50,7 +50,7 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
     public function level_is_required_for_creating_residualBonusSetting()
     {
         $this->withHeaders($this->getHeaders());
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'rank' =>  mt_rand(0, 100),
             'percentage' =>  mt_rand(0, 1000)/10,
         ])->assertStatus(422);
@@ -62,7 +62,7 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
     public function rank_is_required_for_creating_residualBonusSetting()
     {
         $this->withHeaders($this->getHeaders());
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'level' =>  mt_rand(0, 100),
             'percentage' =>  mt_rand(0, 1000)/10,
         ])->assertStatus(422);
@@ -74,7 +74,7 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
     public function percentage_is_required_for_creating_residualBonusSetting()
     {
         $this->withHeaders($this->getHeaders());
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'level' =>  mt_rand(0, 100),
             'rank' =>  mt_rand(0, 100),
         ])->assertStatus(422);
@@ -91,13 +91,13 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
             'rank' => 3,
             'percentage' => 20.09,
         ]);
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'level' =>  14,
             'rank' => 3,
             'percentage' => 19,
         ])->assertStatus(422);
 
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'level' =>  5,
             'rank' => 3,
             'percentage' => 19,
@@ -110,7 +110,7 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
     public function percentage_should_be_numeric_for_creating_residualBonusSetting()
     {
         $this->withHeaders($this->getHeaders());
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'level' =>  mt_rand(0, 100),
             'rank' =>  mt_rand(0, 100),
             'percentage' => ' ',
@@ -123,7 +123,7 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
     public function rank_should_be_integer_for_creating_residualBonusSetting()
     {
         $this->withHeaders($this->getHeaders());
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'level' =>  mt_rand(0, 100),
             'rank' =>  mt_rand(0, 99)/100,
             'percentage' =>mt_rand(0, 1000)/10,
@@ -137,7 +137,7 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
     public function level_should_be_integer_for_creating_residualBonusSetting()
     {
         $this->withHeaders($this->getHeaders());
-        $this->post(route('residualBonusSetting.store'), [
+        $this->post(route('admin.residualBonusSetting.store'), [
             'level' =>  mt_rand(0, 99)/100,
             'rank' =>  mt_rand(0, 100),
             'percentage' =>mt_rand(0, 1000)/10,

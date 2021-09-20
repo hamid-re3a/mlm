@@ -23,7 +23,7 @@ class ResidualBonusSettingFetchDataFeatureTest extends MLMTest
         $residualBonusSetting = ResidualBonusSetting::factory()->create([
             'rank' => $rank->rank,
         ]);
-        $response = $this->get(route('residualBonusSetting.index'))->assertOk();
+        $response = $this->get(route('admin.residualBonusSetting.index'))->assertOk();
         $response->assertJsonStructure(
             [
                 "status",
@@ -33,13 +33,13 @@ class ResidualBonusSettingFetchDataFeatureTest extends MLMTest
         );
         $response->assertJsonFragment([
             'id' => $residualBonusSetting->id,
-            'percentage' => $residualBonusSetting->percentage,
-            'level' => $residualBonusSetting->level,
-            'rank' => $rank->rank,
+            'percentage' => "$residualBonusSetting->percentage",
+            'level' => "$residualBonusSetting->level",
+            'rank' => "$rank->rank",
             'rank_name' => $rank->rank_name,
-            'condition_converted_in_bp' => $rank->condition_converted_in_bp,
-            'condition_sub_rank' => $rank->condition_sub_rank,
-            'condition_direct_or_indirect' => $rank->condition_direct_or_indirect,
+            'condition_converted_in_bp' => "$rank->condition_converted_in_bp",
+            'condition_sub_rank' => "$rank->condition_sub_rank",
+            'condition_direct_or_indirect' => "$rank->condition_direct_or_indirect",
 
         ]);
 
@@ -52,7 +52,7 @@ class ResidualBonusSettingFetchDataFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
         ResidualBonusSetting::factory()->create();
-        $this->get(route('residualBonusSetting.index'))->assertStatus(403);
+        $this->get(route('admin.residualBonusSetting.index'))->assertStatus(403);
 
     }
 
@@ -66,7 +66,7 @@ class ResidualBonusSettingFetchDataFeatureTest extends MLMTest
         $residualBonusSetting = ResidualBonusSetting::factory()->create([
             'rank' => $rank->rank,
         ]);
-        $response = $this->get(route('residualBonusSetting.show', [
+        $response = $this->get(route('admin.residualBonusSetting.show', [
             'id' => $residualBonusSetting->id,
         ]))->assertOk();
         $response->assertJsonStructure(
@@ -78,13 +78,13 @@ class ResidualBonusSettingFetchDataFeatureTest extends MLMTest
         );
         $response->assertJsonFragment([
             'id' => $residualBonusSetting->id,
-            'percentage' => $residualBonusSetting->percentage,
-            'level' => $residualBonusSetting->level,
-            'rank' => $rank->rank,
+            'percentage' => "$residualBonusSetting->percentage",
+            'level' => "$residualBonusSetting->level",
+            'rank' => "$rank->rank",
             'rank_name' => $rank->rank_name,
-            'condition_converted_in_bp' => $rank->condition_converted_in_bp,
-            'condition_sub_rank' => $rank->condition_sub_rank,
-            'condition_direct_or_indirect' => $rank->condition_direct_or_indirect,
+            'condition_converted_in_bp' => "$rank->condition_converted_in_bp",
+            'condition_sub_rank' => "$rank->condition_sub_rank",
+            'condition_direct_or_indirect' => "$rank->condition_direct_or_indirect",
 
         ]);
 
@@ -97,7 +97,7 @@ class ResidualBonusSettingFetchDataFeatureTest extends MLMTest
     {
         $this->withHeaders($this->getHeaders(null, USER_ROLE_CLIENT));
         $residualBonusSetting = ResidualBonusSetting::factory()->create();
-        $this->get(route('residualBonusSetting.show', [
+        $this->get(route('admin.residualBonusSetting.show', [
             'id' => $residualBonusSetting->id,
         ]))->assertStatus(403);
 

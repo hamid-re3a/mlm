@@ -25,7 +25,6 @@ class CreateCommissionsTable extends Migration
 
 
             $table->unsignedBigInteger('transaction_id')->nullable();
-            $table->boolean('confirmed')->default(false);
             $table->timestamps();
         });
     }

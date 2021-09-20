@@ -43,7 +43,6 @@ class ResidualBonusCommand extends Command
      */
     public function handle()
     {
-
         if(!PackageRoi::query()->today()->exists()){
             $this->info(PHP_EOL . 'Admin has not set any ROI for today.' . PHP_EOL);
             return;
@@ -53,7 +52,6 @@ class ResidualBonusCommand extends Command
         $min_rank =ResidualBonusSetting::query()->min('rank');
 
         $users = User::query()->where('rank','>=',$min_rank)->get();
-
 
 
         $bar = $this->output->createProgressBar($users->count());
