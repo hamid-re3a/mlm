@@ -4,6 +4,7 @@ namespace MLM\tests\UnitTest\Order;
 
 
 use MLM\Models\OrderedPackage;
+use MLM\Models\PackageRoi;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use MLM\Services\Commissions\BinaryCommission;
@@ -119,7 +120,7 @@ class OrderTest extends MLMTest
 
         $this->assertEquals(1, $user->commissions()->type(TRAINER_BONUS_COMMISSION)->count(), 'Number of trainer bonus commissions');
 
-        $this->assertEquals(231.68, $user->commissions()->sum('amount'), 'Sum of earned commissions');
+        $this->assertEquals(200, $user->commissions()->type(TRAINER_BONUS_COMMISSION)->sum('amount'), 'Sum of earned commissions');
 
     }
 
@@ -140,10 +141,11 @@ class OrderTest extends MLMTest
         $third_user = $this->registerUser($user->id);
 
         $this->assertEquals(1, $user->commissions()->type(BINARY_COMMISSION)->count(), 'Number of binary commissions');
-        $this->assertEquals(7.92,$user->commissions()->type(BINARY_COMMISSION)->sum('amount'));
-        $this->assertEquals($user->binaryTree->converted_points,99);
+        $this->assertEquals(7.92, $user->commissions()->type(BINARY_COMMISSION)->sum('amount'));
+        $this->assertEquals($user->binaryTree->converted_points, 99);
 
     }
+
     /**
      * @test
      */
@@ -153,18 +155,109 @@ class OrderTest extends MLMTest
 
         $user = $this->registerUser();
 
-        $second_user = $this->registerUser($user->id,RANK_6_EXECUTIVE['condition_converted_in_bp']);
+        $second_user = $this->registerUser($user->id, RANK_6_EXECUTIVE['condition_converted_in_bp'] * BF_TO_BB_RATIO);
         $user->default_binary_position = "right";
         $user->save();
 
-        $third_user = $this->registerUser($user->id,RANK_6_EXECUTIVE['condition_converted_in_bp']);
+        $third_user = $this->registerUser($user->id, RANK_6_EXECUTIVE['condition_converted_in_bp'] * BF_TO_BB_RATIO);
 
         $this->assertEquals(1, $user->commissions()->type(BINARY_COMMISSION)->count(), 'Number of binary commissions');
-        $this->assertEquals(RANK_6_EXECUTIVE['cap'],$user->commissions()->type(BINARY_COMMISSION)->sum('amount'));
-        $this->assertEquals(RANK_6_EXECUTIVE['condition_converted_in_bp'] - RANK_6_EXECUTIVE['cap'],$user->commissions()->type('cap-commission')->sum('amount'));
-        $this->assertEquals($user->binaryTree->converted_points,RANK_6_EXECUTIVE['condition_converted_in_bp']);
+        $this->assertEquals(RANK_6_EXECUTIVE['cap'] * 8 / 100, $user->commissions()->type(BINARY_COMMISSION)->sum('amount'));
+        $this->assertEquals((RANK_6_EXECUTIVE['condition_converted_in_bp'] * 5 - RANK_6_EXECUTIVE['cap']) * 8 / 100, $user->commissions()->type('cap-commission')->sum('amount'));
+        $this->assertEquals($user->binaryTree->converted_points, RANK_6_EXECUTIVE['condition_converted_in_bp'] * BF_TO_BB_RATIO);
 
     }
+
+    /**
+     * @test
+     */
+    public function trading_profit_commission()
+    {
+        $user = $this->registerUser(1, 99, 1);
+
+        $second_user = $this->registerUser($user->id);
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+
+
+        PackageRoi::factory()->create([
+            'package_id' => 1,
+            'roi_percentage' => 3,
+            'due_date' => now()->toDate()
+        ]);
+        $this->artisan('roi:trading')
+            ->execute();
+
+        $this->assertEquals(1, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
+        $this->assertEquals(3 / 100 * 99, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
+
+    }
+
+    /**
+     * @test
+     */
+    public function no_trading_profit_commission()
+    {
+        $user = $this->registerUser(1, 99, 1);
+
+        $second_user = $this->registerUser($user->id);
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+
+
+        $this->artisan('roi:trading')->execute();
+
+        $this->assertEquals(0, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
+        $this->assertEquals(0, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
+
+
+    }
+
+    /**
+     * @test
+     */
+    public function residual_bonus_commission()
+    {
+        $user = $this->registerUser(1, 99, 1);
+
+        $second_user = $this->registerUser($user->id, 5 * RANK_6_EXECUTIVE['condition_converted_in_bp'] * BF_TO_BB_RATIO);
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id, 5 * RANK_6_EXECUTIVE['condition_converted_in_bp'] * BF_TO_BB_RATIO);
+
+
+        $fourth_user = $this->registerUser($second_user->id);
+        $second_user->default_binary_position = "right";
+        $second_user->save();
+        $fifth_user = $this->registerUser($second_user->id);
+
+
+        $sixth_user = $this->registerUser($third_user->id);
+        $third_user->default_binary_position = "right";
+        $third_user->save();
+        $seventh_user = $this->registerUser($third_user->id);
+
+        PackageRoi::factory()->create([
+            'package_id' => 1,
+            'roi_percentage' => 3,
+            'due_date' => now()->toDate()
+        ]);
+        $this->artisan('roi:trading')->execute();
+
+        $this->assertEquals(1, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
+        $this->assertEquals(3 / 100 * 99, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
+
+
+        $this->artisan('roi:residual')->execute();
+        $this->assertEquals(1, $user->commissions()->type(RESIDUAL_BONUS_COMMISSION)->count(), 'Number of residual commissions');
+
+    }
+
     /**
      * @test
      */
@@ -199,15 +292,17 @@ class OrderTest extends MLMTest
     /**
      * @param \User\Models\User $user
      * @param int $package_price
+     * @param $package_id
      * @return Order
      */
-    private function createOrderWithUser(\User\Models\User $user,$package_price = 99): Order
+    private function createOrderWithUser(\User\Models\User $user, $package_price = 99, $package_id = 1): Order
     {
 
 
         $order_entity = OrderedPackage::factory()->create([
             'user_id' => $user->id,
-            'price' => $package_price
+            'price' => $package_price,
+            'package_id' => $package_id
         ]);
 
         $order_entity->packageIndirectCommission()->create([
@@ -226,14 +321,15 @@ class OrderTest extends MLMTest
     /**
      * @param int $sponsor_id
      * @param int $package_price
+     * @param int $package_id
      * @return \User\Models\User
      */
-    private function registerUser($sponsor_id = 1,$package_price = 99): \User\Models\User
+    private function registerUser($sponsor_id = 1, $package_price = 99, $package_id = 1): \User\Models\User
     {
         $user = \User\Models\User::factory()->create([
             'sponsor_id' => $sponsor_id
         ]);
-        $order = $this->createOrderWithUser($user,$package_price);
+        $order = $this->createOrderWithUser($user, $package_price, $package_id);
 
         list($bool, $msg) = (new OrderResolver($order))->handle();
         $this->assertTrue($bool);

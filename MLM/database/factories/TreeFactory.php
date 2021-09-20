@@ -23,7 +23,7 @@ class TreeFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => User::query()->inRandomOrder()->first()->id
+            'user_id' => User::factory()->create()->id
         ];
     }
 }

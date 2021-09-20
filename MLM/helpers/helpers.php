@@ -97,16 +97,18 @@ if (!function_exists('getWalletGrpcClient')) {
 if (!function_exists('userRankBasedOnConvertedPoint')) {
     function userRankBasedOnConvertedPoint($converted_point): \MLM\Models\Rank
     {
-        return \MLM\Models\Rank::query()->where('condition_converted_in_bp', '<=', $converted_point)->orderBy('rank', 'desc')->first();
+        return \MLM\Models\Rank::query()->where('condition_converted_in_bp', '<=', $converted_point / BF_TO_BB_RATIO)->orderBy('rank', 'desc')->first();
     }
 }
 if (!function_exists('getAndUpdateUserRank')) {
 
     function getAndUpdateUserRank(\User\Models\User $user): ?\MLM\Models\Rank
     {
-        $ranks = \MLM\Models\Rank::query()->orderBy('rank', 'asc')->get();
+        $ranks = \MLM\Models\Rank::query()->orderBy('rank', 'desc')->get();
         foreach ($ranks as $rank) {
-            if ($rank->condition_converted_in_bp >= (BF_TO_BB_RATIO * $user->binaryTree->converted_points)) {
+            if ($user->binaryTree->converted_points >= BF_TO_BB_RATIO * $rank->condition_converted_in_bp) {
+
+
                 $left_binary_children = $user->binaryTree->leftSideChildrenIds();
                 $right_binary_children = $user->binaryTree->rightSideChildrenIds();
                 if ($rank->condition_direct_or_indirect) {

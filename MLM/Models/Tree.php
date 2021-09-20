@@ -200,7 +200,6 @@ class Tree extends Model
         return true;
     }
 
-
     public function leftChildCount()
     {
         $left_child = $this->children()->left()->first();

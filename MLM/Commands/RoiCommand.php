@@ -14,7 +14,7 @@ class RoiCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'roi:regular';
+    protected $signature = 'roi:trading';
 
     /**
      * The console command description.

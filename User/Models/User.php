@@ -150,12 +150,31 @@ class User extends Model
      */
     public function getUserService()
     {
+        $this->fresh();
         $user = new \User\Services\Grpc\User();
-        $user->setId((int)$this->attributes['id']);
+        $user->setId($this->attributes['id']);
         $user->setFirstName($this->attributes['first_name']);
         $user->setLastName($this->attributes['last_name']);
         $user->setUsername($this->attributes['username']);
         $user->setEmail($this->attributes['email']);
+        $user->setMemberId($this->attributes['member_id']);
+        if (isset($this->attributes['sponsor_id']) AND !empty($this->attributes['sponsor_id']))
+            $user->setSponsorId($this->attributes['sponsor_id']);
+
+        if (isset($this->attributes['block_type']) AND !empty($this->attributes['block_type']))
+            $user->setBlockType($this->attributes['block_type']);
+
+        if (isset($this->attributes['is_deactivate']))
+            $user->setIsDeactivate($this->attributes['is_deactivate']);
+
+        if (isset($this->attributes['is_freeze']))
+            $user->setIsFreeze($this->attributes['is_freeze']);
+
+        if ($this->getRoleNames()->count()) {
+            $role_name = implode(",", $this->getRoleNames()->toArray());
+            $user->setRole($role_name);
+        }
+
         return $user;
     }
 

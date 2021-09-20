@@ -28,7 +28,6 @@ class TradingProfitCommissionJob implements ShouldQueue
 
     public function handle(PackageService $package_service)
     {
-
         if (!$this->ordered_package->active()->exists())
             return;
 
@@ -40,7 +39,7 @@ class TradingProfitCommissionJob implements ShouldQueue
 
 
             /** @var  $roi PackageRoi */
-            $roi = $this->ordered_package->package()->rois()->today()->first();
+            $roi = $this->ordered_package->package->rois()->today()->first();
             if ($roi) {
                 $percentage = $roi->roi_percentage;
 

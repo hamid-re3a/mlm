@@ -3,11 +3,15 @@
 namespace MLM\Http\Controllers\Front;
 
 
+use Illuminate\Support\Carbon;
+use MLM\Http\Requests\BinaryTreeRequest;
 use MLM\Http\Requests\ReferralTreeRequest;
+use MLM\Http\Resources\Tree\BinaryTreeResource;
 use MLM\Http\Resources\Tree\ReferralTreeResource;
 use MLM\Models\ReferralTree;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
+use MLM\Models\Tree;
 
 class TreeController extends Controller
 {
@@ -16,18 +20,21 @@ class TreeController extends Controller
     /**
      * Get Referral Tree
      * @group
-     * Public User > Referral Tree
+     * Public User > Display Tree
+     *
+     * @queryParam id integer
+     * @queryParam page integer
      */
     public function getUserReferralTree(ReferralTreeRequest $request)
     {
 
-        if(auth()->check() && !auth()->user()->isNetworker())
+        if(auth()->check() && !auth()->user()->hasReferralNode())
             return api()->error();
 
         if ($request->has('id') && request('id'))
-            $tree = ReferralTree::find(request('id'));
+            $tree = ReferralTree::query()->where('user_id',request('id'))->firstOrFail();
         else
-            $tree = ReferralTree::where('user_id',auth()->id())->first();
+            $tree = ReferralTree::query()->where('user_id',auth()->id())->first();
         $page = 1;
         if ($request->has('page') && request('page'))
             $page = request('page');
@@ -35,15 +42,55 @@ class TreeController extends Controller
 
 
         $data = [
-            'children' => ReferralTreeResource::collection($tree->children()->paginate(25)),
+            'children' => ReferralTreeResource::collection($tree->children()->paginate(50)),
             'id' => $tree->id,
-            'hasOrder' => $tree->user->orders()->count() > 0,
-            'hasChildren' => $tree->children()->exists(),
-            'hasMore'=>$tree->children()->count() > $page*25,
-            'childrenCount' => $tree->children()->count(),
+            'created_at' => Carbon::make($tree->created_at),
+            'user_rank' => $tree->user->rank,
+            'has_children' => $tree->children()->exists(),
+            'has_more'=> $tree->children()->count() > $page*25,
+            'children_count' => $tree->children()->count(),
             'page' => $page
         ];
         return api()->success('', $data);
     }
 
+    /**
+     * Get Binary Tree
+     * @group
+     * Public User > Display Tree
+     *
+     *  @queryParam id integer
+     */
+    public function getBinaryTree(BinaryTreeRequest $request)
+    {
+
+
+        if(auth()->check() && !auth()->user()->hasBinaryNode())
+            return api()->error();
+
+        if ($request->has('id') && request('id'))
+            $tree = Tree::query()->where('user_id',request('id'))->firstOrFail();
+        else
+            $tree = Tree::query()->where('user_id',auth()->id())->first();
+
+
+
+        $left_child = $tree->children()->left()->first();
+        $right_child = $tree->children()->right()->first();
+        $data = [
+            'children' => [
+                (is_null($left_child)) ? (object)[] : BinaryTreeResource::make($left_child),
+                (is_null($right_child)) ? (object)[] : BinaryTreeResource::make($right_child),
+            ],
+            'id' => $tree->id,
+            'position' => $tree->position,
+            'created_at' => Carbon::make($tree->created_at),
+            'user' => $tree->user,
+            'has_children' => $tree->children()->exists(),
+            'children_count_right' => $tree->rightChildCount(),
+            'children_count_left' => $tree->leftChildCount(),
+            'rank' => getRank($tree->user->rank)
+        ];
+        return ResponseData::success('', $data);
+    }
 }
