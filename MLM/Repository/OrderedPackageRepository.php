@@ -20,14 +20,16 @@ class OrderedPackageRepository
         $package_find = $package_entity->query()->firstOrCreate([
             'order_id' => $order->getId(),
         ]);
+        if(!is_null($package_find->is_commission_resolved_at))
+            return $package_find;
         $package_find->update([
             "user_id" => $order->getUserId(),
             "package_id" => $package->getId(),
 
             "plan" => $order->getPlan(),
-            "is_paid_at" => $order->getIsPaidAt(),
-            "is_resolved_at" => $order->getIsResolvedAt(),
-            "is_commission_resolved_at" => $order->getIsCommissionResolvedAt(),
+            "is_paid_at" => Carbon::make($order->getIsPaidAt()),
+            "is_resolved_at" => Carbon::make($order->getIsResolvedAt()),
+            "is_commission_resolved_at" => Carbon::make($order->getIsCommissionResolvedAt()),
 
             "validity_in_days" => $package->getValidityInDays(),
             "price" => $package->getPrice(),

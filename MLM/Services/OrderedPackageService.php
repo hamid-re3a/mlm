@@ -4,11 +4,13 @@
 namespace MLM\Services;
 
 
+use MLM\Models\OrderedPackage;
 use MLM\Repository\OrderedPackageRepository;
 use MLM\Repository\PackageRepository;
 use Orders\Services\Grpc\Order;
 use Packages\Services\Grpc\Id;
 use Packages\Services\Grpc\Package;
+use User\Models\User;
 
 class OrderedPackageService
 {
@@ -25,10 +27,9 @@ class OrderedPackageService
         $this->package_repository = $package_repository;
     }
 
-    public function updateOrderAndPackage(Order $order)
+    public function updateOrderAndPackage(Order $order) : OrderedPackage
     {
         $package = $this->updatePackage($order);
-
         return $this->ordered_package_repository->updateOrderAndPackage($order,$package);
     }
 
@@ -41,6 +42,7 @@ class OrderedPackageService
     {
         $id = new Id();
         $id->setId($order->getPackageId());
+
         /** @var $package Package */
         list($package, $status) = getPackageGrpcClient()->packageById($id)->wait();
         if ($status->code != 0)

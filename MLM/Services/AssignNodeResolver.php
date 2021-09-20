@@ -51,7 +51,6 @@ class AssignNodeResolver
                 // add user to referral tree
                 $this->to_user->referralTree->appendNode($this->user->buildReferralTreeNode());
 
-
                 if ($this->resolve($simulate)) {
                     if (!$simulate)
                         DB::commit();

@@ -4,10 +4,13 @@
 namespace MLM\Services\Grpc;
 
 
+use Illuminate\Support\Facades\DB;
 use Mix\Grpc\Context;
+use MLM\Models\OrderedPackage;
+use MLM\Services\OrderedPackageService;
 use MLM\Services\OrderResolver;
-use User\Services\Grpc as UserGrpc;
 use Orders\Services\Grpc as OrderGrpc;
+use User\Services\Grpc as UserGrpc;
 use User\Services\UserService;
 
 class MLMGrpcService implements MLMServiceInterface
@@ -27,13 +30,13 @@ class MLMGrpcService implements MLMServiceInterface
     public function hasValidPackage(Context $context, UserGrpc\User $request): Acknowledge
     {
         $acknowledge = new Acknowledge();
-        try{
+        try {
             $user = $this->user_service->findByIdOrFail($request->getId());
-            if($user->hasActivePackage()){
+            if ($user->hasActivePackage()) {
                 $acknowledge->setStatus(true);
                 return $acknowledge;
             }
-        } catch (\Exception $exception){
+        } catch (\Exception $exception) {
             $acknowledge->setMessage($exception->getMessage());
         }
 
@@ -46,10 +49,22 @@ class MLMGrpcService implements MLMServiceInterface
      */
     public function simulateOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
-        list($status, $message) = (new OrderResolver($request))->simulateValidation();
+        DB::beginTransaction();
         $acknowledge = new Acknowledge();
-        $acknowledge->setStatus($status);
-        $acknowledge->setMessage($message);
+        /** @var  $package_ordered OrderedPackage */
+        $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
+        if (is_null($package_ordered->is_commission_resolved_at)) {
+            list($status, $message) = (new OrderResolver($request))->simulateValidation();
+            $acknowledge->setStatus($status);
+            $acknowledge->setMessage($message);
+            $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
+
+        } else {
+            $acknowledge->setStatus(true);
+            $acknowledge->setMessage('already processed');
+            $acknowledge->setCreatedAt($package_ordered->is_commission_resolved_at);
+        }
+        DB::rollBack();
         return $acknowledge;
     }
 
@@ -58,11 +73,21 @@ class MLMGrpcService implements MLMServiceInterface
      */
     public function submitOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
-        list($status, $message) = (new OrderResolver($request))->handle();
         $acknowledge = new Acknowledge();
-        $acknowledge->setStatus($status);
-        $acknowledge->setMessage($message);
-        $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
+        /** @var  $package_ordered OrderedPackage */
+        $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
+        if (is_null($package_ordered->is_commission_resolved_at)) {
+            list($status, $message) = (new OrderResolver($request))->handle();
+            $acknowledge->setStatus($status);
+            $acknowledge->setMessage($message);
+            $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
+
+        } else {
+            $acknowledge->setStatus(true);
+            $acknowledge->setMessage('already processed');
+            $acknowledge->setCreatedAt($package_ordered->is_commission_resolved_at);
+        }
+
         return $acknowledge;
     }
 }
