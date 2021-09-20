@@ -45,3 +45,6 @@ jobs:
     - name: Run server_deploy.sh
       run: | 
         sudo su - mlm -c '/home/mlm/public_html/multi-level-marketing/server_deploy.sh'
+    - name: Restart supervisord mlm workers
+      run: |
+        sudo supervisorctl restart mlm-grpcServer:mlm-grpcServer_00
