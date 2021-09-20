@@ -74,6 +74,8 @@ if (!function_exists('updateUserFromGrpcServer')) {
         try {
             /** @var $user \User\Services\Grpc\User */
             list($user, $status) = $client->getUserById($id)->wait();
+            \Illuminate\Support\Facades\Log::info('user => ' . serialize($user));
+            \Illuminate\Support\Facades\Log::info('status => ' . serialize($status));
             if ($status->code == 0) {
                 app(UserService::class)->userUpdate($user);
                 return $user;
