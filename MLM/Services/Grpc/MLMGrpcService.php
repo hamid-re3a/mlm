@@ -1,15 +1,16 @@
 <?php
 
 
-namespace Orders\Services\Grpc;
+namespace MLM\Services\Grpc;
 
 
 use Mix\Grpc\Context;
 use MLM\Services\OrderResolver;
 use User\Services\Grpc as UserGrpc;
+use Orders\Services\Grpc as OrderGrpc;
 use User\Services\UserService;
 
-class OrdersGrpcService implements OrdersServiceInterface
+class MLMGrpcService implements MLMServiceInterface
 {
 
     /** @var  $user_service UserService */
@@ -43,7 +44,7 @@ class OrdersGrpcService implements OrdersServiceInterface
     /**
      * @inheritDoc
      */
-    public function simulateOrder(Context $context, Order $request): Acknowledge
+    public function simulateOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
         list($status, $message) = (new OrderResolver($request))->simulateValidation();
         $acknowledge = new Acknowledge();
@@ -55,7 +56,7 @@ class OrdersGrpcService implements OrdersServiceInterface
     /**
      * @inheritDoc
      */
-    public function submitOrder(Context $context, Order $request): Acknowledge
+    public function submitOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
         list($status, $message) = (new OrderResolver($request))->handle();
         $acknowledge = new Acknowledge();
