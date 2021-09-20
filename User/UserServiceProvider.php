@@ -2,7 +2,6 @@
 
 namespace User;
 
-use App\Jobs\User\UserGetDataJob;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,11 +64,13 @@ class UserServiceProvider extends ServiceProvider
                  * if there is not exist user. get data user complete from api gateway
                  * error code 470 is for data user not exist log for development
                  */
-                if ($user === null) {
+                if (is_null($user)) {
                     $service_user = updateUserFromGrpcServer($request);
-                    if ($service_user === null)
+                    if (is_null($service_user))
                         throw new Exception('please try another time!', 470);
-                    $user = $service_user;
+
+                    $user = User::query()->whereId($request->header('X-user-id'))->first();
+
                 }
 
                 $hash_user_service = md5(serialize($user->getUserService()));
