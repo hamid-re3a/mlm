@@ -1,13 +1,11 @@
 <?php
 
-
-use Illuminate\Http\Request;
-use User\Services\UserService;
-
-
 /**
  * user_roles
  */
+
+use Illuminate\Http\Request;
+use User\Services\UserService;
 const USER_ROLE_SUPER_ADMIN = 'super-admin';
 const USER_ROLE_ADMIN_GATEWAY = 'user-gateway-admin';
 const USER_ROLE_ADMIN_KYC = 'kyc-admin';
@@ -34,44 +32,20 @@ const USER_ROLES = [
 ];
 
 
-if (!function_exists('user')) {
-
-    function user(int $id): ?\User\Services\Grpc\User
-    {
-        $user_db = \User\Models\User::query()->find($id);
-
-        $user = new \User\Services\Grpc\User();
-        $user->setId((int)$user_db->id);
-        $user->setFirstName($user_db->first_name);
-        $user->setLastName($user_db->last_name);
-        $user->setUsername($user_db->username);
-        $user->setEmail($user_db->email);
-        return $user;
-
-    }
-}
-
-
-if (!function_exists('getUserGrpcServerClient')) {
-    function getUserGrpcServerClient()
-    {
-        return new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
 if (!function_exists('updateUserFromGrpcServer')) {
 
-    function updateUserFromGrpcServer($user_id): ?\User\Services\Grpc\User
+    function updateUserFromGrpcServer($input_id): ?\User\Services\Grpc\User
     {
-        if (!is_numeric($user_id))
+        if(!is_numeric($input_id))
             return null;
-
+        $client = new \User\Services\Grpc\UserServiceClient('staging-api-gateway.janex.org:9595', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
         $id = new \User\Services\Grpc\Id();
-        $id->setId((int)$user_id);
+        $id->setId((int)$input_id);
         try {
             /** @var $user \User\Services\Grpc\User */
-            list($user, $status) = getUserGrpcServerClient()->getUserById($id)->wait();
+            list($user, $status) = $client->getUserById($id)->wait();
             if ($status->code == 0) {
                 app(UserService::class)->userUpdate($user);
                 return $user;
