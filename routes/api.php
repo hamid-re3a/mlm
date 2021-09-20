@@ -17,10 +17,3 @@ use Illuminate\Support\Facades\Route;
 //
 //
 //});
-Route::get('test',function(){
-    echo request('id');
-    
-    $user = updateUserFromGrpcServer(request('id'));
-
-    return $user->getFirstName();
-});
