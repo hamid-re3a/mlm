@@ -23,11 +23,11 @@ class UserServiceClient extends \Grpc\BaseStub {
      * @return \User\Services\Grpc\User
      */
     public function getUserById(\User\Services\Grpc\Id $argument,
-                                $metadata = [], $options = []) {
+      $metadata = [], $options = []) {
         return $this->_simpleRequest('/user.services.grpc.UserService/getUserById',
-            $argument,
-            ['\User\Services\Grpc\User', 'decode'],
-            $metadata, $options);
+        $argument,
+        ['\User\Services\Grpc\User', 'decode'],
+        $metadata, $options);
     }
 
     /**
@@ -37,11 +37,11 @@ class UserServiceClient extends \Grpc\BaseStub {
      * @return \User\Services\Grpc\WalletInfo
      */
     public function getUserWalletInfo(\User\Services\Grpc\WalletRequest $argument,
-                                      $metadata = [], $options = []) {
+      $metadata = [], $options = []) {
         return $this->_simpleRequest('/user.services.grpc.UserService/getUserWalletInfo',
-            $argument,
-            ['\User\Services\Grpc\WalletInfo', 'decode'],
-            $metadata, $options);
+        $argument,
+        ['\User\Services\Grpc\WalletInfo', 'decode'],
+        $metadata, $options);
     }
 
 }
