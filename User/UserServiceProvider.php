@@ -6,6 +6,7 @@ use App\Jobs\User\UserGetDataJob;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use User\Models\User;
@@ -54,7 +55,8 @@ class UserServiceProvider extends ServiceProvider
                 && is_numeric($request->header('X-user-id'))
             ) {
 
-
+                Log::info($request->hasHeader('X-user-id'));
+                Log::info($request->hasHeader('X-user-hash'));
                 $user_update = new UserUpdate();
                 $user_update->setId($request->header('X-user-id'));
                 $user_update->setQueueName('subscriptions');
