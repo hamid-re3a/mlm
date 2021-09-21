@@ -5,6 +5,7 @@ namespace MLM\Services\Grpc;
 
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Mix\Grpc\Context;
 use MLM\Models\OrderedPackage;
 use MLM\Services\OrderedPackageService;
@@ -50,19 +51,25 @@ class MLMGrpcService implements MLMServiceInterface
     public function simulateOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
         DB::beginTransaction();
+        Log::info("simulate");
         $acknowledge = new Acknowledge();
-        /** @var  $package_ordered OrderedPackage */
-        $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
-        if (is_null($package_ordered->is_commission_resolved_at)) {
-            list($status, $message) = (new OrderResolver($request))->simulateValidation();
-            $acknowledge->setStatus($status);
-            $acknowledge->setMessage($message);
-            $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
+        try {
 
-        } else {
-            $acknowledge->setStatus(true);
-            $acknowledge->setMessage('already processed');
-            $acknowledge->setCreatedAt($package_ordered->is_commission_resolved_at);
+            /** @var  $package_ordered OrderedPackage */
+            $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
+            if (is_null($package_ordered->is_commission_resolved_at)) {
+                list($status, $message) = (new OrderResolver($request))->simulateValidation();
+                $acknowledge->setStatus($status);
+                $acknowledge->setMessage($message);
+                $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
+
+            } else {
+                $acknowledge->setStatus(true);
+                $acknowledge->setMessage('already processed');
+                $acknowledge->setCreatedAt($package_ordered->is_commission_resolved_at);
+            }
+        } catch (\Exception $exception){
+
         }
         DB::rollBack();
         return $acknowledge;
@@ -73,6 +80,7 @@ class MLMGrpcService implements MLMServiceInterface
      */
     public function submitOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
+        Log::info("submit order");
         $acknowledge = new Acknowledge();
         /** @var  $package_ordered OrderedPackage */
         $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
