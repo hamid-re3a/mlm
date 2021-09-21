@@ -34,7 +34,7 @@ class TreeController extends Controller
         if ($request->has('id') && request('id'))
             $tree = ReferralTree::query()->where('user_id',request('id'))->firstOrFail();
         else
-            $tree = ReferralTree::query()->where('user_id',auth()->id())->first();
+            $tree = ReferralTree::query()->where('user_id',auth()->user()->id)->first();
         $page = 1;
         if ($request->has('page') && request('page'))
             $page = request('page');
@@ -71,7 +71,7 @@ class TreeController extends Controller
         if ($request->has('id') && request('id'))
             $tree = Tree::query()->where('user_id',request('id'))->firstOrFail();
         else
-            $tree = Tree::query()->where('user_id',auth()->id())->first();
+            $tree = Tree::query()->where('user_id',auth()->user()->id)->first();
 
 
 
@@ -91,6 +91,6 @@ class TreeController extends Controller
             'children_count_left' => $tree->leftChildCount(),
             'rank' => getRank($tree->user->rank)
         ];
-        return ResponseData::success('', $data);
+        return api()->success('', $data);
     }
 }
