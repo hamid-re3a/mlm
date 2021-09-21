@@ -4,7 +4,6 @@
 namespace MLM\Services\Grpc;
 
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Mix\Grpc\Context;
 use MLM\Models\OrderedPackage;
@@ -50,7 +49,7 @@ class MLMGrpcService implements MLMServiceInterface
      */
     public function simulateOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
-        DB::beginTransaction();
+//        DB::beginTransaction();
         Log::info("simulate");
         $acknowledge = new Acknowledge();
         try {
@@ -71,7 +70,7 @@ class MLMGrpcService implements MLMServiceInterface
         } catch (\Exception $exception){
 
         }
-        DB::rollBack();
+//        DB::rollBack();
         return $acknowledge;
     }
 
