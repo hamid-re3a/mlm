@@ -107,7 +107,6 @@ class OrderResolver
     public function simulateValidation(): array
     {
         DB::beginTransaction();
-        app(OrderedPackageService::class)->updateOrderAndPackage($this->order);
         list($bool, $msg) = $this->isValid();
         if ($bool) {
             list($bool, $msg) = $this->addUserToNetwork(true);
