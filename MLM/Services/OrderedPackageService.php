@@ -27,7 +27,7 @@ class OrderedPackageService
         $this->package_repository = $package_repository;
     }
 
-    public function updateOrderAndPackage(Order $order) : OrderedPackage
+    public function updateOrderAndPackage(Order $order, $simulate ) : OrderedPackage
     {
         $package = $this->updatePackage($order);
         return $this->ordered_package_repository->updateOrderAndPackage($order,$package);
