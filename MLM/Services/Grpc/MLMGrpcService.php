@@ -55,18 +55,18 @@ class MLMGrpcService implements MLMServiceInterface
 //        Log::info($request->getId());
         $acknowledge = new Acknowledge();
 //        try {
-//
+
 //            /** @var  $package_ordered OrderedPackage */
 //            $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
 //            if (is_null($package_ordered->is_commission_resolved_at)) {
-//                list($status, $message) = (new OrderResolver($request))->simulateValidation();
-//                $acknowledge->setStatus($status);
-//                $acknowledge->setMessage($message);
-//                $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
-//
+                list($status, $message) = (new OrderResolver($request))->simulateValidation();
+                $acknowledge->setStatus($status);
+                $acknowledge->setMessage($message);
+                $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
+
 //            } else {
-                $acknowledge->setStatus(true);
-                $acknowledge->setMessage('already processed');
+//                $acknowledge->setStatus(true);
+//                $acknowledge->setMessage('already processed');
 //                $acknowledge->setCreatedAt($package_ordered->is_commission_resolved_at);
 //            }
 //        } catch (\Exception $exception){
