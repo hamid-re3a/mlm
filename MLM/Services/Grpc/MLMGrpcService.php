@@ -52,6 +52,7 @@ class MLMGrpcService implements MLMServiceInterface
     {
         DB::beginTransaction();
         Log::info("simulate");
+        Log::info($request->getId());
         $acknowledge = new Acknowledge();
         try {
 
@@ -82,6 +83,7 @@ class MLMGrpcService implements MLMServiceInterface
     public function submitOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
         Log::info("submit order");
+        Log::info($request->getId());
         $acknowledge = new Acknowledge();
         /** @var  $package_ordered OrderedPackage */
         $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
