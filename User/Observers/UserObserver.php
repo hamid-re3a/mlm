@@ -2,23 +2,23 @@
 
 namespace User\Observers;
 
-use User\Mail\UserRankChangedEmail;
+use MLM\Jobs\UserRankEmailJob;
+use MLM\Mail\UserRankChangedEmail;
 use User\Models\User;
 
 class UserObserver
 {
+
+
     public function updating(User $user)
     {
 
+            if($user->isDirty('rank')){
 
-        if ($user->isDirty('rank')) {
+                UserRankEmailJob::dispatch($user);
 
-
-
-        }
+            }
 
     }
-
-
 
 }
