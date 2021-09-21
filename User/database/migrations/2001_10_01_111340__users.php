@@ -24,11 +24,11 @@ class Users extends Migration
             $table->integer('rank')->default(0);
             $table->enum('default_binary_position',[\MLM\Models\Tree::LEFT,\MLM\Models\Tree::RIGHT])->default(\MLM\Models\Tree::LEFT);
 
-            $table->string('block_type')->after('email')->nullable();
-            $table->boolean('is_freeze')->after('email')->default(FALSE)->nullable();
-            $table->boolean('is_deactivate')->after('email')->default(FALSE)->nullable();
-            $table->unsignedBigInteger('sponsor_id')->after('email')->nullable();
-            $table->unsignedBigInteger('member_id')->after('email')->unsigned()->nullable();
+            $table->string('block_type')->nullable();
+            $table->boolean('is_freeze')->default(FALSE)->nullable();
+            $table->boolean('is_deactivate')->default(FALSE)->nullable();
+            $table->unsignedBigInteger('sponsor_id')->nullable();
+            $table->unsignedBigInteger('member_id')->unsigned()->nullable();
 
             $table->softDeletes();
             $table->timestamps();
