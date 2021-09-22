@@ -45,6 +45,7 @@ class TreeController extends Controller
             'children' => ReferralTreeResource::collection($tree->children()->paginate(50)),
             'id' => $tree->id,
             'created_at' => $tree->created_at->timestamp,
+            'user' => $tree->user,
             'user_rank' => $tree->user->rank,
             'has_children' => $tree->children()->exists(),
             'has_more'=> $tree->children()->count() > $page*25,
