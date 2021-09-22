@@ -20,6 +20,7 @@ class ReferralTreeResource extends JsonResource
         return [
             'id' => $this->id,
             'created_at' => $this->created_at->timestamp,
+            'user' => $this->user,
             'user_rank' => $this->user->rank,
             'has_children' => $this->children()->exists(),
             'has_more' => false,
