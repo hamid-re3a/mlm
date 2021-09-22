@@ -5,6 +5,7 @@ namespace MLM\database\seeders;
 use Illuminate\Database\Seeder;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
+use User\Services\UserService;
 
 /**
  * Class AuthTableSeeder.
@@ -20,8 +21,11 @@ class TreeTableSeeder extends Seeder
     {
         if (app()->environment() != 'testing')
             if (ReferralTree::query()->get()->count() == 0) {
-                ReferralTree::create(['user_id' => 1]);
-                Tree::create(['user_id' => 1]);
+//                ReferralTree::create(['user_id' => 1]);
+//                Tree::create(['user_id' => 1]);
+                $this->buildBinaryTree();
+                $this->buildReferralTree();
+
             }
     }
 
@@ -55,6 +59,7 @@ class TreeTableSeeder extends Seeder
             ];
         foreach ($data as $item) {
             Tree::factory()->create($item);
+            app(UserService::class)->findByIdOrFail($item['user_id']);
             Tree::fixTree();
         }
     }
