@@ -86,7 +86,6 @@ use User\Models\User;
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree withoutRoot()
  * @property-read \Kalnoy\Nestedset\Collection|Tree[] $children
  * @property int $converted_points
- * @property int $packages_price
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereAllPackagesPrice($value)
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereConvertedPoints($value)
  * @property int $is_active
@@ -208,11 +207,6 @@ class Tree extends Model
         return $left_child->descendantsAndSelfCount();
     }
 
-    public function updatePackagesPrice()
-    {
-        $this->packages_price =  $this->user->ordered_packages()->sum('price');
-        $this->save();
-    }
 
     public function leftSideChildrenPackagePrice() : int
     {

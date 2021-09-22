@@ -58,8 +58,8 @@ class TreeTableSeeder extends Seeder
                 ['id' => 22, 'user_id' => 22, 'position' => 'right', 'parent_id' => 13],
             ];
         foreach ($data as $item) {
-            Tree::factory()->create($item);
             app(UserService::class)->findByIdOrFail($item['user_id']);
+            Tree::query()->create($item);
             Tree::fixTree();
         }
     }
@@ -92,7 +92,7 @@ class TreeTableSeeder extends Seeder
                 ['id' => 22, 'user_id' => 22, 'parent_id' => 12],
             ];
         foreach ($data as $item) {
-            ReferralTree::factory()->create($item);
+            ReferralTree::query()->create($item);
             ReferralTree::fixTree();
         }
     }
