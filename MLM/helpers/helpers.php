@@ -30,7 +30,7 @@ if (!function_exists('getRank')) {
         if (isset(RANKS[$rank]))
             return RANKS[$rank];
 
-        return null;    
+        return null;
     }
 }
 

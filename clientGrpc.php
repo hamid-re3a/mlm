@@ -6,8 +6,8 @@ use Orders\Services\Grpc\OrderPlans;
 require './vendor/autoload.php';
 
 $order = new Order();
-$order->setId((int)1000);
-$order->setUserId((int)3);
+$order->setId((int)1001);
+$order->setUserId((int)2);
 $order->setIsPaidAt(now()->toString());
 $order->setPlan(OrderPlans::ORDER_PLAN_START);
 //$order->setPlan(OrderPlans::ORDER_PLAN_PURCHASE);
