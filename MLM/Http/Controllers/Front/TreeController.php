@@ -44,7 +44,7 @@ class TreeController extends Controller
         $data = [
             'children' => ReferralTreeResource::collection($tree->children()->paginate(50)),
             'id' => $tree->id,
-            'created_at' => Carbon::make($tree->created_at),
+            'created_at' => $tree->created_at->timestamp,
             'user_rank' => $tree->user->rank,
             'has_children' => $tree->children()->exists(),
             'has_more'=> $tree->children()->count() > $page*25,
@@ -84,7 +84,7 @@ class TreeController extends Controller
             ],
             'id' => $tree->id,
             'position' => $tree->position,
-            'created_at' => Carbon::make($tree->created_at),
+            'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
             'has_children' => $tree->children()->exists(),
             'children_count_right' => $tree->rightChildCount(),
