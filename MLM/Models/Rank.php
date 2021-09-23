@@ -52,7 +52,7 @@ class Rank extends Model
 
     public function residualBonusSettings()
     {
-        return $this->hasMany(ResidualBonusSetting::class,'rank','rank');
+        return $this->hasMany(ResidualBonusSetting::class, 'rank', 'rank');
     }
 
     protected static function newFactory()
@@ -60,5 +60,21 @@ class Rank extends Model
         return RankFactory::new();
     }
 
+    public function getRankService(): \MLM\Services\Grpc\Rank
+    {
+        $rank = new \MLM\Services\Grpc\Rank;
+        $rank->setRank((int)$this->rank);
+        $rank->setRankName($this->rank_name);
+        $rank->setConditionConvertedInBp((int)$this->condition_converted_in_bp);
+        $rank->setConditionSubRank((int)$this->condition_sub_rank);
+        $rank->setConditionDirectOrIndirect((bool)$this->condition_direct_or_indirect);
+        $rank->setPrizeInPf((int)$this->prize_in_pf);
+        $rank->setPrizeAlternative($this->prize_alternative);
+        $rank->setCap((int)$this->cap);
+        $rank->setWithdrawalLimit((int)$this->withdrawal_limit);
+        $rank->setConditionNumberOfLeftChildren((int)$this->condition_number_of_left_children);
+        $rank->setConditionNumberOfRightChildren((int)$this->condition_number_of_right_children);
+        return $rank;
+    }
 
 }

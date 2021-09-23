@@ -6,6 +6,7 @@ namespace MLM\Services\Grpc;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Mix\Grpc;
 use Mix\Grpc\Context;
 use MLM\Models\OrderedPackage;
 use MLM\Services\OrderedPackageService;
@@ -100,5 +101,24 @@ class MLMGrpcService implements MLMServiceInterface
         }
 
         return $acknowledge;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUserRank(Context $context, UserGrpc\User $request): Rank
+    {
+        if($request->getId()){
+            try{
+                $user = $this->user_service->findByIdOrFail($request->getId());
+                $rank = getAndUpdateUserRank($user);
+
+                if(!is_null($rank))
+                    return $rank->getRankService();
+            } catch (\Exception $exception){
+
+            }
+        }
+        return new Rank;
     }
 }
