@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
+use MLM\Models\EmailContentSetting;
 use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
 
@@ -155,4 +156,20 @@ if (!function_exists('getMLMSetting')) {
         \Illuminate\Support\Facades\Log::error('mlmSetting => ' . $key);
         throw new Exception(trans('mlm.responses.settings.key-doesnt-exists', ['key' => $key]));
     }
+}
+
+
+function getEmailAndTextSetting($key)
+{
+    // Comment Test
+    if (DB::table('email_content_settings')->exists()) {
+        $setting = EmailContentSetting::query()->where('key', $key)->first();
+        if ($setting && !empty($setting->body))
+            return $setting->toArray();
+    }
+
+    if (isset(EMAIL_CONTENT_SETTINGS[$key]))
+        return EMAIL_CONTENT_SETTINGS[$key];
+
+    throw new Exception(trans('user.responses.main-key-settings-is-missing'));
 }
