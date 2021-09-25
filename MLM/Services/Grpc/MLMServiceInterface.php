@@ -6,8 +6,8 @@ namespace MLM\Services\Grpc;
 
 use Mix\Grpc;
 use Mix\Grpc\Context;
-use Orders\Services\Grpc;
-use User\Services\Grpc;
+use Orders\Services\Grpc as OrderGrpc;
+use User\Services\Grpc as UserGrpc;
 
 interface MLMServiceInterface extends Grpc\ServiceInterface
 {
@@ -16,25 +16,16 @@ interface MLMServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
-    * @param Grpc\User $request
+    * @param UserGrpc\User $request
     * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
     */
-    public function hasValidPackage(Context $context, Grpc\User $request): Acknowledge;
+    public function hasValidPackage(Context $context, UserGrpc\User $request): Acknowledge;
 
     /**
     * @param Context $context
-    * @param Grpc\User $request
-    * @return Rank
-    *
-    * @throws Grpc\Exception\InvokeException
-    */
-    public function getUserRank(Context $context, Grpc\User $request): Rank;
-
-    /**
-    * @param Context $context
-    * @param Grpc\User $request
+    * @param UserGrpc\User $request
     * @return Rank
     *
     * @throws Grpc\Exception\InvokeException
@@ -43,19 +34,19 @@ interface MLMServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
-    * @param Grpc\Order $request
+    * @param OrderGrpc\Order $request
     * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
     */
-    public function simulateOrder(Context $context, Grpc\Order $request): Acknowledge;
+    public function simulateOrder(Context $context, OrderGrpc\Order $request): Acknowledge;
 
     /**
     * @param Context $context
-    * @param Grpc\Order $request
+    * @param OrderGrpc\Order $request
     * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
     */
-    public function submitOrder(Context $context, Grpc\Order $request): Acknowledge;
+    public function submitOrder(Context $context, OrderGrpc\Order $request): Acknowledge;
 }
