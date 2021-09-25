@@ -28,8 +28,8 @@ class RankResource extends JsonResource
             'withdrawal_limit' => $this->withdrawal_limit,
             'condition_number_of_left_children' => $this->condition_number_of_left_children,
             'condition_number_of_right_children' => $this->condition_number_of_right_children,
-            'updated_at' => $this->updated_at,
-            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at->timestamp,
+            'created_at' => $this->created_at->timestamp,
 
         ];
 

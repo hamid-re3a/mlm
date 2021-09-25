@@ -30,7 +30,7 @@ if (!function_exists('getRank')) {
         if (isset(RANKS[$rank]))
             return RANKS[$rank];
 
-        throw new Exception(trans('responses.main-key-settings-is-missing'));
+        return null;
     }
 }
 

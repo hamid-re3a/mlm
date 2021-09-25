@@ -34,7 +34,7 @@ class TreeController extends Controller
         if ($request->has('id') && request('id'))
             $tree = ReferralTree::query()->where('user_id',request('id'))->firstOrFail();
         else
-            $tree = ReferralTree::query()->where('user_id',auth()->id())->first();
+            $tree = ReferralTree::query()->where('user_id',auth()->user()->id)->first();
         $page = 1;
         if ($request->has('page') && request('page'))
             $page = request('page');
@@ -44,7 +44,8 @@ class TreeController extends Controller
         $data = [
             'children' => ReferralTreeResource::collection($tree->children()->paginate(50)),
             'id' => $tree->id,
-            'created_at' => Carbon::make($tree->created_at),
+            'created_at' => $tree->created_at->timestamp,
+            'user' => $tree->user,
             'user_rank' => $tree->user->rank,
             'has_children' => $tree->children()->exists(),
             'has_more'=> $tree->children()->count() > $page*25,
@@ -71,7 +72,7 @@ class TreeController extends Controller
         if ($request->has('id') && request('id'))
             $tree = Tree::query()->where('user_id',request('id'))->firstOrFail();
         else
-            $tree = Tree::query()->where('user_id',auth()->id())->first();
+            $tree = Tree::query()->where('user_id',auth()->user()->id)->first();
 
 
 
@@ -84,13 +85,13 @@ class TreeController extends Controller
             ],
             'id' => $tree->id,
             'position' => $tree->position,
-            'created_at' => Carbon::make($tree->created_at),
+            'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
             'has_children' => $tree->children()->exists(),
             'children_count_right' => $tree->rightChildCount(),
             'children_count_left' => $tree->leftChildCount(),
             'rank' => getRank($tree->user->rank)
         ];
-        return ResponseData::success('', $data);
+        return api()->success('', $data);
     }
 }

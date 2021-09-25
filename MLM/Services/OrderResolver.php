@@ -107,19 +107,18 @@ class OrderResolver
     public function simulateValidation(): array
     {
         DB::beginTransaction();
-
         list($bool, $msg) = $this->isValid();
-        if ($bool) {
-            list($bool, $msg) = $this->addUserToNetwork(true);
-            if ($bool) {
-                DB::rollBack();
-                return [true, 'resolve'];
-            }
-
-        }
+//        if ($bool) {
+//            list($bool, $msg) = $this->addUserToNetwork(true);
+//            if ($bool) {
+//                DB::rollBack();
+//                return [true, 'resolve'];
+//            }
+//
+//        }
 
         DB::rollBack();
-        return [false, $msg ?? 'resolve'];
+        return [$bool, $msg ?? 'resolve'];
 
     }
 
