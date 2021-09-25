@@ -7,6 +7,7 @@ namespace MLM\Repository;
 use Carbon\Carbon;
 use MLM\Models\OrderedPackage;
 use Orders\Services\Grpc\Order;
+use Orders\Services\Grpc\OrderPlans;
 use Packages\Services\Grpc\Package;
 
 class OrderedPackageRepository
@@ -26,7 +27,7 @@ class OrderedPackageRepository
             "user_id" => $order->getUserId(),
             "package_id" => $package->getId(),
 
-            "plan" => $order->getPlan(),
+            "plan" => OrderPlans::name($order->getPlan()),
             "is_paid_at" => Carbon::make($order->getIsPaidAt()),
             "is_resolved_at" => Carbon::make($order->getIsResolvedAt()),
             "is_commission_resolved_at" => Carbon::make($order->getIsCommissionResolvedAt()),
