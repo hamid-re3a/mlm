@@ -3,6 +3,7 @@
 namespace MLM\tests\UnitTest\Order;
 
 
+use Illuminate\Support\Facades\Mail;
 use MLM\Models\OrderedPackage;
 use MLM\Models\PackageRoi;
 use MLM\Models\ReferralTree;
@@ -18,6 +19,7 @@ class OrderTest extends MLMTest
     public function setUp(): void
     {
         parent::setUp();
+        Mail::fake();
         ReferralTree::create(['user_id' => 1]);
         Tree::create(['user_id' => 1]);
     }

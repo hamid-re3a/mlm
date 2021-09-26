@@ -32,9 +32,9 @@ class UserRankChangedEmail extends Mailable implements SettingableMail
     {
         $setting = $this->getSetting();
 
-
-        $setting['body'] = str_replace('{{full_name}}',(is_null( $this->user->full_name) || empty( $this->user->full_name)) ? 'Unknown':  $this->user->full_name, $setting['body']);
-        $setting['body'] = str_replace('{{rank}}',(is_null( $this->user->rank) || empty( $this->user->rank)) ? 'Unknown':  $this->user->rank, $setting['body']);
+        $rank = getAndUpdateUserRank($this->user);
+        $setting['body'] = str_replace('{{full_name}}', (is_null($this->user->full_name) || empty($this->user->full_name)) ? 'Unknown' : $this->user->full_name, $setting['body']);
+        $setting['body'] = str_replace('{{rank}}', (is_null($rank) || empty($rank)) ? 'Unknown' : $rank->rank_name, $setting['body']);
 
         return $this
             ->from($setting['from'], $setting['from_name'])

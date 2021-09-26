@@ -5,7 +5,6 @@ namespace User\tests\Feature;
 
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Mail;
-use MLM\Jobs\UserRankEmailJob;
 use MLM\Mail\UserRankChangedEmail;
 use User\Models\User;
 use User\tests\UserTest;
@@ -72,15 +71,12 @@ class UserFeatureTest extends UserTest
      */
     public function email_should_be_send_after_updating_users_rank()
     {
-//        Mail::fake();
-        Bus::fake();
+        Mail::fake();
 
         $user = User::factory()->create();
-        $user->rank=$user->rank+1;
+        $user->rank = $user->rank + 1;
         $user->save();
-//        Mail::assertSent(UserRankChangedEmail::class);
-        Bus::assertDispatched(UserRankEmailJob::class);
-//
+        Mail::assertSent(UserRankChangedEmail::class);
 
     }
 

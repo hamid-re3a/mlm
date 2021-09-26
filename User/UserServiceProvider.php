@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use User\Models\User;
+use User\Observers\UserObserver;
 use User\Services\Grpc\UserUpdate;
 
 class UserServiceProvider extends ServiceProvider
@@ -108,6 +109,8 @@ class UserServiceProvider extends ServiceProvider
                 __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
         }
+
+        User::observe(UserObserver::class);
     }
 
     /**
