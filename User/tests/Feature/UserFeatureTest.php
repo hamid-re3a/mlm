@@ -3,6 +3,9 @@
 
 namespace User\tests\Feature;
 
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Mail;
+use MLM\Mail\UserRankChangedEmail;
 use User\Models\User;
 use User\tests\UserTest;
 
@@ -60,6 +63,20 @@ class UserFeatureTest extends UserTest
         $this->put(route('users.binaryPosition'), [
             'default_binary_position' => \MLM\Models\Tree::LEFT
         ])->assertStatus(403);
+
+    }
+
+    /**
+     * @test
+     */
+    public function email_should_be_send_after_updating_users_rank()
+    {
+        Mail::fake();
+
+        $user = User::factory()->create();
+        $user->rank = $user->rank + 1;
+        $user->save();
+        Mail::assertSent(UserRankChangedEmail::class);
 
     }
 

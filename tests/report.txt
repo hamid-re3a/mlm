@@ -3,6 +3,7 @@ User Feature (User\tests\Feature\UserFeature)
  [x] Default binary position is required for editing binary position
  [x] Default binary position is correct enum value for editing binary position
  [x] User should login before calling binary position
+ [x] Email should be send after updating users rank
 
 Order (MLM\tests\UnitTest\Order\Order)
  [x] Add user to both tree with valid ordered package

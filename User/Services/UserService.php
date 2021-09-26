@@ -25,7 +25,7 @@ class UserService
         }
         $user_grpc = updateUserFromGrpcServer($id);
 
-        if($user_grpc->getId()){
+        if(!is_null($user_grpc) && $user_grpc->getId()){
             $user = $this->user_repository->findById($id);
             if(!is_null($user)){
                 return $user;
