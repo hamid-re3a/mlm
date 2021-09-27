@@ -19,7 +19,7 @@ class CreateOrderedPackagesIndirectCommissionsTable extends Migration
             $table->unsignedBigInteger('ordered_package_id');
 
             $table->integer('level');
-            $table->integer('percentage');
+            $table->integer('percentage')->default(0);
 
             $table->unique(['ordered_package_id', 'level'],'ordered_package_id_unique');
 

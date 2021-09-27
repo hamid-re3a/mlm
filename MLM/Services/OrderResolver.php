@@ -140,7 +140,7 @@ class OrderResolver
                 }
 
                 DB::commit();
-                $this->order->setIsCommissionResolvedAt(now()->toString());
+                $this->order->setIsCommissionResolvedAt(now()->toDateTimeString());
             } catch (\Throwable $e) {
                 DB::rollBack();
                 return [false, trans('responses.resolveCommission')];
