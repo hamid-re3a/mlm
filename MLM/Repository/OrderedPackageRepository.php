@@ -7,6 +7,7 @@ namespace MLM\Repository;
 use Carbon\Carbon;
 use MLM\Models\OrderedPackage;
 use Orders\Services\Grpc\Order;
+use Packages\Services\Grpc\IndirectCommission;
 use Packages\Services\Grpc\Package;
 
 class OrderedPackageRepository
@@ -37,6 +38,14 @@ class OrderedPackageRepository
             "binary_percentage" => $package->getBinaryPercentage(),
             "expires_at" => Carbon::make($order->getIsPaidAt())->addDays($order->getValidityInDays())
         ]);
+
+
+        /** @var $indirect_commission IndirectCommission */
+        foreach ($package->getIndirectCommission() as $indirect_commission){
+            $indirect_commission_db = $package_find->packageIndirectCommission()->firstOrCreate(['level'=>$indirect_commission->getLevel()]);
+            $indirect_commission_db->update(['percentage'=>$indirect_commission->getPercentage()]);
+        }
+
         return $package_find;
     }
 }
