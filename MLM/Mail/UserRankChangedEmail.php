@@ -45,6 +45,6 @@ class UserRankChangedEmail extends Mailable implements SettingableMail
 
     public function getSetting(): array
     {
-        return getEmailAndTextSetting('USER_ACCOUNT_HAS_BEEN_DEACTIVATED');
+        return getEmailAndTextSetting('USER_RANK_HAS_BEEN_CHANGED');
     }
 }
