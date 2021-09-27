@@ -7,7 +7,7 @@ require './vendor/autoload.php';
 
 $order = new Order();
 $order->setId((int)1001);
-$order->setUserId((int)23);
+$order->setUserId((int)24);
 $order->setIsPaidAt(now()->toString());
 $order->setPlan(OrderPlans::ORDER_PLAN_START);
 //$order->setPlan(OrderPlans::ORDER_PLAN_PURCHASE);
