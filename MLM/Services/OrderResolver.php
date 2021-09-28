@@ -108,14 +108,14 @@ class OrderResolver
     {
         DB::beginTransaction();
         list($bool, $msg) = $this->isValid();
-//        if ($bool) {
-//            list($bool, $msg) = $this->addUserToNetwork(true);
-//            if ($bool) {
-//                DB::rollBack();
-//                return [true, 'resolve'];
-//            }
-//
-//        }
+        if ($bool) {
+            list($bool, $msg) = $this->addUserToNetwork(true);
+            if ($bool) {
+                DB::rollBack();
+                return [true, 'resolve'];
+            }
+
+        }
 
         DB::rollBack();
         return [$bool, $msg ?? 'resolve'];
