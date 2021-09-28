@@ -59,7 +59,8 @@ class PackageRoiController extends Controller
      * @param Request $request
      * @return JsonResponse
      * @throws ValidationException
-     * @queryParam package_id,due_date
+     * @queryParam package_id
+     * @queryParam due_date
      */
     public function show(Request $request)
     {
@@ -189,7 +190,7 @@ class PackageRoiController extends Controller
     {
         $field = $bulk ? 'package_id.*' : 'package_id';
         $validator = Validator::make($request, [
-            $field => 'integer|exists:packages,id',
+            $field => 'required|integer|exists:packages,id',
         ]);
         if ($validator->fails()) {
             throw (new ValidationException($validator));

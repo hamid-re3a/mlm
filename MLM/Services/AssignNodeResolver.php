@@ -54,6 +54,8 @@ class AssignNodeResolver
                 if ($this->resolve($simulate)) {
                     if (!$simulate)
                         DB::commit();
+                    else
+                        DB::rollBack();
                     return [true, trans('responses.tree-node-attached-successful')];
                 } else {
                     $msg = trans('responses.commission-failed');
