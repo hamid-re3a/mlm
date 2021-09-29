@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use MLM\Http\Requests\PackageRoiBulkUpdateRequest;
 use MLM\Http\Requests\PackageRoiDestroyRequest;
+use MLM\Http\Requests\PackageRoiIndexRequest;
 use MLM\Http\Requests\PackageRoiStoreRequest;
 use MLM\Http\Requests\PackageRoiUpdateRequest;
 use MLM\Http\Resources\PackageRoi\PackageRoiResource;
@@ -45,12 +46,15 @@ class PackageRoiController extends Controller
      * @group Admin User > PackageRoi
      * @return JsonResponse
      */
-    public function index()
+    public function index(PackageRoiIndexRequest $request)
     {
-        $packageRois = PackageRoiResource::collection($this->packageRoiService->getAll());
 
-        return api()->success(trans('responses.ok'), $packageRois);
+        $rois = $this->packageRoiService->getAllByDate($request->from_date,$request->to_date);
 
+        if(is_null($rois))
+            return api()->notFound();
+
+        return api()->success(trans('responses.ok'), PackageRoiResource::collection($rois));
     }
 
     /**

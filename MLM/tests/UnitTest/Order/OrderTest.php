@@ -10,9 +10,11 @@ use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use MLM\Services\Commissions\BinaryCommission;
 use MLM\Services\OrderResolver;
+use MLM\Services\Wallet\WalletClientFacade;
 use MLM\tests\MLMTest;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;
+use Wallets\Services\Grpc\Deposit;
 
 class OrderTest extends MLMTest
 {
@@ -22,6 +24,8 @@ class OrderTest extends MLMTest
         Mail::fake();
         ReferralTree::create(['user_id' => 1]);
         Tree::create(['user_id' => 1]);
+        WalletClientFacade::shouldReceive('deposit')->andReturn( new Deposit());
+
     }
 
     /**

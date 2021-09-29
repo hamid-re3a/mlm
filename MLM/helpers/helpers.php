@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\DB;
 use MLM\Models\EmailContentSetting;
 use User\Models\User;
-use Wallets\Services\Grpc\Deposit;
 
 if (!function_exists('subset')) {
 
@@ -35,48 +34,33 @@ if (!function_exists('getRank')) {
     }
 }
 
-if (!function_exists('payCommission')) {
-    /**
-     * @param Deposit $deposit_service_object
-     * @param User $user
-     * @param $type
-     * @param null $package_id
-     * @throws Exception
-     */
-    function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
-    {
-        DB::beginTransaction();
-        try {
-            $commission = $user->commissions()->create([
-                'amount' => $deposit_service_object->getAmount(),
-                'ordered_package_id' => $package_id,
-                'type' => $type,
-            ]);
-
-            if (app()->environment() != 'testing') {
-                if ($commission) {
-                    $deposit_service_object->setPayloadId($commission->id);
-                    /** @var $deposit_response  Deposit */
-                    list($deposit_response, $error) = getWalletGrpcClient()->deposit($deposit_service_object)->wait();
-                    if ($error != 0) {
-                        throw new \Exception('Wallet Service Error');
-                    }
-
-                    $commission->transaction_id = $deposit_response->getTransactionId();
-                    $commission->save();
-                } else {
-                    throw new \Exception('Commission Failed Error');
-                }
-            }
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            throw new \Exception('Commission Error => ' . $exception->getMessage());
-        }
-
-        DB::commit();
-
-    }
-}
+//if (!function_exists('payCommission')) {
+//
+//    function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
+//    {
+//        DB::beginTransaction();
+//        try {
+//            $commission = $user->commissions()->create([
+//                'amount' => $deposit_service_object->getAmount(),
+//                'ordered_package_id' => $package_id,
+//                'type' => $type,
+//            ]);
+//            if ($commission) {
+//                $deposit_response = WalletClientFacade::deposit($deposit_service_object);
+//                $commission->transaction_id = $deposit_response->getTransactionId();
+//                $commission->save();
+//            } else {
+//                throw new \Exception('Commission Failed Error');
+//            }
+//        } catch (\Exception $exception) {
+//            DB::rollBack();
+//            throw new \Exception('Commission Error => ' . $exception->getMessage());
+//        }
+//
+//        DB::commit();
+//
+//    }
+//}
 if (!function_exists('getPackageGrpcClient')) {
     function getPackageGrpcClient()
     {

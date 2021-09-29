@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use MLM\Models\OrderedPackage;
 use MLM\Models\Rank;
+use MLM\Services\CommissionResolver;
 use User\Models\User;
 use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
@@ -86,8 +87,7 @@ class BinaryCommissionJob implements ShouldQueue
                                 ]));
                                 $deposit_service_object->setType('Commission');
                                 $deposit_service_object->setSubType('Binary');
-
-                                payCommission($deposit_service_object, $parent, $this->getType(), $this->package->id);
+                                (new CommissionResolver)->payCommission($deposit_service_object, $parent, $this->getType(), $this->package->id);
                             }
 
 
