@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use MLM\Models\OrderedPackage;
 use MLM\Models\OrderedPackagesIndirectCommission;
+use MLM\Services\CommissionResolver;
 use User\Models\User;
 use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
@@ -59,7 +60,7 @@ class IndirectSellCommissionJob implements ShouldQueue
 
 
 
-                payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);
+                (new CommissionResolver)->payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);
 
             }
         }

@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
+use MLM\Services\CommissionResolver;
 use User\Models\User;
 use User\Services\UserService;
 use Wallets\Services\Grpc\Deposit;
@@ -62,7 +63,7 @@ class TrainerBonusCommissionJob implements ShouldQueue
                             $deposit_service_object->setType('Commission');
                             $deposit_service_object->setSubType('Trainer Bonus');
 
-                            payCommission($deposit_service_object, $grand_parent, $this->getType(), $this->package->id);
+                            (new CommissionResolver)->payCommission($deposit_service_object, $grand_parent, $this->getType(), $this->package->id);
 
 
                         }

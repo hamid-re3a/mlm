@@ -3,6 +3,7 @@
 
 namespace MLM\Repository;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use MLM\Models\PackageRoi;
 use MLM\Services\Grpc\PackageRoi as PackageRoiData;
@@ -71,6 +72,18 @@ class PackageRoiRepository
 
         return $packageRoi_entity->query()->where('package_id', $packageId)->where('due_date', $dueDate)->first();
 
+    }
+
+    public function getAllByDate($from_date = null, $to_date = null)
+    {
+        /** @var  $packageRoi_entity PackageRoi*/
+        $packageRoi_entity = new $this->entity_name;
+        $query = $packageRoi_entity->query();
+        if(!is_null($from_date))
+            $query->whereDate('due_date' , '>=', Carbon::make($from_date)->toDate());
+        if(!is_null($to_date))
+            $query->whereDate('due_date' , '<=', Carbon::make($to_date)->toDate());
+        return $query->get();
     }
 
 }

@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
 use MLM\Models\PackageRoi;
+use MLM\Services\CommissionResolver;
 use MLM\Services\PackageService;
 use Wallets\Services\Grpc\Deposit;
 
@@ -59,7 +60,7 @@ class TradingProfitCommissionJob implements ShouldQueue
                 $deposit_service_object->setSubType('Trading Profit');
 
 
-                payCommission($deposit_service_object,$this->ordered_package->user,TRADING_PROFIT_COMMISSION,$this->ordered_package->id);
+                (new CommissionResolver)->payCommission($deposit_service_object,$this->ordered_package->user,TRADING_PROFIT_COMMISSION,$this->ordered_package->id);
 
 
             }

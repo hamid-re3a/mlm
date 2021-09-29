@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use MLM\Models\Commission as CommissionModel;
 use MLM\Models\ReferralTree;
+use MLM\Services\CommissionResolver;
 use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
 
@@ -65,7 +66,7 @@ class ResidualBonusCommissionJob implements ShouldQueue
 
 
 
-        payCommission($deposit_service_object,$this->user,RESIDUAL_BONUS_COMMISSION);
+        (new CommissionResolver)->payCommission($deposit_service_object,$this->user,RESIDUAL_BONUS_COMMISSION);
 
 
 
