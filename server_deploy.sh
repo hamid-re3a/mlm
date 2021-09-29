@@ -7,6 +7,7 @@ rm -rf config/
 rm -rf database/
 rm -rf routes/
 rm -rf User/
+rm -rf resources/
 #git clone git@github.com:Ride-To-The-Future/subscriptions.git
 #cp -r subscriptions/* .
 #rm -rf subscriptions/

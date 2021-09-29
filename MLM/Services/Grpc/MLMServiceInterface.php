@@ -16,7 +16,7 @@ interface MLMServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
-    * @param Grpc\User $request
+    * @param UserGrpc\User $request
     * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
@@ -25,7 +25,7 @@ interface MLMServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
-    * @param Grpc\User $request
+    * @param UserGrpc\User $request
     * @return Rank
     *
     * @throws Grpc\Exception\InvokeException
@@ -34,7 +34,7 @@ interface MLMServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
-    * @param Grpc\Order $request
+    * @param OrderGrpc\Order $request
     * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
@@ -43,7 +43,7 @@ interface MLMServiceInterface extends Grpc\ServiceInterface
 
     /**
     * @param Context $context
-    * @param Grpc\Order $request
+    * @param OrderGrpc\Order $request
     * @return Acknowledge
     *
     * @throws Grpc\Exception\InvokeException
