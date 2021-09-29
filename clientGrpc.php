@@ -7,7 +7,7 @@ require './vendor/autoload.php';
 
 $order = new Order();
 $order->setId((int)1001);
-$order->setUserId((int)24);
+$order->setUserId((int)26);
 $order->setIsPaidAt(now()->toString());
 $order->setPlan(OrderPlans::ORDER_PLAN_START);
 //$order->setPlan(OrderPlans::ORDER_PLAN_PURCHASE);
@@ -16,10 +16,9 @@ $client = new \MLM\Services\Grpc\MLMServiceClient('staging-api-gateway.janex.org
 //$client = new \MLM\Services\Grpc\MLMServiceClient('127.0.0.1:9598', [
     'credentials' => \Grpc\ChannelCredentials::createInsecure()
 ]);
-list($reply, $status) = $client->submitOrder($order)->wait();
-print_r($status);
-//var_dump($reply->getStatus());
-//var_dump($reply->getMessage());
+list($reply, $status) = $client->simulateOrder($order)->wait();
+var_dump($reply->getStatus());
+var_dump($reply->getMessage());
 
 
 

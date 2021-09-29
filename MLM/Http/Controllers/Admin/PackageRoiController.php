@@ -65,10 +65,13 @@ class PackageRoiController extends Controller
     public function show(Request $request)
     {
         $this->handleValidation($request->all());
+        $packageRoi = $this->packageRoiService->getByPackageIdDueDate($request->package_id, $request->due_date);
 
-        $packageRois = new PackageRoiResource($this->packageRoiService->getByPackageIdDueDate($request->package_id, $request->due_date));
+        if(is_null($packageRoi)){
+            return api()->notFound(trans('responses.error'));
+        }
 
-        return api()->success(trans('responses.ok'), $packageRois);
+        return api()->success(trans('responses.ok'),  PackageRoiResource::make($packageRoi));
 
     }
 
