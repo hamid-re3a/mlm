@@ -17,6 +17,31 @@ class TreeController extends Controller
 {
     use  ValidatesRequests;
 
+
+//    public function getUserReferralWithLevelTree(ReferralTreeRequest $request)
+//    {
+//
+//        if (auth()->check() && !auth()->user()->hasReferralNode())
+//            return api()->error();
+//
+//        if ($request->has('id') && request('id'))
+//            $tree = ReferralTree::withDepth()->query()->where('user_id', request('id'))->firstOrFail();
+//        else
+//            $tree = ReferralTree::withDepth()->query()->where('user_id', auth()->user()->id)->first();
+//        $depth = $tree->depth;
+//
+//        $users = ReferralTree::withDepth()->descendantsAndSelf($tree->id)
+//            ->where('depth', $depth + 10);
+//
+//        $sub = clone $users;
+//        $sub->where('')
+//        $page = 1;
+//        if ($request->has('page') && request('page'))
+//            $page = request('page');
+//
+//
+//    }
+
     /**
      * Get Referral Tree
      * @group
@@ -28,17 +53,17 @@ class TreeController extends Controller
     public function getUserReferralTree(ReferralTreeRequest $request)
     {
 
-        if(auth()->check() && !auth()->user()->hasReferralNode())
+        if (auth()->check() && !auth()->user()->hasReferralNode())
             return api()->error();
 
         if ($request->has('id') && request('id'))
-            $tree = ReferralTree::query()->where('user_id',request('id'))->firstOrFail();
+            $tree = ReferralTree::query()->where('user_id', request('id'))->firstOrFail();
         else
-            $tree = ReferralTree::query()->where('user_id',auth()->user()->id)->first();
+            $tree = ReferralTree::query()->where('user_id', auth()->user()->id)->first();
+
         $page = 1;
         if ($request->has('page') && request('page'))
             $page = request('page');
-
 
 
         $data = [
@@ -48,7 +73,7 @@ class TreeController extends Controller
             'user' => $tree->user,
             'user_rank' => $tree->user->rank,
             'has_children' => $tree->children()->exists(),
-            'has_more'=> $tree->children()->count() > $page*25,
+            'has_more' => $tree->children()->count() > $page * 25,
             'children_count' => $tree->children()->count(),
             'page' => $page
         ];
@@ -60,20 +85,19 @@ class TreeController extends Controller
      * @group
      * Public User > Display Tree
      *
-     *  @queryParam id integer
+     * @queryParam id integer
      */
     public function getBinaryTree(BinaryTreeRequest $request)
     {
 
 
-        if(auth()->check() && !auth()->user()->hasBinaryNode())
+        if (auth()->check() && !auth()->user()->hasBinaryNode())
             return api()->error();
 
         if ($request->has('id') && request('id'))
-            $tree = Tree::query()->where('user_id',request('id'))->firstOrFail();
+            $tree = Tree::query()->where('user_id', request('id'))->firstOrFail();
         else
-            $tree = Tree::query()->where('user_id',auth()->user()->id)->first();
-
+            $tree = Tree::query()->where('user_id', auth()->user()->id)->first();
 
 
         $left_child = $tree->children()->left()->first();

@@ -52,7 +52,7 @@ class PackageRoiController extends Controller
         $rois = $this->packageRoiService->getAllByDate($request->from_date,$request->to_date);
 
         if(is_null($rois))
-            return api()->notFound();
+            return api()->success(trans('responses.ok'),[]);
 
         return api()->success(trans('responses.ok'), PackageRoiResource::collection($rois));
     }
@@ -72,7 +72,7 @@ class PackageRoiController extends Controller
         $packageRoi = $this->packageRoiService->getByPackageIdDueDate($request->package_id, $request->due_date);
 
         if(is_null($packageRoi)){
-            return api()->notFound(trans('responses.error'));
+            return api()->success(trans('responses.ok'),[]);
         }
 
         return api()->success(trans('responses.ok'),  PackageRoiResource::make($packageRoi));
