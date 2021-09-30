@@ -95,8 +95,19 @@ class MLMGrpcService implements MLMServiceInterface
                 $user = $this->user_service->findByIdOrFail($request->getId());
                 $rank = getAndUpdateUserRank($user);
 
-                if (!is_null($rank))
-                    return $rank->getRankService();
+                if (!is_null($rank)) {
+                    $rank_grpc = $rank->getRankService();
+                    $ordered_package = $user->biggestActivePackage();
+                    if(!is_null($ordered_package)) {
+                        if($ordered_package->isCompanyPackage())
+                            $rank_grpc->setWithdrawalLimit((int)-1);
+                        if ($ordered_package->isSpecialPackage())
+                            if ($user->directSellAmount() <= $ordered_package->price)
+                                $rank_grpc->setWithdrawalLimit((int)0);
+
+                        return $rank_grpc;
+                    }
+                }
             } catch (\Exception $exception) {
 
             }
@@ -104,4 +115,6 @@ class MLMGrpcService implements MLMServiceInterface
 
         return new Rank;
     }
+
+
 }

@@ -17,8 +17,9 @@ $client = new \MLM\Services\Grpc\MLMServiceClient('staging-api-gateway.janex.org
     'credentials' => \Grpc\ChannelCredentials::createInsecure()
 ]);
 list($reply, $status) = $client->simulateOrder($order)->wait();
-var_dump($reply->getStatus());
-var_dump($reply->getMessage());
+var_dump($status);
+//var_dump($reply->getStatus());
+//var_dump($reply->getMessage());
 
 
 

@@ -158,8 +158,8 @@ class ResidualBonusSettingUpdateFeatureTest extends MLMTest
         $this->put(route('admin.residualBonusSetting.update'), [
             'id' => $residualBonusSetting->id,
             'level' =>$residualBonusSetting->level,
-            'rank' => mt_rand(0, 99)/100,
-            'percentage' => mt_rand(0, 100)/10,
+            'rank' => mt_rand(1, 99)/100,
+            'percentage' => mt_rand(1, 100)/10,
         ])->assertStatus(422);
     }
 

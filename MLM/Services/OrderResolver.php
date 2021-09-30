@@ -9,6 +9,7 @@ use MLM\Interfaces\Commission;
 use MLM\Jobs\UpdateUserRanksJob;
 use MLM\Models\OrderedPackage;
 use MLM\Services\Plans\RegisterOder;
+use MLM\Services\Plans\SpecialOrder;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;
 use User\Models\User;
@@ -34,13 +35,29 @@ class OrderResolver
     public function __construct(Order &$order)
     {
         $this->order = $order;
-        $this->plan = app(RegisterOder::class);
+        $this->planDefiner();
         $this->user_service = app(UserService::class);
         try {
             $this->user = $this->user_service->findByIdOrFail($this->order->getUserId());
         } catch (\Exception $e) {
             return [false, trans('order.responses.user-not-valid')];
         }
+    }
+
+    private function planDefiner()
+    {
+        switch ($this->order->getPlan()) {
+            case OrderPlans::ORDER_PLAN_SPECIAL:
+            case OrderPlans::ORDER_PLAN_COMPANY:
+                $this->plan = app(SpecialOrder::class);
+                break;
+            case OrderPlans::ORDER_PLAN_START:
+            case OrderPlans::ORDER_PLAN_PURCHASE:
+            default:
+                $this->plan = app(RegisterOder::class);
+                break;
+        }
+
     }
 
 
@@ -155,14 +172,28 @@ class OrderResolver
      */
     public function isValid(): array
     {
-        if ($this->order->getPlan() != OrderPlans::ORDER_PLAN_START) {
-
-            if (!$this->user->hasAnyValidOrder())
-                return [false, trans('order.responses.you-should-order-starter-plan-first')];
-        } else {
-            if ($this->user->hasAnyValidOrder())
-                return [false, trans('order.responses.you-should-order-starter-plan-first')];
+        $ordered_package = OrderedPackage::query()->firstOrFail($this->order->getId());
+        switch ($this->order->getPlan()){
+            case OrderPlans::ORDER_PLAN_START:
+                if ($this->user->hasAnyValidOrder())
+                    return [false, trans('order.responses.you-should-order-other-plan-you-have-already-start-plan')];
+                break;
+            case OrderPlans::ORDER_PLAN_PURCHASE:
+                if (!$this->user->hasAnyValidOrder())
+                    return [false, trans('order.responses.you-should-order-starter-plan-first')];
+                break;
+            case OrderPlans::ORDER_PLAN_SPECIAL:
+                if($ordered_package->package->short_name != 'A1')
+                    return [false, trans('order.responses.you-have-to-select-a1-for-special-package')];
+                break;
+            case OrderPlans::ORDER_PLAN_COMPANY:
+                if($ordered_package->package->short_name != 'P4')
+                    return [false, trans('order.responses.you-have-to-select-p4-for-company-package')];
+                break;
+            default:
+                return [false, trans('responses.not-valid-plan')];
         }
+
 
         // check user if he is in tree
         return [true, trans('responses.isValid')];
@@ -176,7 +207,7 @@ class OrderResolver
 
     private function addUserToNetwork($simulate = false): array
     {
-        if ($this->order->getPlan() == OrderPlans::ORDER_PLAN_START)
+        if(in_array($this->order->getPlan(),[OrderPlans::ORDER_PLAN_START,OrderPlans::ORDER_PLAN_COMPANY,OrderPlans::ORDER_PLAN_SPECIAL]))
             return (new AssignNodeResolver($this->order))->handle($simulate);
         return [true, trans('responses.isValid')];
     }
