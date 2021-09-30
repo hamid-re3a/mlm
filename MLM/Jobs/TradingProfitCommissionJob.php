@@ -8,7 +8,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use MLM\Models\Commission as CommissionModel;
 use MLM\Models\OrderedPackage;
 use MLM\Models\PackageRoi;
 use MLM\Services\CommissionResolver;
@@ -29,14 +28,13 @@ class TradingProfitCommissionJob implements ShouldQueue
 
     public function handle(PackageService $package_service)
     {
-        if (!$this->ordered_package->active()->exists())
+        if (!$this->ordered_package->active()->exists() || $this->ordered_package->isSpecialPackage() || $this->ordered_package->isCompanyPackage())
             return;
 
         if (!$this->ordered_package->commissions()
             ->where('type', TRADING_PROFIT_COMMISSION)
             ->whereDate('created_at', now()->toDate())
             ->where('ordered_package_id', $this->ordered_package->id)->exists()) {
-
 
 
             /** @var  $roi PackageRoi */
@@ -60,7 +58,7 @@ class TradingProfitCommissionJob implements ShouldQueue
                 $deposit_service_object->setSubType('Trading Profit');
 
 
-                (new CommissionResolver)->payCommission($deposit_service_object,$this->ordered_package->user,TRADING_PROFIT_COMMISSION,$this->ordered_package->id);
+                (new CommissionResolver)->payCommission($deposit_service_object, $this->ordered_package->user, TRADING_PROFIT_COMMISSION, $this->ordered_package->id);
 
 
             }

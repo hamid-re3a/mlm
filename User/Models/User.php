@@ -11,6 +11,8 @@ use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Orders\Services\Grpc\Order;
+use Orders\Services\Grpc\OrderPlans;
 use Spatie\Permission\Traits\HasRoles;
 use User\database\factories\UserFactory;
 
@@ -229,5 +231,13 @@ class User extends Model
     public function residualBonusSetting()
     {
         return $this->hasMany(ResidualBonusSetting::class,'rank','rank');
+    }
+
+    public function directSellAmount()
+    {
+        $referral_children = $this->referralTree->childrenUserIds();
+        if(count($referral_children) == 0)
+            return 0;
+        return OrderedPackage::query()->whereIn('user_id',$referral_children)->whereIn('plan',[OrderPlans::ORDER_PLAN_PURCHASE,OrderPlans::ORDER_PLAN_START])->sum('price');
     }
 }

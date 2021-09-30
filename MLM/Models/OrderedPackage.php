@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use MLM\database\factories\OrderedPackageFactory;
 use MLM\database\factories\PackageFactory;
+use Orders\Services\Grpc\OrderPlans;
 use User\Models\User;
 
 /**
@@ -36,6 +37,7 @@ use User\Models\User;
  * @property-read int|null $package_indirect_commission_count
  * @property-read User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage active()
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage notSpecial()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage biggest()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderedPackage canGetRoi()
  * @method static \MLM\database\factories\OrderedPackageFactory factory(...$parameters)
@@ -77,6 +79,10 @@ class OrderedPackage extends Model
         return $query->whereDate("expires_at", ">", now()->toDate());
     }
 
+    public function scopeNotSpecial($query)
+    {
+        return $query->whereNotIn("plan", [OrderPlans::ORDER_PLAN_COMPANY, OrderPlans::ORDER_PLAN_SPECIAL]);
+    }
     public function scopeCanGetRoi($query)
     {
         return $query->where('plan', '!=', 'Special');
@@ -115,5 +121,14 @@ class OrderedPackage extends Model
         return $this->hasMany(OrderedPackagesIndirectCommission::class);
     }
 
+    public function isSpecialPackage(): bool
+    {
+        return in_array($this->plan, [OrderPlans::ORDER_PLAN_COMPANY, OrderPlans::ORDER_PLAN_SPECIAL]);
+    }
 
+
+    public function isCompanyPackage(): bool
+    {
+        return in_array($this->plan, [OrderPlans::ORDER_PLAN_COMPANY]);
+    }
 }

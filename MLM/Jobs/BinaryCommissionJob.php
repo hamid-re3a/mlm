@@ -57,7 +57,7 @@ class BinaryCommissionJob implements ShouldQueue
                         DB::beginTransaction();
                         try {
 
-                            if ($requested_commission_amount + $amount_paid_today > $rank_based_on_converted_points->cap) {
+                            if (!$this->package->isCompanyPackage() && $requested_commission_amount + $amount_paid_today > $rank_based_on_converted_points->cap) {
 
                                 $payable_amount = $rank_based_on_converted_points->cap - $amount_paid_today;
                                 $payable_amount = ($payable_amount < 0) ? 0 : $payable_amount;
