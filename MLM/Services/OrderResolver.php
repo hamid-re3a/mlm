@@ -5,6 +5,7 @@ namespace MLM\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use MLM\Interfaces\Commission;
 use MLM\Jobs\UpdateUserRanksJob;
 use MLM\Models\OrderedPackage;
@@ -87,31 +88,36 @@ class OrderResolver
         DB::beginTransaction();
         $problem_level = 0;
 
-        list($bool, $msg) = $this->isValid();
-        if ($bool) {
-
-            list($bool, $msg) = $this->addUserToNetwork();
+        try {
+            list($bool, $msg) = $this->isValid();
             if ($bool) {
-                list($bool, $msg) = $this->resolveCommission();
+
+                list($bool, $msg) = $this->addUserToNetwork();
                 if ($bool) {
-                    $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId())
-                        ->first();
-                    $ordered_package->is_commission_resolved_at = Carbon::make($this->order->getIsCommissionResolvedAt());
-                    $ordered_package->save();
+                    list($bool, $msg) = $this->resolveCommission();
+                    if ($bool) {
+                        $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId())
+                            ->first();
+                        $ordered_package->is_commission_resolved_at = Carbon::make($this->order->getIsCommissionResolvedAt());
+                        $ordered_package->save();
 
-                    UpdateUserRanksJob::dispatch(User::query()->find($this->order->getUserId()));
+                        UpdateUserRanksJob::dispatch(User::query()->find($this->order->getUserId()));
 
-                    DB::commit();
-                    return [true, 'resolve', $problem_level];
+                        DB::commit();
+                        return [true, 'resolve', $problem_level];
+                    } else {
+                        $problem_level = 3;
+                    }
                 } else {
-                    $problem_level = 3;
+                    $problem_level = 2;
                 }
             } else {
-                $problem_level = 2;
+                $problem_level = 1;
             }
-        } else {
-            $problem_level = 1;
+        } catch (\Exception $exception) {
+            Log::error('OrderResolver@resolve =>' . $exception->getMessage());
         }
+
 
         DB::rollBack();
         return [false, $msg ?? 'resolve', $problem_level];
@@ -172,29 +178,35 @@ class OrderResolver
      */
     public function isValid(): array
     {
-        $ordered_package = OrderedPackage::query()->where('order_id',$this->order->getId());
-        switch ($this->order->getPlan()){
-            case OrderPlans::ORDER_PLAN_START:
-                if ($this->user->hasAnyValidOrder())
-                    return [false, trans('order.responses.you-should-order-other-plan-you-have-already-start-plan')];
-                break;
-            case OrderPlans::ORDER_PLAN_PURCHASE:
-                if (!$this->user->hasAnyValidOrder())
-                    return [false, trans('order.responses.you-should-order-starter-plan-first')];
-                break;
-            case OrderPlans::ORDER_PLAN_SPECIAL:
-                if($ordered_package->package->short_name != 'A1')
-                    return [false, trans('order.responses.you-have-to-select-a1-for-special-package')];
-                break;
-            case OrderPlans::ORDER_PLAN_COMPANY:
-                if($ordered_package->package->short_name != 'P4')
-                    return [false, trans('order.responses.you-have-to-select-p4-for-company-package')];
-                break;
-            default:
-                return [false, trans('responses.not-valid-plan')];
+        try {
+
+
+            $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId());
+            switch ($this->order->getPlan()) {
+                case OrderPlans::ORDER_PLAN_START:
+                    if ($this->user->hasAnyValidOrder())
+                        return [false, trans('order.responses.you-should-order-other-plan-you-have-already-start-plan')];
+                    break;
+                case OrderPlans::ORDER_PLAN_PURCHASE:
+                    if (!$this->user->hasAnyValidOrder())
+                        return [false, trans('order.responses.you-should-order-starter-plan-first')];
+                    break;
+                case OrderPlans::ORDER_PLAN_SPECIAL:
+                    if ($ordered_package->package->short_name != 'A1')
+                        return [false, trans('order.responses.you-have-to-select-a1-for-special-package')];
+                    break;
+                case OrderPlans::ORDER_PLAN_COMPANY:
+                    if ($ordered_package->package->short_name != 'P4')
+                        return [false, trans('order.responses.you-have-to-select-p4-for-company-package')];
+                    break;
+                default:
+                    return [false, trans('responses.not-valid-plan')];
+            }
+
+        } catch (\Exception $exception) {
+            Log::error('OrderResolver@resolve =>' . $exception->getMessage());
+            return [false, trans('responses.unknown')];
         }
-
-
         // check user if he is in tree
         return [true, trans('responses.isValid')];
     }
@@ -207,7 +219,7 @@ class OrderResolver
 
     private function addUserToNetwork($simulate = false): array
     {
-        if(in_array($this->order->getPlan(),[OrderPlans::ORDER_PLAN_START,OrderPlans::ORDER_PLAN_COMPANY,OrderPlans::ORDER_PLAN_SPECIAL]))
+        if (in_array($this->order->getPlan(), [OrderPlans::ORDER_PLAN_START, OrderPlans::ORDER_PLAN_COMPANY, OrderPlans::ORDER_PLAN_SPECIAL]))
             return (new AssignNodeResolver($this->order))->handle($simulate);
         return [true, trans('responses.isValid')];
     }
