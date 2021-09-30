@@ -179,8 +179,6 @@ class OrderResolver
     public function isValid(): array
     {
         try {
-
-
             $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId());
             switch ($this->order->getPlan()) {
                 case OrderPlans::ORDER_PLAN_START:
@@ -204,7 +202,7 @@ class OrderResolver
             }
 
         } catch (\Exception $exception) {
-            Log::error('OrderResolver@resolve =>' . $exception->getMessage());
+            Log::error('OrderResolver@isValid =>' . $exception->getMessage());
             return [false, trans('responses.unknown')];
         }
         // check user if he is in tree
@@ -219,8 +217,13 @@ class OrderResolver
 
     private function addUserToNetwork($simulate = false): array
     {
-        if (in_array($this->order->getPlan(), [OrderPlans::ORDER_PLAN_START, OrderPlans::ORDER_PLAN_COMPANY, OrderPlans::ORDER_PLAN_SPECIAL]))
-            return (new AssignNodeResolver($this->order))->handle($simulate);
+        try {
+            if (in_array($this->order->getPlan(), [OrderPlans::ORDER_PLAN_START, OrderPlans::ORDER_PLAN_COMPANY, OrderPlans::ORDER_PLAN_SPECIAL]))
+                return (new AssignNodeResolver($this->order))->handle($simulate);
+        } catch (\Exception $exception) {
+            Log::error('OrderResolver@addUserToNetwork =>' . $exception->getMessage());
+            return [false, trans('responses.unknown')];
+        }
         return [true, trans('responses.isValid')];
     }
 
