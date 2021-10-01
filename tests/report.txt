@@ -92,3 +92,6 @@ Residual Bonus Setting Update Feature (MLM\tests\Feature\ResidualBonusSettingUpd
  [x] Rank should be integer for updating residualBonusSetting
  [x] Level should be integer for creating residualBonusSetting
 
+Tree Feature (MLM\tests\Feature\Tree\TreeFeature)
+ [x] Tree display multi level
+

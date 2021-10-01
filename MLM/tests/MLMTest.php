@@ -76,6 +76,7 @@ class MLMTest extends TestCase
         $user->roles()->detach();
         $user->assignRole($role ? $role : USER_ROLE_SUPER_ADMIN);
         $user->save();
+
         $hash = md5(serialize($user->getUserService()));
         return [
             'X-user-id' => $user->id,
