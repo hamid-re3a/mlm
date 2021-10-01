@@ -3,44 +3,118 @@
 namespace MLM\Http\Controllers\Front;
 
 
-use Illuminate\Support\Carbon;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller;
+use MLM\Http\Requests\BinaryTreeMultiRequest;
 use MLM\Http\Requests\BinaryTreeRequest;
+use MLM\Http\Requests\ReferralTreeMultiRequest;
 use MLM\Http\Requests\ReferralTreeRequest;
 use MLM\Http\Resources\Tree\BinaryTreeResource;
 use MLM\Http\Resources\Tree\ReferralTreeResource;
 use MLM\Models\ReferralTree;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller;
 use MLM\Models\Tree;
 
 class TreeController extends Controller
 {
     use  ValidatesRequests;
 
+    /**
+     * Get Binary Tree Multi Level
+     * @group
+     * Public User > Display Tree
+     *
+     * @queryParam id integer
+     * @queryParam level integer
+     */
+    public function getBinaryTreeMultiLevel(BinaryTreeMultiRequest  $request)
+    {
 
-//    public function getUserReferralWithLevelTree(ReferralTreeRequest $request)
-//    {
-//
-//        if (auth()->check() && !auth()->user()->hasReferralNode())
-//            return api()->error();
-//
-//        if ($request->has('id') && request('id'))
-//            $tree = ReferralTree::withDepth()->query()->where('user_id', request('id'))->firstOrFail();
-//        else
-//            $tree = ReferralTree::withDepth()->query()->where('user_id', auth()->user()->id)->first();
-//        $depth = $tree->depth;
-//
-//        $users = ReferralTree::withDepth()->descendantsAndSelf($tree->id)
-//            ->where('depth', $depth + 10);
-//
-//        $sub = clone $users;
-//        $sub->where('')
-//        $page = 1;
-//        if ($request->has('page') && request('page'))
-//            $page = request('page');
-//
-//
-//    }
+        $level = $request->has('level') ? (int) $request->level : 6;
+        if (auth()->check() && !auth()->user()->hasBinaryNode())
+            return api()->error();
+
+        if ($request->has('id') && request('id'))
+            $tree = Tree::with(['user', 'user.rank_model'])->withDepth()->where('user_id', request('id'))->firstOrFail();
+        else
+            $tree = Tree::with(['user', 'user.rank_model'])->withDepth()->where('user_id', auth()->user()->id)->first();
+        $depth = $tree->depth;
+
+        $users = Tree::with(['user', 'user.rank_model'])->withDepth()->descendantsAndSelf($tree->id)
+            ->where('depth', '<=', $depth + $level)->groupBy('parent_id');
+        return api()->success('', $this->binaryTreeResource($tree, $users));
+    }
+
+    private function binaryTreeResource($tree, &$array)
+    {
+        $children = [];
+
+        if (isset($array[$tree->id]) && $array[$tree->id]) {
+            foreach ($array[$tree->id] as $item) {
+                $children[] = $this->binaryTreeResource($item, $array);
+            }
+        }
+
+        return [
+            'id' => $tree->id,
+            'children' => $children,
+//            'children_count' => $tree->children()->count(),
+            'position' => $tree->position,
+            'created_at' => $tree->created_at->timestamp,
+            'user' => $tree->user,
+            'has_children' => $tree->children()->exists(),
+            'children_count_right' => $tree->rightChildCount(),
+            'children_count_left' => $tree->leftChildCount(),
+            'rank' => $tree->user->rank_model
+        ];
+    }
+
+    /**
+     * Get Referral Tree Multi Level
+     * @group
+     * Public User > Display Tree
+     *
+     * @queryParam id integer
+     * @queryParam level integer
+     */
+    public function getReferralTreeMultiLevel(ReferralTreeMultiRequest $request)
+    {
+
+        $level = $request->has('level') ? (int) $request->level : 6;
+        if (auth()->check() && !auth()->user()->hasReferralNode())
+            return api()->error();
+
+        if ($request->has('id') && request('id'))
+            $tree = ReferralTree::with('user')->withDepth()->where('user_id', request('id'))->firstOrFail();
+        else
+            $tree = ReferralTree::with('user')->withDepth()->where('user_id', auth()->user()->id)->first();
+        $depth = $tree->depth;
+
+        $users = ReferralTree::with('user')->withDepth()->descendantsAndSelf($tree->id)
+            ->where('depth', '<=', $depth + 10)->groupBy('parent_id');
+
+        return api()->success('', $this->referralTreeResource($tree, $users));
+    }
+
+    private function referralTreeResource($tree, &$array)
+    {
+        $children = [];
+
+        if (isset($array[$tree->id]) && $array[$tree->id]) {
+            foreach ($array[$tree->id] as $item) {
+                $children[] = $this->referralTreeResource($item, $array);
+            }
+        }
+
+        return [
+            'children' => $children,
+            'id' => $tree->id,
+            'created_at' => $tree->created_at->timestamp,
+            'user' => $tree->user,
+            'user_rank' => $tree->user->rank,
+            'has_children' => $tree->children()->exists(),
+            'children_count' => $tree->children()->count(),
+        ];
+    }
 
     /**
      * Get Referral Tree
@@ -73,9 +147,7 @@ class TreeController extends Controller
             'user' => $tree->user,
             'user_rank' => $tree->user->rank,
             'has_children' => $tree->children()->exists(),
-            'has_more' => $tree->children()->count() > $page * 25,
             'children_count' => $tree->children()->count(),
-            'page' => $page
         ];
         return api()->success('', $data);
     }

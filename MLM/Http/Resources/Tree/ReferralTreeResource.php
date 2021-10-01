@@ -23,9 +23,7 @@ class ReferralTreeResource extends JsonResource
             'user' => $this->user,
             'user_rank' => $this->user->rank,
             'has_children' => $this->children()->exists(),
-            'has_more' => false,
             'children_count' => $this->children()->count(),
-            'page' => 1
         ];
     }
 
