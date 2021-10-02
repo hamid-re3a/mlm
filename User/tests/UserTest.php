@@ -3,12 +3,9 @@
 namespace User\tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
-use Tests\TestCase;
 use Tests\CreatesApplication;
+use Tests\TestCase;
 use User\Models\User;
 use User\UserConfigure;
 
@@ -16,14 +13,13 @@ use User\UserConfigure;
 class UserTest extends TestCase
 {
     use CreatesApplication;
-//    use RefreshDatabase;
+    use RefreshDatabase;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
         UserConfigure::seed();
-        $this->withHeaders($this->getHeaders());
         $this->app->setLocale('en');
     }
 
@@ -35,9 +31,8 @@ class UserTest extends TestCase
         );
     }
 
-    public function getHeaders()
+    public function getHeaders($id = null)
     {
-        Role::query()->create(['name'=>'super-admin']);
         User::query()->firstOrCreate([
             'id' => '1',
             'first_name' => 'Admin',
@@ -46,12 +41,16 @@ class UserTest extends TestCase
             'email' => 'work@sajidjaved.com',
             'username' => 'admin',
         ]);
-        $user = User::query()->first();
-        $user->assignRole('super-admin');
+
+        $user = User::query()->when($id, function ($query) use ($id) {
+            $query->where('id', $id);
+        })->first();
+
+        $user->assignRole(USER_ROLE_SUPER_ADMIN);
         $user->save();
         $hash = md5(serialize($user->getUserService()));
         return [
-            'X-user-id' => '1',
+            'X-user-id' => $user->id,
             'X-user-hash' => $hash,
         ];
     }

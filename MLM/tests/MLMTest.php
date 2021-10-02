@@ -4,21 +4,27 @@
 namespace MLM\tests;
 
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use MLM\MLMConfigure;
 use MLM\Models\Tree;
 use Illuminate\Support\Facades\Artisan;
 use Tests\CreatesApplication;
 use Tests\TestCase;
+use User\Models\User;
+use User\UserConfigure;
 
 class MLMTest extends TestCase
 {
     use CreatesApplication;
-//    use RefreshDatabase;
+    use RefreshDatabase;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
         Artisan::call('migrate:fresh');
-//        MLMConfigure::seed();
+        UserConfigure::seed();
+        MLMConfigure::seed();
+
         $this->app->setLocale('en');
     }
 
@@ -50,5 +56,31 @@ class MLMTest extends TestCase
             Tree::factory()->create($item);
             Tree::fixTree();
         }
+    }
+
+    public function getHeaders($id = null, $role = null)
+    {
+        User::query()->firstOrCreate([
+            'id' => '1',
+            'first_name' => 'Admin',
+            'last_name' => 'Admin',
+            'member_id' => 1000,
+            'email' => 'work@sajidjaved.com',
+            'username' => 'admin',
+        ]);
+
+        $user = User::query()->when($id, function ($query) use ($id) {
+            $query->where('id', $id);
+        })->first();
+
+        $user->roles()->detach();
+        $user->assignRole($role ? $role : USER_ROLE_SUPER_ADMIN);
+        $user->save();
+
+        $hash = md5(serialize($user->getUserService()));
+        return [
+            'X-user-id' => $user->id,
+            'X-user-hash' => $hash,
+        ];
     }
 }

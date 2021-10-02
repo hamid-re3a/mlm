@@ -24,7 +24,7 @@ class ReferralTreeRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'sometimes|exists:referral_trees',
+            'id' => 'sometimes|exists:users',
             'page' => 'sometimes|numeric',
         ];
     }

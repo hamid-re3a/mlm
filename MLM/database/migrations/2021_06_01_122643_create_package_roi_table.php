@@ -14,12 +14,13 @@ class CreatePackageRoiTable extends Migration
     public function up()
     {
         Schema::create('package_rois', function (Blueprint $table) {
-            $table->id();
+            $table->id()->autoIncrement();
             $table->unsignedBigInteger('package_id');
+            $table->unsignedBigInteger('user_id');
             $table->foreign('package_id')->on('packages')->references('id');
 
-            $table->integer('roi_percentage')->nullable();
-            $table->date('due_date')->unique();
+            $table->double('roi_percentage')->nullable();
+            $table->date('due_date');
 
             $table->unique(['package_id','due_date']);
             $table->softDeletes();

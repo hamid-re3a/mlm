@@ -4,7 +4,14 @@ namespace MLM;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use MLM\Commands\ResidualBonusCommand;
 use MLM\Commands\RoiCommand;
+use MLM\Models\Setting;
+use MLM\Models\Tree;
+use MLM\Observers\SettingObserver;
+use MLM\Observers\TreeObserver;
+use MLM\Services\Wallet\WalletClientFacade;
+use MLM\Services\Wallet\WalletClientProvider;
 
 class MLMServiceProvider extends ServiceProvider
 {
@@ -20,6 +27,8 @@ class MLMServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        WalletClientFacade::shouldProxyTo(WalletClientProvider::class);
+
         if (!$this->app->runningInConsole()) {
             return;
         }
@@ -32,6 +41,10 @@ class MLMServiceProvider extends ServiceProvider
             __DIR__ . '/database/migrations' => database_path('migrations'),
         ], $this->name . '-migrations');
 
+        $this->publishes([
+            __DIR__ . '/resources/lang' => resource_path('lang'),
+        ], 'mlm-resources');
+
     }
 
     /**
@@ -43,11 +56,13 @@ class MLMServiceProvider extends ServiceProvider
     {
 
 
+        Tree::observe(TreeObserver::class);
+        Setting::observe(SettingObserver::class);
         $this->setupConfig();
 
         $this->registerHelpers();
 
-        Route::prefix('v1/uni-level')
+        Route::prefix('v1/mlm')
             ->middleware('api')
             ->namespace($this->routes_namespace)
             ->group(__DIR__ . '/routes/api.php');
@@ -56,7 +71,8 @@ class MLMServiceProvider extends ServiceProvider
             $this->seed();
 
             $this->commands([
-                RoiCommand::class
+                RoiCommand::class,
+                ResidualBonusCommand::class
             ]);
             $this->publishes([
                 __DIR__ . '/config/'.$this->config_file_name.'.php' => config_path($this->config_file_name . '.php'),
@@ -80,6 +96,10 @@ class MLMServiceProvider extends ServiceProvider
     protected function registerHelpers()
     {
         if (file_exists($helperFile = __DIR__ . '/helpers/helpers.php')) {
+            require_once $helperFile;
+        }
+
+        if (file_exists($helperFile = __DIR__ . '/helpers/constant.php')) {
             require_once $helperFile;
         }
     }

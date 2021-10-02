@@ -4,34 +4,48 @@
 namespace MLM\Repository;
 
 
+use Carbon\Carbon;
 use MLM\Models\OrderedPackage;
-use Orders\Services\Order;
+use Orders\Services\Grpc\Order;
+use Packages\Services\Grpc\IndirectCommission;
+use Packages\Services\Grpc\Package;
 
 class OrderedPackageRepository
 {
     protected $entity_name = OrderedPackage::class;
 
-    public function updatePackage(Order $order)
+    public function updateOrderAndPackage(Order $order, Package $package)
     {
         /** @var  $package_entity OrderedPackage */
         $package_entity = new $this->entity_name;
         $package_find = $package_entity->query()->firstOrCreate([
             'order_id' => $order->getId(),
         ]);
+        if (!is_null($package_find->is_commission_resolved_at))
+            return $package_find;
         $package_find->update([
-            "plan" => $order->getPlan(),
-            "is_paid_at" => $order->getIsPaidAt(),
-            "is_resolved_at" => $order->getIsResolvedAt(),
-            "is_commission_resolved_at" => $order->getIsCommissionResolvedAt(),
             "user_id" => $order->getUserId(),
-            "name" => $order->getPackage()->getName(),
-            "short_name" => $order->getPackage()->getShortName(),
-            "validity_in_days" => $order->getPackage()->getValidityInDays(),
-            "price" => $order->getPackage()->getPrice(),
-            "roi_percentage" => $order->getPackage()->getRoiPercentage(),
-            "direct_percentage" => $order->getPackage()->getDirectPercentage(),
-            "binary_percentage" => $order->getPackage()->getBinaryPercentage(),
+            "package_id" => $package->getId(),
+
+            "plan" => $order->getPlan(),
+            "is_paid_at" => empty($order->getIsPaidAt()) ? null : Carbon::make($order->getIsPaidAt()),
+            "is_resolved_at" => empty($order->getIsResolvedAt()) ? null : Carbon::make($order->getIsResolvedAt()),
+            "is_commission_resolved_at" => empty($order->getIsCommissionResolvedAt()) ? null : Carbon::make($order->getIsCommissionResolvedAt()),
+
+            "validity_in_days" => $package->getValidityInDays(),
+            "price" => $package->getPrice(),
+            "direct_percentage" => $package->getDirectPercentage(),
+            "binary_percentage" => $package->getBinaryPercentage(),
+            "expires_at" => Carbon::make($order->getIsPaidAt())->addDays($order->getValidityInDays())
         ]);
+
+
+        /** @var $indirect_commission IndirectCommission */
+        foreach ($package->getIndirectCommission() as $indirect_commission){
+            $indirect_commission_db = $package_find->packageIndirectCommission()->firstOrCreate(['level'=>$indirect_commission->getLevel()]);
+            $indirect_commission_db->update(['percentage'=>$indirect_commission->getPercentage()]);
+        }
+
         return $package_find;
     }
 }

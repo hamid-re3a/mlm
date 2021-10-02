@@ -6,11 +6,15 @@ use Carbon\Carbon;
 use MLM\Models\Commission;
 use MLM\Models\OrderedPackage;
 use MLM\Models\Rank;
+use MLM\Models\ResidualBonusSetting;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Orders\Services\Grpc\Order;
+use Orders\Services\Grpc\OrderPlans;
 use Spatie\Permission\Traits\HasRoles;
+use User\database\factories\UserFactory;
 
 /**
  * User\Models\User
@@ -65,6 +69,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereSponsorId($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|OrderedPackage[] $ordered_packages
  * @property-read int|null $ordered_packages_count
+ * @method static \User\database\factories\UserFactory factory(...$parameters)
+ * @property-read \Illuminate\Database\Eloquent\Collection|ResidualBonusSetting[] $residualBonusSetting
+ * @property-read int|null $residual_bonus_setting_count
  */
 class User extends Model
 {
@@ -79,6 +86,10 @@ class User extends Model
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
     }
 
+    protected static function newFactory()
+    {
+        return UserFactory::new();
+    }
 
     /**
      * relations
@@ -86,8 +97,9 @@ class User extends Model
 
     public function rank_model()
     {
-        return $this->hasOne(Rank::class,'rank','rank');
+        return $this->hasOne(Rank::class, 'rank', 'rank');
     }
+
     public function commissions()
     {
         return $this->hasMany(Commission::class);
@@ -140,25 +152,41 @@ class User extends Model
      */
     public function getUserService()
     {
-            $user = new \User\Services\User();
-            $user->setId((int)$this->attributes['id']);
-            $user->setFirstName($this->attributes['first_name']);
-            $user->setLastName($this->attributes['last_name']);
-            $user->setUsername($this->attributes['username']);
-            $user->setEmail($this->attributes['email']);
-            return $user;
+        $this->fresh();
+        $user = new \User\Services\Grpc\User();
+        $user->setId((int)$this->attributes['id']);
+        $user->setFirstName((string)$this->attributes['first_name']);
+        $user->setLastName((string)$this->attributes['last_name']);
+        $user->setUsername((string)$this->attributes['username']);
+        $user->setEmail((string)$this->attributes['email']);
+        $user->setMemberId((int)$this->attributes['member_id']);
+        $user->setSponsorId((int)$this->attributes['sponsor_id']);
+        $user->setBlockType((string)$this->attributes['block_type']);
+        $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
+        $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
+
+        if ($this->getRoleNames()->count()) {
+            $role_name = implode(",", $this->getRoleNames()->toArray());
+            $user->setRole($role_name);
+        }
+
+
+        return $user;
     }
 
     public function biggestActivePackage(): ?OrderedPackage
     {
-        return $this->ordered_packages()->active()->biggest();
+        return $this->ordered_packages()->active()->biggest()->first();
     }
 
     public function hasActivePackage()
     {
         return is_null($this->ordered_packages()->active()->first()) ? false : true;
     }
-
+    public function hasAnyValidOrder()
+    {
+        return $this->ordered_packages()->whereNotNull('is_commission_resolved_at')->exists();
+    }
 
     public function eligibleForQuickStartBonus()
     {
@@ -172,7 +200,7 @@ class User extends Model
     {
         $oldest_package = $this->ordered_packages()->oldest()->first();
 
-        if (now()->diffInDays(Carbon::make($oldest_package->createdAt())) <= 30) {
+        if ($oldest_package && now()->diffInDays(Carbon::make($oldest_package->created_at)) <= 30) {
             return true;
         }
         return false;
@@ -180,24 +208,36 @@ class User extends Model
 
     public function hasCompletedBinaryLegs(): bool
     {
-
+        $this->refresh();
         $left_binary_children = $this->binaryTree->leftSideChildrenIds();
         $right_binary_children = $this->binaryTree->rightSideChildrenIds();
 
-        $referral_children = $this->referralTree->childrenIds();
+        $referral_children = $this->referralTree->childrenUserIds();
 
         $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
         $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
 
-        if (self::hasAtLeastOnActiveUserWithRank($left_binary_sponsored_children) && self::hasAtLeastOnActiveUserWithRank($right_binary_sponsored_children))
+        if (self::hasLeastChildrenWithRank($left_binary_sponsored_children) && self::hasLeastChildrenWithRank($right_binary_sponsored_children))
             return true;
 
         return false;
     }
 
-    public static function hasAtLeastOnActiveUserWithRank(array $children, $rank  = 1): bool
+    public static function hasLeastChildrenWithRank(array $children, $rank = 0, $number_of_children = 1): bool
     {
-        return User::query()->whereIn('id',$children)->where('rank','>=',$rank)->exists();
+        return User::query()->whereIn('id', $children)->where('rank', '>=', $rank)->count() >= $number_of_children;
     }
 
+    public function residualBonusSetting()
+    {
+        return $this->hasMany(ResidualBonusSetting::class,'rank','rank');
+    }
+
+    public function directSellAmount()
+    {
+        $referral_children = $this->referralTree->childrenUserIds();
+        if(count($referral_children) == 0)
+            return 0;
+        return OrderedPackage::query()->whereIn('user_id',$referral_children)->whereIn('plan',[OrderPlans::ORDER_PLAN_PURCHASE,OrderPlans::ORDER_PLAN_START])->sum('price');
+    }
 }

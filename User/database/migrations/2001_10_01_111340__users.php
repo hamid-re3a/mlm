@@ -14,7 +14,7 @@ class Users extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->id()->autoIncrement();
 
             $table->string('first_name',100)->nullable();
             $table->string('last_name',100)->nullable();
@@ -23,6 +23,12 @@ class Users extends Migration
 
             $table->integer('rank')->default(0);
             $table->enum('default_binary_position',[\MLM\Models\Tree::LEFT,\MLM\Models\Tree::RIGHT])->default(\MLM\Models\Tree::LEFT);
+
+            $table->string('block_type')->nullable();
+            $table->boolean('is_freeze')->default(FALSE)->nullable();
+            $table->boolean('is_deactivate')->default(FALSE)->nullable();
+            $table->unsignedBigInteger('sponsor_id')->nullable();
+            $table->unsignedBigInteger('member_id')->unsigned()->nullable();
 
             $table->softDeletes();
             $table->timestamps();
