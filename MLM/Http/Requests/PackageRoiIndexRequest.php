@@ -29,6 +29,7 @@ class PackageRoiIndexRequest extends FormRequest
         return [
             'from_date' => 'sometimes|date_format:Y-m-d|after:2021-01-01',
             'to_date' => 'sometimes|date_format:Y-m-d|after:2021-01-01',
+            'package_id' => 'sometimes|exists:packages,id',
 
         ];
     }

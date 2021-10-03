@@ -56,9 +56,9 @@ class PackageRoiService
 
     }
 
-    public function getAllByDate($from_date = null,$to_date = null)
+    public function getAllByDate($from_date = null,$to_date = null,$package_id = null)
     {
-        return $this->package_roi_repository->getAllByDate($from_date,$to_date);
+        return $this->package_roi_repository->getAllByDate($from_date,$to_date,$package_id);
     }
 
 
