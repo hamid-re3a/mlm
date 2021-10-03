@@ -2,6 +2,7 @@
 
 namespace MLM\Http\Resources\Tree;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 
@@ -18,11 +19,14 @@ class ReferralTreeResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'hasOrder' => $this->user->orders()->count() > 0,
-            'hasChildren' => $this->children()->exists(),
-            'hasMore' => false,
-            'childrenCount' => $this->children()->count(),
-            'page' => 1
+            'created_at' => $this->created_at->timestamp,
+            'user' => $this->user,
+            'user_rank' => $this->user->rank,
+            'has_children' => $this->children()->exists(),
+            'children_count' => $this->children()->count(),
         ];
     }
+
+
+
 }

@@ -5,7 +5,8 @@ namespace MLM\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Kalnoy\Nestedset\NodeTrait;
-use phpDocumentor\Reflection\Types\Integer;
+use MLM\database\factories\TreeFactory;
+use User\database\factories\UserFactory;
 use User\Models\User;
 
 /**
@@ -85,12 +86,12 @@ use User\Models\User;
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree withoutRoot()
  * @property-read \Kalnoy\Nestedset\Collection|Tree[] $children
  * @property int $converted_points
- * @property int $packages_price
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereAllPackagesPrice($value)
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereConvertedPoints($value)
  * @property int $is_active
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree whereIsActive($value)
  * @method static \Kalnoy\Nestedset\QueryBuilder|Tree wherePackagesPrice($value)
+ * @method static \MLM\database\factories\TreeFactory factory(...$parameters)
  */
 class Tree extends Model
 {
@@ -100,6 +101,11 @@ class Tree extends Model
     const RIGHT = "right";
     protected $guarded = [];
 
+
+    protected static function newFactory()
+    {
+        return TreeFactory::new();
+    }
     /**
      * Scopes
      */
@@ -193,7 +199,6 @@ class Tree extends Model
         return true;
     }
 
-
     public function leftChildCount()
     {
         $left_child = $this->children()->left()->first();
@@ -202,20 +207,10 @@ class Tree extends Model
         return $left_child->descendantsAndSelfCount();
     }
 
-    public function updatePackagesPrice()
-    {
-        $this->packages_price =  $this->user->ordered_packages()->sum('price');
-        $this->save();
-    }
 
-    public function leftSideChildrenPackagePrice() : Integer
+    public function leftSideChildrenPackagePrice() : int
     {
-        /** @var  $left_child Tree*/
-        $left_child = $this->children()->left()->first();
-        if(is_null($left_child))
-            return 0;
-
-        return $left_child->descendants()->sum('packages_price');
+        return OrderedPackage::query()->whereIn('user_id',$this->leftSideChildrenIds())->sum('price');
     }
 
     public function leftSideChildrenIds() : array
@@ -226,7 +221,8 @@ class Tree extends Model
             return [];
 
         $children = $left_child->descendants()->pluck('user_id')->toArray();
-        return  array_merge([$left_child->id],$children);
+
+        return  array_merge([$left_child->user_id],$children);
     }
 
     public function hasRightChild()
@@ -254,16 +250,13 @@ class Tree extends Model
             return [];
 
         $children = $right_child->descendants()->pluck('user_id')->toArray();
-        return  array_merge([$right_child->id],$children);
+        return  array_merge([$right_child->user_id],$children);
     }
 
-    public function rightSideChildrenPackagePrice() : Integer
+    public function rightSideChildrenPackagePrice() : int
     {
-        /** @var  $right_child Tree*/
-        $right_child = $this->children()->right()->first();
-        if(is_null($right_child))
-            return 0;
-
-        return $right_child->descendants()->sum('packages_price');
+        return OrderedPackage::query()->whereIn('user_id',$this->rightSideChildrenIds())->sum('price');
     }
+
+
 }

@@ -14,7 +14,7 @@ class RoiCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'roi:do';
+    protected $signature = 'roi:trading';
 
     /**
      * The console command description.
@@ -45,7 +45,7 @@ class RoiCommand extends Command
             return;
         }
 
-        $ordered_packages = OrderedPackage::query()->active()->canGetRoi()->get();
+        $ordered_packages = OrderedPackage::query()->active()->notSpecial()->canGetRoi()->get();
         $bar = $this->output->createProgressBar($ordered_packages->count());
         $this->info(PHP_EOL . 'Start trading profits');
         $bar->start();

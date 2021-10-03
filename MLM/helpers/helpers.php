@@ -1,294 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+use MLM\Models\EmailContentSetting;
 use User\Models\User;
-const BF_TO_BB_RATIO = 5;
-
-const TRADING_PROFIT_COMMISSION = 'trading-profit-commission';
-const DIRECT_SELL_COMMISSION = 'direct-sell-commission';
-const BINARY_COMMISSION = 'binary-commission';
-const TRAINER_BONUS_COMMISSION = 'trainer-bonus-commission';
-const INDIRECT_SELL_COMMISSION = 'indirect-sell-commission';
-const RESIDUAL_BONUS_COMMISSION = 'residual-bonus-commission';
-
-const COMMISSIONS = [
-    TRADING_PROFIT_COMMISSION,
-    DIRECT_SELL_COMMISSION,
-    TRAINER_BONUS_COMMISSION,
-    INDIRECT_SELL_COMMISSION,
-    RESIDUAL_BONUS_COMMISSION,
-];
-
-const RANK_1_BINARY_ACTIVE = [
-    'rank' => 1,
-    'condition_converted_in_bp' => 0, 'condition_sub_rank' => 0, 'condition_direct_or_indirect' => false,
-    'prize_in_pf' => null, 'prize_alternative' => null,
-    'cap' => 500
-];
-const RANK_2_BRONZE = [
-    'rank' => 2,
-    'condition_converted_in_bp' => 1000, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
-    'prize_in_pf' => null, 'prize_alternative' => 'PIN',
-    'cap' => 1000
-];
-const RANK_3_SILVER = [
-    'rank' => 3,
-    'condition_converted_in_bp' => 2500, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
-    'prize_in_pf' => 150, 'prize_alternative' => 'Watch',
-    'cap' => 1500
-];
-const RANK_4_GOLD = [
-    'rank' => 4,
-    'condition_converted_in_bp' => 7000, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
-    'prize_in_pf' => 400, 'prize_alternative' => 'iPad',
-    'cap' => 2000
-];
-const RANK_5_PLATINUM = [
-    'rank' => 5,
-    'condition_converted_in_bp' => 10000, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
-    'prize_in_pf' => 800, 'prize_alternative' => 'iPhone',
-    'cap' => 3000
-];
-const RANK_6_EXECUTIVE = [
-    'rank' => 6,
-    'condition_converted_in_bp' => 20000, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
-    'prize_in_pf' => 1500, 'prize_alternative' => 'Macbook',
-    'cap' => 4000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ]
-    ]
-];
-const RANK_7_SENIOR_EXECUTIVE = [
-    'rank' => 7,
-    'condition_converted_in_bp' => 70000, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
-    'prize_in_pf' => 7500, 'prize_alternative' => 'Rolex',
-    'cap' => 5000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ]
-    ]
-];
-const RANK_8_EMERALD = [
-    'rank' => 8,
-    'condition_converted_in_bp' => 200000, 'condition_sub_rank' => 4, 'condition_direct_or_indirect' => true,
-    'prize_in_pf' => 40000, 'prize_alternative' => 'c/3/A4',
-    'cap' => 6000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ],
-        [
-            'level' => 2,
-            'percentage' => 2
-        ],
-        [
-            'level' => 3,
-            'percentage' => 1
-        ]
-    ]
-];
-const RANK_9_RUBY = [
-    'rank' => 9,
-    'condition_converted_in_bp' => 600000, 'condition_sub_rank' => 7, 'condition_direct_or_indirect' => true,
-    'prize_in_pf' => 50000, 'prize_alternative' => 'e/5/A6',
-    'cap' => 10000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ],
-        [
-            'level' => 2,
-            'percentage' => 2
-        ],
-        [
-            'level' => 3,
-            'percentage' => 1
-        ]
-    ]
-];
-const RANK_10_DIAMOND = [
-    'rank' => 10,
-    'condition_converted_in_bp' => 2000000, 'condition_sub_rank' => 8, 'condition_direct_or_indirect' => true,
-    'prize_in_pf' => 100000, 'prize_alternative' => 'Range Rover Sport',
-    'cap' => 15000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ],
-        [
-            'level' => 2,
-            'percentage' => 2
-        ],
-        [
-            'level' => 3,
-            'percentage' => 1
-        ],
-        [
-            'level' => 4,
-            'percentage' => 1
-        ]
-    ]
-];
-const RANK_11_DOUBLE_DIAMOND = [
-    'rank' => 11,
-    'condition_converted_in_bp' => 4800000, 'condition_sub_rank' => 9, 'condition_direct_or_indirect' => true,
-    'prize_in_pf' => 200000, 'prize_alternative' => 'Ferrari',
-    'cap' => 20000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ],
-        [
-            'level' => 2,
-            'percentage' => 2
-        ],
-        [
-            'level' => 3,
-            'percentage' => 1
-        ],
-        [
-            'level' => 4,
-            'percentage' => 1
-        ],
-        [
-            'level' => 5,
-            'percentage' => 1
-        ]
-    ]
-];
-const RANK_12_VICE_PRESIDENT = [
-    'rank' => 12,
-    'condition_converted_in_bp' => 9600000, 'condition_sub_rank' => 10, 'condition_direct_or_indirect' => true,
-    'prize_in_pf' => 1000000, 'prize_alternative' => 'Villa',
-    'cap' => 25000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ],
-        [
-            'level' => 2,
-            'percentage' => 2
-        ],
-        [
-            'level' => 3,
-            'percentage' => 1
-        ],
-        [
-            'level' => 4,
-            'percentage' => 1
-        ],
-        [
-            'level' => 5,
-            'percentage' => 1
-        ],
-        [
-            'level' => 6,
-            'percentage' => 1
-        ]
-    ]
-];
-const RANK_13_PRESIDENT = [
-    'rank' => 13,
-    'condition_converted_in_bp' => 13400000, 'condition_sub_rank' => 11, 'condition_direct_or_indirect' => true,
-    'prize_in_pf' => 5000000, 'prize_alternative' => 'Villa',
-    'cap' => 30000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ],
-        [
-            'level' => 2,
-            'percentage' => 2
-        ],
-        [
-            'level' => 3,
-            'percentage' => 1
-        ],
-        [
-            'level' => 4,
-            'percentage' => 1
-        ],
-        [
-            'level' => 5,
-            'percentage' => 1
-        ],
-        [
-            'level' => 6,
-            'percentage' => 1
-        ],
-        [
-            'level' => 7,
-            'percentage' => 1
-        ]
-    ]
-];
-const RANK_14_ROYAL_PRESIDENT = [
-    'rank' => 14,
-    'condition_converted_in_bp' => 17200000, 'condition_sub_rank' => 12, 'condition_direct_or_indirect' => true,
-    'prize_in_pf' => 10000000, 'prize_alternative' => 'Private Jet',
-    'cap' => 35000,
-    'roi_commissions' => [
-        [
-            'level' => 1,
-            'percentage' => 3
-        ],
-        [
-            'level' => 2,
-            'percentage' => 2
-        ],
-        [
-            'level' => 3,
-            'percentage' => 1
-        ],
-        [
-            'level' => 4,
-            'percentage' => 1
-        ],
-        [
-            'level' => 5,
-            'percentage' => 1
-        ],
-        [
-            'level' => 6,
-            'percentage' => 1
-        ],
-        [
-            'level' => 7,
-            'percentage' => 1
-        ],
-        [
-            'level' => 8,
-            'percentage' => 1
-        ]
-    ]
-];
-
-const RANKS = [
-    1 => RANK_1_BINARY_ACTIVE,
-    2 => RANK_2_BRONZE,
-    3 => RANK_3_SILVER,
-    4 => RANK_4_GOLD,
-    5 => RANK_5_PLATINUM,
-    6 => RANK_6_EXECUTIVE,
-    7 => RANK_7_SENIOR_EXECUTIVE,
-    8 => RANK_8_EMERALD,
-    9 => RANK_9_RUBY,
-    10 => RANK_10_DIAMOND,
-    11 => RANK_11_DOUBLE_DIAMOND,
-    12 => RANK_12_VICE_PRESIDENT,
-    13 => RANK_13_PRESIDENT,
-    14 => RANK_14_ROYAL_PRESIDENT,
-];
 
 if (!function_exists('subset')) {
 
@@ -316,30 +30,83 @@ if (!function_exists('getRank')) {
         if (isset(RANKS[$rank]))
             return RANKS[$rank];
 
-        throw new Exception(trans('responses.main-key-settings-is-missing'));
+        return null;
     }
 }
 
+//if (!function_exists('payCommission')) {
+//
+//    function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
+//    {
+//        DB::beginTransaction();
+//        try {
+//            $commission = $user->commissions()->create([
+//                'amount' => $deposit_service_object->getAmount(),
+//                'ordered_package_id' => $package_id,
+//                'type' => $type,
+//            ]);
+//            if ($commission) {
+//                $deposit_response = WalletClientFacade::deposit($deposit_service_object);
+//                $commission->transaction_id = $deposit_response->getTransactionId();
+//                $commission->save();
+//            } else {
+//                throw new \Exception('Commission Failed Error');
+//            }
+//        } catch (\Exception $exception) {
+//            DB::rollBack();
+//            throw new \Exception('Commission Error => ' . $exception->getMessage());
+//        }
+//
+//        DB::commit();
+//
+//    }
+//}
+if (!function_exists('getPackageGrpcClient')) {
+    function getPackageGrpcClient()
+    {
+        return new \Packages\Services\Grpc\PackagesServiceClient('staging-api-gateway.janex.org:9596', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+if (!function_exists('getWalletGrpcClient')) {
+    function getWalletGrpcClient()
+    {
+        return new \Wallets\Services\Grpc\WalletServiceClient('staging-api-gateway.janex.org:9596', [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+
+if (!function_exists('userRankBasedOnConvertedPoint')) {
+    function userRankBasedOnConvertedPoint($converted_point): \MLM\Models\Rank
+    {
+        return \MLM\Models\Rank::query()->where('condition_converted_in_bp', '<=', $converted_point / BF_TO_BB_RATIO)->orderBy('rank', 'desc')->first();
+    }
+}
 if (!function_exists('getAndUpdateUserRank')) {
 
-    function getAndUpdateUserRank(\User\Models\User $user): \MLM\Models\Rank
+    function getAndUpdateUserRank(\User\Models\User $user): ?\MLM\Models\Rank
     {
-        $ranks = \MLM\Models\Rank::query()->orderBy('rank','asc')->get();
+        $ranks = \MLM\Models\Rank::query()->orderBy('rank', 'desc')->get();
         foreach ($ranks as $rank) {
-            if ($rank->condition_converted_in_bp >= (BF_TO_BB_RATIO * $user->binaryTree->converted_points)) {
+            if ($user->binaryTree->converted_points >= BF_TO_BB_RATIO * $rank->condition_converted_in_bp) {
+
+
                 $left_binary_children = $user->binaryTree->leftSideChildrenIds();
                 $right_binary_children = $user->binaryTree->rightSideChildrenIds();
                 if ($rank->condition_direct_or_indirect) {
-                    $referral_children = $user->referralTree->descendantsIds();
+                    $referral_children = $user->referralTree->descendantsUserIds();
                 } else {
-                    $referral_children = $user->referralTree->childrenIds();
+                    $referral_children = $user->referralTree->childrenUserIds();
                 }
 
                 $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
                 $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
 
-                if (User::hasAtLeastOnActiveUserWithRank($left_binary_sponsored_children, $rank->condition_sub_rank) &&
-                    User::hasAtLeastOnActiveUserWithRank($right_binary_sponsored_children, $rank->condition_sub_rank)){
+                if (User::hasLeastChildrenWithRank($left_binary_sponsored_children, $rank->condition_sub_rank, $rank->condition_number_of_left_children) &&
+                    User::hasLeastChildrenWithRank($right_binary_sponsored_children, $rank->condition_sub_rank, $rank->condition_number_of_right_children)) {
                     $user->rank = $rank->rank;
                     $user->save();
                     return $rank;
@@ -350,4 +117,43 @@ if (!function_exists('getAndUpdateUserRank')) {
         return null;
 
     }
+}
+
+
+if (!function_exists('getMLMSetting')) {
+
+    function getSetting($key)
+    {
+        //Check if settings are available in cache
+        if (cache()->has('mlm_settings'))
+            if ($setting = collect(cache('mlm_settings'))->where('name', $key)->first())
+                return $setting['value'];
+
+        $setting = \MLM\Models\Setting::query()->where('name', $key)->first();
+        if ($setting)
+            return $setting->value;
+
+
+        if (defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) AND array_key_exists($key, MLM_SETTINGS))
+            return MLM_SETTINGS[$key]['value'];
+
+        \Illuminate\Support\Facades\Log::error('mlmSetting => ' . $key);
+        throw new Exception(trans('mlm.responses.settings.key-doesnt-exists', ['key' => $key]));
+    }
+}
+
+
+function getEmailAndTextSetting($key)
+{
+    // Comment Test
+    if (DB::table('email_content_settings')->exists()) {
+        $setting = EmailContentSetting::query()->where('key', $key)->first();
+        if ($setting && !empty($setting->body))
+            return $setting->toArray();
+    }
+
+    if (isset(EMAIL_CONTENT_SETTINGS[$key]))
+        return EMAIL_CONTENT_SETTINGS[$key];
+
+    throw new Exception(trans('user.responses.main-key-settings-is-missing'));
 }

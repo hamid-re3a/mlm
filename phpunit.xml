@@ -3,10 +3,18 @@
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
->get-transaction
+>
     <testsuites>
         <testsuite name="User">
             <directory suffix="Test.php">User/tests/Feature</directory>
+        </testsuite>
+
+        <testsuite name="MLM">
+            <directory suffix="Test.php">MLM/tests/UnitTest</directory>
+        </testsuite>
+
+        <testsuite name="MLM-Feature">
+            <directory suffix="Test.php">MLM/tests/Feature</directory>
         </testsuite>
 
     </testsuites>

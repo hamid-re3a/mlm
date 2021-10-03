@@ -6,8 +6,6 @@ use MLM\Interfaces\Plan;
 use MLM\Services\Commissions\BinaryCommission;
 use MLM\Services\Commissions\DirectSellCommission;
 use MLM\Services\Commissions\IndirectSellCommission;
-use MLM\Services\Commissions\QuickStartBonusCommission;
-use MLM\Services\Commissions\ResidualBonusCommission;
 use MLM\Services\Commissions\TrainerBonusCommission;
 
 class RegisterOder implements Plan

@@ -2,7 +2,9 @@
 
 namespace MLM\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use MLM\database\factories\RankFactory;
 
 /**
  * MLM\Models\Rank
@@ -31,9 +33,48 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Rank whereUpdatedAt($value)
  * @property int $condition_direct_or_indirect
  * @method static \Illuminate\Database\Eloquent\Builder|Rank whereConditionDirectOrIndirect($value)
+ * @property int $withdrawal_limit
+ * @property int $condition_number_of_left_children
+ * @property int $condition_number_of_right_children
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereConditionNumberOfLeftChildren($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereConditionNumberOfRightChildren($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereWithdrawalLimit($value)
+ * @property string $rank_name
+ * @property-read \Illuminate\Database\Eloquent\Collection|\MLM\Models\ResidualBonusSetting[] $residualBonusSettings
+ * @property-read int|null $residual_bonus_settings_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Rank whereRankName($value)
+ * @method static \MLM\database\factories\RankFactory factory(...$parameters)
  */
 class Rank extends Model
 {
+    use HasFactory;
     protected $guarded = [];
+
+    public function residualBonusSettings()
+    {
+        return $this->hasMany(ResidualBonusSetting::class, 'rank', 'rank');
+    }
+
+    protected static function newFactory()
+    {
+        return RankFactory::new();
+    }
+
+    public function getRankService(): \MLM\Services\Grpc\Rank
+    {
+        $rank = new \MLM\Services\Grpc\Rank;
+        $rank->setRank((int)$this->rank);
+        $rank->setRankName($this->rank_name);
+        $rank->setConditionConvertedInBp((int)$this->condition_converted_in_bp);
+        $rank->setConditionSubRank((int)$this->condition_sub_rank);
+        $rank->setConditionDirectOrIndirect((bool)$this->condition_direct_or_indirect);
+        $rank->setPrizeInPf((int)$this->prize_in_pf);
+        $rank->setPrizeAlternative($this->prize_alternative);
+        $rank->setCap((int)$this->cap);
+        $rank->setWithdrawalLimit((int)$this->withdrawal_limit);
+        $rank->setConditionNumberOfLeftChildren((int)$this->condition_number_of_left_children);
+        $rank->setConditionNumberOfRightChildren((int)$this->condition_number_of_right_children);
+        return $rank;
+    }
 
 }
