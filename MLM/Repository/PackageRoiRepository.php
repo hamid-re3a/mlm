@@ -74,7 +74,7 @@ class PackageRoiRepository
 
     }
 
-    public function getAllByDate($from_date = null, $to_date = null)
+    public function getAllByDate($from_date = null, $to_date = null,$package_id = null)
     {
         /** @var  $packageRoi_entity PackageRoi*/
         $packageRoi_entity = new $this->entity_name;
@@ -83,6 +83,8 @@ class PackageRoiRepository
             $query->whereDate('due_date' , '>=', Carbon::make($from_date)->toDate());
         if(!is_null($to_date))
             $query->whereDate('due_date' , '<=', Carbon::make($to_date)->toDate());
+        if(!is_null($package_id))
+            $query->where('package_id' , $package_id);
         return $query->get();
     }
 
