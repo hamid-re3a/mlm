@@ -40,8 +40,3 @@ jobs:
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml stop mlm
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml rm -f mlm
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml up -d mlm
-    - name: Handle laravel-log directory issue
-      run: |
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T mlm chmod -R 777 storage/logs
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T mlm chmod -R 777 storage/framework/sessions
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T mlm chmod -R 777 storage/framework/views
