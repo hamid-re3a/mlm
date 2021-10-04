@@ -41,3 +41,6 @@ RUN php artisan db:seed
 RUN php artisan scribe:generate
 RUN php artisan optimize:clear
 RUN php artisan queue:restart
+
+# permission
+RUN chown -R application:application /app
