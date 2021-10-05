@@ -55,8 +55,8 @@ class CommissionResolver
     {
         try {
             $type = $deposit_service_object->getType() . ' ' . $deposit_service_object->getSubType();
-            UrgentEmailJob::dispatch(new UserCommissionEmail($user, $commission, $type));
-        } catch (\Exception $exception) {
+            UrgentEmailJob::dispatch(new UserCommissionEmail($user, $commission, $type),$user->email);
+        } catch (\Throwable $exception) {
             Log::info('Commission email is not sent because => ' . $exception->getMessage());
         }
     }
