@@ -5,6 +5,9 @@ User Feature (User\tests\Feature\UserFeature)
  [x] User should login before calling binary position
  [x] Email should be send after updating users rank
 
+User Unit (User\tests\Unit\UserUnit)
+ [x] User can should have sponsor
+
 Order (MLM\tests\UnitTest\Order\Order)
  [x] Add user to both tree with valid ordered package
  [x] Add four user to same sponsor cause no problem

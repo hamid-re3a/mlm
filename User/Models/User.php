@@ -116,7 +116,7 @@ class User extends Model
     }
     public function sponsor()
     {
-        return $this->hasOne(User::class,'sponsor_id','id');
+        return $this->belongsTo(User::class,'sponsor_id','id');
     }
     public function referralTree()
     {
