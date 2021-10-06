@@ -61,6 +61,10 @@ class TreeController extends Controller
             'position' => $tree->position,
             'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
+            'sponsor_user' => $tree->user->sponsor,
+            'parent_user' => optional($tree->parent)->user,
+            'highest_package_detail' => $tree->user->biggestActivePackage(),
+            'highest_package' => optional($tree->user->biggestActivePackage())->package,
             'has_children' => $tree->children()->exists(),
             'children_count_right' => $tree->rightChildCount(),
             'children_count_left' => $tree->leftChildCount(),
@@ -110,84 +114,13 @@ class TreeController extends Controller
             'id' => $tree->id,
             'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
-            'user_rank' => $tree->user->rank,
+            'rank' => $tree->user->rank_model,
+            'sponsor_user' => $tree->user->sponsor,
+            'parent_user' => optional($tree->parent)->user,
+            'highest_package_detail' => $tree->user->biggestActivePackage(),
+            'highest_package' => optional($tree->user->biggestActivePackage())->package,
             'has_children' => $tree->children()->exists(),
             'children_count' => $tree->children()->count(),
         ];
-    }
-
-    /**
-     * Get Referral Tree
-     * @group
-     * Public User > Display Tree
-     *
-     * @queryParam id integer
-     * @queryParam page integer
-     */
-    public function getUserReferralTree(ReferralTreeRequest $request)
-    {
-
-        if (auth()->check() && !auth()->user()->hasReferralNode())
-            return api()->error();
-
-        if ($request->has('id') && request('id'))
-            $tree = ReferralTree::query()->where('user_id', request('id'))->firstOrFail();
-        else
-            $tree = ReferralTree::query()->where('user_id', auth()->user()->id)->first();
-
-        $page = 1;
-        if ($request->has('page') && request('page'))
-            $page = request('page');
-
-
-        $data = [
-            'children' => ReferralTreeResource::collection($tree->children()->paginate(50)),
-            'id' => $tree->id,
-            'created_at' => $tree->created_at->timestamp,
-            'user' => $tree->user,
-            'user_rank' => $tree->user->rank,
-            'has_children' => $tree->children()->exists(),
-            'children_count' => $tree->children()->count(),
-        ];
-        return api()->success('', $data);
-    }
-
-    /**
-     * Get Binary Tree
-     * @group
-     * Public User > Display Tree
-     *
-     * @queryParam id integer
-     */
-    public function getBinaryTree(BinaryTreeRequest $request)
-    {
-
-
-        if (auth()->check() && !auth()->user()->hasBinaryNode())
-            return api()->error();
-
-        if ($request->has('id') && request('id'))
-            $tree = Tree::query()->where('user_id', request('id'))->firstOrFail();
-        else
-            $tree = Tree::query()->where('user_id', auth()->user()->id)->first();
-
-
-        $left_child = $tree->children()->left()->first();
-        $right_child = $tree->children()->right()->first();
-        $data = [
-            'children' => [
-                (is_null($left_child)) ? (object)[] : BinaryTreeResource::make($left_child),
-                (is_null($right_child)) ? (object)[] : BinaryTreeResource::make($right_child),
-            ],
-            'id' => $tree->id,
-            'position' => $tree->position,
-            'created_at' => $tree->created_at->timestamp,
-            'user' => $tree->user,
-            'has_children' => $tree->children()->exists(),
-            'children_count_right' => $tree->rightChildCount(),
-            'children_count_left' => $tree->leftChildCount(),
-            'rank' => getRank($tree->user->rank)
-        ];
-        return api()->success('', $data);
     }
 }
