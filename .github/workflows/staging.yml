@@ -1,7 +1,7 @@
-name: Laravel
+name: Staging
 on:
   push:
-    branches: [ master ]
+    branches: [ staging ]
 jobs:
 #  laravel-tests:
 #    runs-on: ubuntu-latest
@@ -27,21 +27,18 @@ jobs:
 #        touch database/database.sqlite
 
   laravel-deploy:
-    runs-on: vmi627964
+    runs-on: staging
 #    needs: laravel-tests
     steps:
     - uses: actions/checkout@v2
     - name: Building docker image
       run: |
         shopt -s dotglob
+        rm -rf .env
+        cp .env.staging .env
         sudo docker build --network=mysql_wo_r2f -t mlm:1 .
     - name: deploy docker-compose
       run: | 
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml stop mlm
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml rm -f mlm
         sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml up -d mlm
-    - name: Handle laravel-log directory issue
-      run: |
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T mlm chmod -R 777 storage/logs
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T mlm chmod -R 777 storage/framework/sessions
-        sudo docker-compose -f /opt/docker-compose-files/backend/docker-compose.yml exec -T mlm chmod -R 777 storage/framework/views

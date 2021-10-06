@@ -34,37 +34,10 @@ if (!function_exists('getRank')) {
     }
 }
 
-//if (!function_exists('payCommission')) {
-//
-//    function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
-//    {
-//        DB::beginTransaction();
-//        try {
-//            $commission = $user->commissions()->create([
-//                'amount' => $deposit_service_object->getAmount(),
-//                'ordered_package_id' => $package_id,
-//                'type' => $type,
-//            ]);
-//            if ($commission) {
-//                $deposit_response = WalletClientFacade::deposit($deposit_service_object);
-//                $commission->transaction_id = $deposit_response->getTransactionId();
-//                $commission->save();
-//            } else {
-//                throw new \Exception('Commission Failed Error');
-//            }
-//        } catch (\Exception $exception) {
-//            DB::rollBack();
-//            throw new \Exception('Commission Error => ' . $exception->getMessage());
-//        }
-//
-//        DB::commit();
-//
-//    }
-//}
 if (!function_exists('getPackageGrpcClient')) {
     function getPackageGrpcClient()
     {
-        return new \Packages\Services\Grpc\PackagesServiceClient('staging-api-gateway.janex.org:9596', [
+        return new \Packages\Services\Grpc\PackagesServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
     }
@@ -72,7 +45,7 @@ if (!function_exists('getPackageGrpcClient')) {
 if (!function_exists('getWalletGrpcClient')) {
     function getWalletGrpcClient()
     {
-        return new \Wallets\Services\Grpc\WalletServiceClient('staging-api-gateway.janex.org:9596', [
+        return new \Wallets\Services\Grpc\WalletServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
     }
