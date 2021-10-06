@@ -114,7 +114,7 @@ class TreeController extends Controller
             'id' => $tree->id,
             'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
-            'user_rank' => $tree->user->rank,
+            'rank' => $tree->user->rank_model,
             'sponsor_user' => $tree->user->sponsor,
             'parent_user' => optional($tree->parent)->user,
             'highest_package_detail' => $tree->user->biggestActivePackage(),
