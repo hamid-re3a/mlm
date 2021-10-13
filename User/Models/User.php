@@ -167,6 +167,7 @@ class User extends Model
         $user->setBlockType((string)$this->attributes['block_type']);
         $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
         $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
+        $user->setGender((boolean)$this->attributes['gender']);
 
         if ($this->getRoleNames()->count()) {
             $role_name = implode(",", $this->getRoleNames()->toArray());
