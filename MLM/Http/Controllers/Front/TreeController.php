@@ -6,11 +6,7 @@ namespace MLM\Http\Controllers\Front;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use MLM\Http\Requests\BinaryTreeMultiRequest;
-use MLM\Http\Requests\BinaryTreeRequest;
 use MLM\Http\Requests\ReferralTreeMultiRequest;
-use MLM\Http\Requests\ReferralTreeRequest;
-use MLM\Http\Resources\Tree\BinaryTreeResource;
-use MLM\Http\Resources\Tree\ReferralTreeResource;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 
@@ -26,10 +22,10 @@ class TreeController extends Controller
      * @queryParam id integer
      * @queryParam level integer
      */
-    public function getBinaryTreeMultiLevel(BinaryTreeMultiRequest  $request)
+    public function getBinaryTreeMultiLevel(BinaryTreeMultiRequest $request)
     {
 
-        $level = $request->has('level') ? (int) $request->level : 6;
+        $level = $request->has('level') ? (int)$request->level : 6;
         if (auth()->check() && !auth()->user()->hasBinaryNode())
             return api()->error();
 
@@ -61,6 +57,7 @@ class TreeController extends Controller
             'position' => $tree->position,
             'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
+            'avatar' => $this->getAvatar($tree),
             'sponsor_user' => $tree->user->sponsor,
             'parent_user' => optional($tree->parent)->user,
             'highest_package_detail' => $tree->user->biggestActivePackage(),
@@ -83,7 +80,7 @@ class TreeController extends Controller
     public function getReferralTreeMultiLevel(ReferralTreeMultiRequest $request)
     {
 
-        $level = $request->has('level') ? (int) $request->level : 6;
+        $level = $request->has('level') ? (int)$request->level : 6;
         if (auth()->check() && !auth()->user()->hasReferralNode())
             return api()->error();
 
@@ -117,10 +114,24 @@ class TreeController extends Controller
             'rank' => $tree->user->rank_model,
             'sponsor_user' => $tree->user->sponsor,
             'parent_user' => optional($tree->parent)->user,
+            'avatar' => $this->getAvatar($tree),
             'highest_package_detail' => $tree->user->biggestActivePackage(),
             'highest_package' => optional($tree->user->biggestActivePackage())->package,
             'has_children' => $tree->children()->exists(),
             'children_count' => $tree->children()->count(),
         ];
+    }
+
+    /**
+     * @param $tree
+     * @return string
+     */
+    private function getAvatar($tree): string
+    {
+        if ($tree->user->member_id)
+            return env('API_GATEWAY_BASE_URL', "https://staging-api-gateway.janex.org/")
+                . "api/gateway/default/general/user/avatar/" . $tree->user->member_id . "/image";
+        else
+            return null;
     }
 }
