@@ -40,6 +40,8 @@ class RoiCommand extends Command
      */
     public function handle()
     {
+
+
         if(!PackageRoi::query()->today()->exists()){
             $this->info(PHP_EOL . 'Admin has not set any ROI for today.' . PHP_EOL);
             return;
@@ -58,6 +60,7 @@ class RoiCommand extends Command
 
         $bar->finish();
         $this->info(PHP_EOL . 'Trading profits completed successfully' . PHP_EOL);
+
 
     }
 
