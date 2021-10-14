@@ -232,6 +232,8 @@ class Tree extends Model
             return false;
         return true;
     }
+
+
     public function rightChildCount()
     {
         /** @var  $right_child Tree*/
