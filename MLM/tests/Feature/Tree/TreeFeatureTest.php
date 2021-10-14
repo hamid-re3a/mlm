@@ -22,7 +22,7 @@ class TreeFeatureTest extends MLMTest
         $this->buildReferralTree();
         $this->withHeaders($this->getHeaders(1, USER_ROLE_CLIENT));
 
-        $response = $this->get(route('customer.trees.binary-multi-level'));
+        $response = $this->get(route('customer.trees.binary-multi-level').'?level=10');
         $response->assertOk();
         $response = $this->get(route('customer.trees.referral-multi-level'));
         $response->assertOk();
