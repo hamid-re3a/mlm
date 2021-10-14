@@ -3,8 +3,11 @@
 namespace MLM\database\seeders;
 
 use Illuminate\Database\Seeder;
+use MLM\Models\OrderedPackage;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
+use Orders\Services\Grpc\OrderPlans;
+use User\Models\User;
 use User\Services\UserService;
 
 /**
@@ -58,7 +61,25 @@ class TreeTableSeeder extends Seeder
                 ['id' => 22, 'user_id' => 22, 'position' => 'right', 'parent_id' => 13],
             ];
         foreach ($data as $item) {
-            app(UserService::class)->findByIdOrFail($item['user_id']);
+            $_user = app(UserService::class)->findByIdOrFail($item['user_id']);
+            OrderedPackage::query()->create([
+
+                'order_id' => $item['user_id'],
+                'price' => 100,
+
+                'direct_percentage' => 8,
+                'binary_percentage' => 8,
+
+                'user_id' => $item['user_id'],
+                'is_paid_at' => now()->toDateString(),
+                'is_resolved_at' => now()->toDateString(),
+                'is_commission_resolved_at' => now()->toDateString(),
+
+                'validity_in_days' => 200,
+                'expires_at' => now()->addDays(200)->toDateString(),
+                'package_id' => 1,
+                'plan' => OrderPlans::ORDER_PLAN_START
+            ]);
             Tree::query()->create($item);
             Tree::fixTree();
         }
