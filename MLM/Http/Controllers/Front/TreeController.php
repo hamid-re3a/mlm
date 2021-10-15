@@ -122,11 +122,7 @@ class TreeController extends Controller
         ];
     }
 
-    /**
-     * @param $tree
-     * @return string
-     */
-    private function getAvatar($tree): string
+    private function getAvatar($tree)
     {
         if ($tree->user->member_id)
             return env('API_GATEWAY_BASE_URL', "https://staging-api-gateway.janex.org/")
