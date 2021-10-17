@@ -61,7 +61,10 @@ class TreeTableSeeder extends Seeder
                 ['id' => 22, 'user_id' => 22, 'position' => 'right', 'parent_id' => 13],
             ];
         foreach ($data as $item) {
+            /** @var  $_user User*/
             $_user = app(UserService::class)->findByIdOrFail($item['user_id']);
+            $_user->rank = $item['user_id'] % 14;
+            $_user->saveQuietly();
             OrderedPackage::query()->create([
 
                 'order_id' => $item['user_id'],
