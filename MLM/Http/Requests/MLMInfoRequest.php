@@ -24,7 +24,8 @@ class MLMInfoRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'sometimes|exists:users',
+            'user_id' => 'sometimes|exists:users',
+            'member_id' => 'sometimes|exists:users,member_id',
         ];
     }
 }

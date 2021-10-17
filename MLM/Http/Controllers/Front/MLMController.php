@@ -21,13 +21,16 @@ class MLMController extends Controller
      * @group
      * Public User > User Info
      *
-     * @queryParam id integer
+     * @queryParam member_id integer
+     * @queryParam user_id integer
      */
     public function getMLMInfo(MLMInfoRequest $request)
     {
         /** @var  $user User */
-        if ($request->has('id') && request('id'))
-            $user = User::query()->find(request('id'));
+        if ($request->has('user_id') && request('user_id'))
+            $user = User::query()->find(request('user_id'));
+        else if ($request->has('member_id') && request('member_id'))
+            $user = User::query()->where('member_id',request('member_id'))->first();
         else
             $user = auth()->user();
 
