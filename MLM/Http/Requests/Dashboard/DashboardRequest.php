@@ -1,11 +1,13 @@
 <?php
 
-namespace MLM\Http\Requests;
+namespace MLM\Http\Requests\Dashboard;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class MLMInfoRequest extends FormRequest
+class DashboardRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -24,8 +26,9 @@ class MLMInfoRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'sometimes|exists:users',
-            'member_id' => 'sometimes|exists:users,member_id',
+            'type' => array('required', Rule::in(["week", "month", "year"])),
         ];
     }
+
+
 }
