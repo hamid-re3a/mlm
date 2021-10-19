@@ -1,6 +1,6 @@
 <?php
 
-namespace Orders\Http\Requests\Front\Order;
+namespace MLM\Http\Requests\Dashboard;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -26,7 +26,7 @@ class DashboardRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => array('required', Rule::in(["week", "month", "year","all"])),
+            'type' => array('required', Rule::in(["week", "month", "year"])),
         ];
     }
 

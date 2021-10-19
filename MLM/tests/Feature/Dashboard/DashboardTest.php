@@ -10,21 +10,21 @@ use MLM\Models\Tree;
 use MLM\tests\MLMTest;
 use User\Models\User;
 
-class TreeFeatureTest extends MLMTest
+class DashboardTest extends MLMTest
 {
     /**
      * @test
      */
-    public function tree_display_multi_level()
+    public function binary_chart()
     {
         Mail::fake();
         $this->buildBinaryTree();
         $this->buildReferralTree();
         $this->withHeaders($this->getHeaders(1, USER_ROLE_CLIENT));
 
-        $response = $this->get(route('customer.trees.binary-multi-level').'?level=10');
-        $response->assertOk();
-        $response = $this->get(route('customer.trees.referral-multi-level'));
+        $response = $this->post(route('customer.dashboard.binary-members-charts'),[
+            'type' => 'week'
+        ]);
         $response->assertOk();
     }
 

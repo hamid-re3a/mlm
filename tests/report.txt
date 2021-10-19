@@ -31,6 +31,9 @@ Binary Tree (MLM\tests\UnitTest\Tree\BinaryTree)
  [x] Find sub set of nodes
  [x] It belongs to user
 
+Dashboard (MLM\tests\Feature\Tree\Dashboard)
+ [x] Binary chart
+
 Package Roi Create Feature (MLM\tests\Feature\PackageRoiCreateFeature)
  [x] User can create packageRoi
  [x] Only super admin and mlm admin can create packageRoi
