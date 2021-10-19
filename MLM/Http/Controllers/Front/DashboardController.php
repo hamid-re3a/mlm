@@ -5,67 +5,47 @@ namespace MLM\Http\Controllers\Front;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
-use MLM\Http\Requests\BinaryTreeMultiRequest;
-use MLM\Http\Requests\MLMInfoRequest;
-use MLM\Http\Requests\ReferralTreeMultiRequest;
-use MLM\Models\ReferralTree;
+use MLM\Http\Requests\Dashboard\DashboardRequest;
 use MLM\Models\Tree;
 use User\Models\User;
 
-class MLMController extends Controller
+class DashboardController extends Controller
 {
     use  ValidatesRequests;
 
     /**
-     * Get MLM Info
+     * Binary member chart
      * @group
-     * Public User > User Info
+     * Public User > User MLM Dashboard
      *
-     * @queryParam member_id integer
-     * @queryParam user_id integer
      */
-    public function getMLMInfo(MLMInfoRequest $request)
+    public function binaryMembers(DashboardRequest $request)
     {
-        /** @var  $user User */
-        if ($request->has('user_id') && request('user_id'))
-            $user = User::query()->find(request('user_id'));
-        else if ($request->has('member_id') && request('member_id'))
-            $user = User::query()->where('member_id',request('member_id'))->first();
-        else
-            $user = auth()->user();
+        if (auth()->check() && !auth()->user()->hasBinaryNode())
+            return api()->error();
+        /** @var  $user User*/
+        $user = auth()->user();
+        $function_left_members = function ($from_day, $to_day) use ($user){
+            if(!$user->binaryTree->hasLeftChild()){
+                return null;
+            }
+            return Tree::query()->whereBetween('created_at',[$from_day,$to_day])->descendantsAndSelf($user->binaryTree->leftChild()->id);
+        };
+        $function_right_members = function ($from_day, $to_day) use ($user){
+            if(!$user->binaryTree->hasRightChild()){
+                return null;
+            }
+            return Tree::query()->whereBetween('created_at',[$from_day,$to_day])->descendantsAndSelf($user->binaryTree->rightChild()->id);
+        };
+        $sub_function = function ($collection, $intervals) {
+            if(is_null($collection))
+                return 0;
+            return $collection->whereBetween('created_at', $intervals)->count();
+        };
 
-
-        if (!$user->hasBinaryNode()) {
-            $info = [
-                'level' => 0,
-                'converted_points' => 0,
-                'left_leg_points' => 0,
-                'right_leg_points' => 0,
-
-                'sponsor_user' => $user->sponsor,
-                'highest_package_detail' => $user->biggestActivePackage(),
-                'highest_package' => optional($user->biggestActivePackage())->package,
-                'rank' => $user->rank_model
-            ];
-        } else {
-            $binary_tree = Tree::withDepth()->where('user_id', $user->id)->first();
-            $depth = $binary_tree->depth;
-            $max_depth = Tree::withDepth()->descendantsAndSelf($binary_tree->id)->max('depth');
-            $info = [
-                'level' => $max_depth - $depth,
-                'converted_points' => $binary_tree->converted_points,
-                'left_leg_points' => $binary_tree->leftSideChildrenPackagePrice(),
-                'right_leg_points' => $binary_tree->rightSideChildrenPackagePrice(),
-                'children_count_left' => $binary_tree->leftChildCount(),
-
-
-                'sponsor_user' => $user->sponsor,
-                'highest_package_detail' => $user->biggestActivePackage(),
-                'highest_package' => optional($user->biggestActivePackage())->package,
-                'rank' => $user->rank_model
-            ];
-        }
-
-        return api()->success('', $info);
+        $final_result = [];
+        $final_result['left'] = chartMaker($request->type, $function_left_members, $sub_function);
+        $final_result['right'] = chartMaker($request->type, $function_right_members, $sub_function);
+        return api()->success('',$final_result );
     }
 }
