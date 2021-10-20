@@ -126,7 +126,7 @@ class TreeController extends Controller
     {
         if ($tree->user->member_id)
             return env('API_GATEWAY_BASE_URL', "https://staging-api-gateway.janex.org/")
-                . "api/gateway/default/general/user/avatar/" . $tree->user->member_id . "/image";
+                . "api/gateway/default/general/user/avatar/" . $tree->user->member_id . "/file";
         else
             return null;
     }
