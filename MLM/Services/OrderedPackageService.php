@@ -45,7 +45,7 @@ class OrderedPackageService
         $id->setId($order->getPackageId());
 
         /** @var $package Package */
-        list($package, $status) = getPackageGrpcClient()->packageById($id)->wait();
+        list($package, $status) = getPackageGrpcClient()->packageById((int)1)->wait();
         if ($status->code != 0){
             Log::error($status->metadata);
             throw new \Exception('Not a valid package in order');
