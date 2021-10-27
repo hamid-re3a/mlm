@@ -42,10 +42,10 @@ class OrderedPackageService
     private function updatePackage(Order $order): Package
     {
         $id = new Id();
-        $id->setId($order->getPackageId());
+        $id->setId((int)1);
 
         /** @var $package Package */
-        list($package, $status) = getPackageGrpcClient()->packageById((int)1)->wait();
+        list($package, $status) = getPackageGrpcClient()->packageById($id)->wait();
         if ($status->code != 0){
             Log::error($status->metadata);
             throw new \Exception('Not a valid package in order');
