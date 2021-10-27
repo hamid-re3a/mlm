@@ -36,7 +36,9 @@ class OrderedPackageRepository
             "price" => $package->getPrice(),
             "direct_percentage" => $package->getDirectPercentage(),
             "binary_percentage" => $package->getBinaryPercentage(),
-            "expires_at" => Carbon::make($order->getIsPaidAt())->addDays($order->getValidityInDays())
+            "expires_at" => Carbon::make($order->getIsPaidAt())->addDays($order->getValidityInDays()),
+            "created_at" => Carbon::make($order->getCreatedAt()),
+            "updated_at" => Carbon::make($order->getUpdatedAt()),
         ]);
 
 
