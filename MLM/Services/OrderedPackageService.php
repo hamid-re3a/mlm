@@ -4,6 +4,7 @@
 namespace MLM\Services;
 
 
+use Illuminate\Support\Facades\Log;
 use MLM\Models\OrderedPackage;
 use MLM\Repository\OrderedPackageRepository;
 use MLM\Repository\PackageRepository;
@@ -45,8 +46,10 @@ class OrderedPackageService
 
         /** @var $package Package */
         list($package, $status) = getPackageGrpcClient()->packageById($id)->wait();
-        if ($status->code != 0)
+        if ($status->code != 0){
+            Log::error($status->metadata);
             throw new \Exception('Not a valid package in order');
+        }
 
         $this->package_repository->updatePackage($package);
         return $package;
