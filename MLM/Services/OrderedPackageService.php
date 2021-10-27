@@ -42,7 +42,7 @@ class OrderedPackageService
     private function updatePackage(Order $order): Package
     {
         $id = new Id();
-        $id->setId((int)1);
+        $id->setId($order->getPackageId());
 
         /** @var $package Package */
         list($package, $status) = getPackageGrpcClient()->packageById($id)->wait();
