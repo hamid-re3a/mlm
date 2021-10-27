@@ -6,13 +6,13 @@ use Orders\Services\Grpc\OrderPlans;
 require './vendor/autoload.php';
 
 $order = new Order();
-$order->setId((int)1001);
+$order->setId((int)1002);
 $order->setUserId((int)22);
 $order->setIsPaidAt(now()->toString());
-$order->setPlan(OrderPlans::ORDER_PLAN_START);
-//$order->setPlan(OrderPlans::ORDER_PLAN_PURCHASE);
+//$order->setPlan(OrderPlans::ORDER_PLAN_START);
+$order->setPlan(OrderPlans::ORDER_PLAN_PURCHASE);
 $order->setPackageId((int)1);
-$client = new \MLM\Services\Grpc\MLMServiceClient('staging-api-gateway.janex.org:9598', [
+$client = new \MLM\Services\Grpc\MLMServiceClient('staging.janex.org:9598', [
 //$client = new \MLM\Services\Grpc\MLMServiceClient('127.0.0.1:9598', [
     'credentials' => \Grpc\ChannelCredentials::createInsecure()
 ]);

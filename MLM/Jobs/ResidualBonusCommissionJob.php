@@ -55,13 +55,13 @@ class ResidualBonusCommissionJob implements ShouldQueue
         $deposit_service_object = app(Deposit::class);
         $deposit_service_object->setUserId($this->user->id);
         $deposit_service_object->setAmount($commission_amount);
-        $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+        $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::JANEX);
 
         $deposit_service_object->setDescription(serialize([
             'description' => 'Commission # ' . RESIDUAL_BONUS_COMMISSION
         ]));
         $deposit_service_object->setType('Commission');
-        $deposit_service_object->setSubType('Trading Profit');
+        $deposit_service_object->setSubType('Residual Bonus');
 
 
 

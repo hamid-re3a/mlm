@@ -56,7 +56,7 @@ class IndirectSellCommissionJob implements ShouldQueue
                     'description' => 'Commission # ' . $this->getType()
                 ]));
                 $deposit_service_object->setType('Commission');
-                $deposit_service_object->setSubType('Indirect Sell');
+                $deposit_service_object->setSubType('Indirect Sale');
 
 
 
