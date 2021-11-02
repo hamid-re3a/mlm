@@ -76,6 +76,8 @@ class MLMGrpcService implements MLMServiceInterface
             return $acknowledge;
         } catch (\Throwable $exception) {
             DB::rollBack();
+            Log::error('MLMGrpcService@simulateOrder => ' . $exception->getMessage());
+            $acknowledge->setMessage(trans('mlm.responses.something-went-wrong'));
             $acknowledge->setStatus(FALSE);
             return $acknowledge;
         }
