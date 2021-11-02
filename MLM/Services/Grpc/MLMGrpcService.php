@@ -56,8 +56,13 @@ class MLMGrpcService implements MLMServiceInterface
             Log::info("simulate order");
             Log::info($request->getId());
             /** @var  $package_ordered OrderedPackage */
+            Log::info('updateOrderAndPackage');
             $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
+            Log::info('Done updateOrderAndPackage');
+
+            Log::info('Check is_commission_resolved_at');
             if (is_null($package_ordered->is_commission_resolved_at)) {
+                Log::info('NULL is_commission_resolved_at');
 
                 list($status, $message) = (new OrderResolver($request))->simulateValidation();
                 $acknowledge->setStatus($status);
@@ -65,6 +70,7 @@ class MLMGrpcService implements MLMServiceInterface
                 $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
 
             } else {
+                Log::info('Not null is_commission_resolved_at');
 
                 $acknowledge->setStatus(true);
                 $acknowledge->setMessage('already processed');
@@ -76,6 +82,8 @@ class MLMGrpcService implements MLMServiceInterface
             return $acknowledge;
         } catch (\Throwable $exception) {
             DB::rollBack();
+            Log::error('MLMGrpcService@simulateOrder => ' . $exception->getMessage());
+            $acknowledge->setMessage(trans('mlm.responses.something-went-wrong'));
             $acknowledge->setStatus(FALSE);
             return $acknowledge;
         }
