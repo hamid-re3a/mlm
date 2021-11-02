@@ -93,7 +93,7 @@ class MLMGrpcService implements MLMServiceInterface
         if ($request->getId()) {
             try {
                 $user = $this->user_service->findByIdOrFail($request->getId());
-                $rank = getAndUpdateUserRank($user);
+                $rank = $user->rank_model;
 
                 if (!is_null($rank)) {
                     $rank_grpc = $rank->getRankService();

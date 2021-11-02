@@ -145,8 +145,9 @@ class User extends Model
 
     public function buildBinaryTreeNode()
     {
-        if ($this->hasBinaryNode())
+        if ($this->hasBinaryNode()){
             return $this->binaryTree;
+        }
         return $this->binaryTree()->create();
     }
 
@@ -181,6 +182,11 @@ class User extends Model
     public function biggestActivePackage(): ?OrderedPackage
     {
         return $this->ordered_packages()->active()->biggest()->first();
+    }
+
+    public function biggestOrderedPackage(): ?OrderedPackage
+    {
+        return $this->ordered_packages()->biggest()->first();
     }
 
     public function hasActivePackage()

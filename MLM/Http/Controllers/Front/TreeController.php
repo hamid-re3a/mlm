@@ -9,6 +9,7 @@ use MLM\Http\Requests\BinaryTreeMultiRequest;
 use MLM\Http\Requests\ReferralTreeMultiRequest;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
+use User\Models\User;
 
 class TreeController extends Controller
 {
@@ -28,6 +29,10 @@ class TreeController extends Controller
         $level = $request->has('level') ? (int)$request->level : 6;
         if (auth()->check() && !auth()->user()->hasBinaryNode())
             return api()->error();
+
+        if(!$this->isTreeNodeInBinaryUserDescendant(request('id'))){
+            return api()->notFound();
+        }
 
         if ($request->has('id') && request('id'))
             $tree = Tree::with(['user', 'user.rank_model'])->withDepth()->where('user_id', request('id'))->firstOrFail();
@@ -84,6 +89,10 @@ class TreeController extends Controller
         if (auth()->check() && !auth()->user()->hasReferralNode())
             return api()->error();
 
+        if(!$this->isTreeNodeInReferralUserDescendant(request('id'))){
+            return api()->notFound();
+        }
+
         if ($request->has('id') && request('id'))
             $tree = ReferralTree::with('user')->withDepth()->where('user_id', request('id'))->firstOrFail();
         else
@@ -129,5 +138,19 @@ class TreeController extends Controller
                 . "api/gateway/default/general/user/avatar/" . $tree->user->member_id . "/file";
         else
             return null;
+    }
+
+
+    private function isTreeNodeInBinaryUserDescendant($to_show_user_id): bool
+    {
+        if (auth()->user()->hasBinaryNode())
+            return Tree::descendantsAndSelf(auth()->user()->binaryTree->id)->where('user_id',$to_show_user_id)->exists();
+    }
+
+
+    private function isTreeNodeInReferralUserDescendant($to_show_user_id): bool
+    {
+        if (auth()->user()->hasBinaryNode())
+            return ReferralTree::descendantsAndSelf(auth()->user()->referralTree->id)->where('user_id',$to_show_user_id)->exists();
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use User\Convert\ConvertCommand;
 use User\Models\User;
 use User\Observers\UserObserver;
 use User\Services\Grpc\UserUpdate;
@@ -108,6 +109,12 @@ class UserServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/config/' . $this->config_file_name . '.php' => config_path($this->config_file_name . '.php'),
             ], 'api-response');
+
+
+
+            $this->commands([
+                ConvertCommand::class
+            ]);
         }
 
         User::observe(UserObserver::class);
