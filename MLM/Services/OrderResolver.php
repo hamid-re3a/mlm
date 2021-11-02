@@ -179,7 +179,7 @@ class OrderResolver
     public function isValid(): array
     {
         try {
-            $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId());
+            $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId())->first();
             switch ($this->order->getPlan()) {
                 case OrderPlans::ORDER_PLAN_START:
                     if ($this->user->hasAnyValidOrder())
@@ -200,7 +200,12 @@ class OrderResolver
                 default:
                     return [false, trans('responses.not-valid-plan')];
             }
-
+            if($this->user->hasAnyValidOrder()){
+                if($this->user->biggestOrderedPackage()->price > $ordered_package->price)
+                {
+                    return [false, trans('order.responses.selected-package-should-be-greater-or-equal-to-previous-package')];
+                }
+            }
         } catch (\Exception $exception) {
             Log::error('OrderResolver@isValid =>' . $exception->getMessage());
             return [false, trans('responses.unknown')];
