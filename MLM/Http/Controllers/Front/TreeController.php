@@ -30,7 +30,7 @@ class TreeController extends Controller
         if (auth()->check() && !auth()->user()->hasBinaryNode())
             return api()->error();
 
-        if(!$this->isTreeNodeInBinaryUserDescendant(request('id'))){
+        if($request->has('id') AND !$this->isTreeNodeInBinaryUserDescendant($request->get('id'))){
             return api()->notFound();
         }
 
@@ -89,7 +89,7 @@ class TreeController extends Controller
         if (auth()->check() && !auth()->user()->hasReferralNode())
             return api()->error();
 
-        if(!$this->isTreeNodeInReferralUserDescendant(request('id'))){
+        if($request->has('id') AND !$this->isTreeNodeInReferralUserDescendant($request->get('id'))){
             return api()->notFound();
         }
 
