@@ -179,7 +179,7 @@ class OrderResolver
     public function isValid(): array
     {
         try {
-            $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId());
+            $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId())->first();
             switch ($this->order->getPlan()) {
                 case OrderPlans::ORDER_PLAN_START:
                     if ($this->user->hasAnyValidOrder())
