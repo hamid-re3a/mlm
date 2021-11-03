@@ -144,13 +144,13 @@ class TreeController extends Controller
     private function isTreeNodeInBinaryUserDescendant($to_show_user_id): bool
     {
         if (auth()->user()->hasBinaryNode())
-            return Tree::descendantsAndSelf(auth()->user()->binaryTree->id)->where('user_id',$to_show_user_id)->exists();
+            return !is_null(Tree::descendantsAndSelf(auth()->user()->binaryTree->id)->where('user_id',$to_show_user_id)->first());
     }
 
 
     private function isTreeNodeInReferralUserDescendant($to_show_user_id): bool
     {
         if (auth()->user()->hasBinaryNode())
-            return ReferralTree::descendantsAndSelf(auth()->user()->referralTree->id)->where('user_id',$to_show_user_id)->exists();
+            return !is_null(ReferralTree::descendantsAndSelf(auth()->user()->referralTree->id)->where('user_id',$to_show_user_id)->first());
     }
 }
