@@ -6,8 +6,10 @@ namespace MLM\Services\Grpc;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Mix\Grpc;
 use Mix\Grpc\Context;
 use MLM\Models\OrderedPackage;
+use MLM\Models\Tree;
 use MLM\Services\OrderedPackageService;
 use MLM\Services\OrderResolver;
 use Orders\Services\Grpc as OrderGrpc;
@@ -146,4 +148,18 @@ class MLMGrpcService implements MLMServiceInterface
     }
 
 
+    /**
+     * @inheritDoc
+     */
+    public function isUserInSecondUserDescendant(Context $context, UserDescendantCheck $request): Acknowledge
+    {
+        $acknowledge = new Acknowledge();
+        $tree = Tree::query()->where('user_id',$request->getUserIndexId())->first();
+        if(!is_null($tree) && !is_null(Tree::descendantsAndSelf($tree->id)->where('user_id',$request->getUserToShowId())->first())){
+            $acknowledge->setStatus(true);
+            return $acknowledge;
+        }
+        $acknowledge->setStatus(false);
+        return $acknowledge;
+    }
 }
