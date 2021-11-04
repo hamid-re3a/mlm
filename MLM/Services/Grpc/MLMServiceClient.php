@@ -72,4 +72,18 @@ class MLMServiceClient extends \Grpc\BaseStub {
         $metadata, $options);
     }
 
+    /**
+     * @param \MLM\Services\Grpc\UserDescendantCheck $argument input argument
+     * @param array $metadata metadata
+     * @param array $options call options
+     * @return \MLM\Services\Grpc\Acknowledge
+     */
+    public function isUserInSecondUserDescendant(\MLM\Services\Grpc\UserDescendantCheck $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/MLM.services.grpc.MLMService/isUserInSecondUserDescendant',
+        $argument,
+        ['\MLM\Services\Grpc\Acknowledge', 'decode'],
+        $metadata, $options);
+    }
+
 }
