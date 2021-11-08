@@ -68,7 +68,7 @@ class TreeTableSeeder extends Seeder
             OrderedPackage::query()->create([
 
                 'order_id' => $item['user_id'],
-                'price' => 100,
+                'price' => 99,
 
                 'direct_percentage' => 8,
                 'binary_percentage' => 8,

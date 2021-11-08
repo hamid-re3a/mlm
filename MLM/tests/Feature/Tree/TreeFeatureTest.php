@@ -27,7 +27,21 @@ class TreeFeatureTest extends MLMTest
         $response = $this->get(route('customer.trees.referral-multi-level'));
         $response->assertOk();
     }
+    /**
+     * @test
+     */
+    public function tree_display_multi_level_with_id()
+    {
+        Mail::fake();
+        $this->buildBinaryTree();
+        $this->buildReferralTree();
+        $this->withHeaders($this->getHeaders(1, USER_ROLE_CLIENT));
 
+        $response = $this->get(route('customer.trees.binary-multi-level').'?id=2&level=10');
+        $response->assertOk();
+        $response = $this->get(route('customer.trees.referral-multi-level').'?id=2');
+        $response->assertOk();
+    }
 
     public function buildBinaryTree($data = null)
     {

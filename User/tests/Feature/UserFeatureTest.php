@@ -62,7 +62,7 @@ class UserFeatureTest extends UserTest
 
         $this->put(route('users.binaryPosition'), [
             'default_binary_position' => \MLM\Models\Tree::LEFT
-        ])->assertStatus(403);
+        ])->assertStatus(401);
 
     }
 

@@ -49,4 +49,13 @@ interface MLMServiceInterface extends Grpc\ServiceInterface
     * @throws Grpc\Exception\InvokeException
     */
     public function submitOrder(Context $context, OrderGrpc\Order $request): Acknowledge;
+
+    /**
+    * @param Context $context
+    * @param UserDescendantCheck $request
+    * @return Acknowledge
+    *
+    * @throws Grpc\Exception\InvokeException
+    */
+    public function isUserInSecondUserDescendant(Context $context, UserDescendantCheck $request): Acknowledge;
 }
