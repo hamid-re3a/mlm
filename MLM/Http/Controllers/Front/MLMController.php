@@ -42,6 +42,7 @@ class MLMController extends Controller
                 'left_leg_points' => 0,
                 'right_leg_points' => 0,
 
+                'default_binary_position' => $user->default_binary_position,
                 'sponsor_user' => $user->sponsor,
                 'highest_package_detail' => $user->biggestActivePackage(),
                 'highest_package' => optional($user->biggestActivePackage())->package,
@@ -60,6 +61,7 @@ class MLMController extends Controller
                 'children_count_left' => $binary_tree->leftChildCount(),
 
 
+                'default_binary_position' => $user->default_binary_position,
                 'sponsor_user' => $user->sponsor,
                 'highest_package_detail' => $user->biggestActivePackage(),
                 'highest_package' => optional($user->biggestActivePackage())->package,
