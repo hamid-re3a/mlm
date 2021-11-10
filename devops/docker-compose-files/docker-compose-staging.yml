@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  mlm:
+    image: staging-reg.dreamcometrue.ai/staging-mlm:1
+    restart: unless-stopped
+    networks:
+      - mysql_wo_r2f
+    ports:
+      - 127.0.0.1:30083:80
+      - 9598:9598
+networks:
+  mysql_wo_r2f:
+    external: true
