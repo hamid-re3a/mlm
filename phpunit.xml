@@ -33,13 +33,8 @@
         <server name="DB_CONNECTION" value="sqlite"/>
         <server name="DB_DATABASE" value="database.sqlite"/>
         <server name="MAIL_MAILER" value="array"/>
-        <server name="QUEUE_CONNECTION" value="sqs"/>
+        <server name="QUEUE_CONNECTION" value="sync"/>
         <server name="SESSION_DRIVER" value="array"/>
         <server name="TELESCOPE_ENABLED" value="false"/>
-        <server name="AWS_ACCESS_KEY_ID" value="AKIAZE6V4Q3H663SFPNN"/>
-        <server name="AWS_SECRET_ACCESS_KEY" value="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"/>
-        <server name="SQS_QUEUE" value="mlm"/>
-        <server name="AWS_DEFAULT_REGION" value="us-east-2"/>
-        <server name="SQS_PREFIX" value="https://sqs.us-east-2.amazonaws.com/629124400847"/>
     </php>
 </phpunit>
