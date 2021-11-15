@@ -28,7 +28,7 @@ class TradingProfitCommissionJob implements ShouldQueue
 
     public function handle(PackageService $package_service)
     {
-        if (!$this->ordered_package->active()->exists() || $this->ordered_package->isSpecialPackage() || $this->ordered_package->isCompanyPackage())
+        if (!$this->ordered_package->active()->exists() || $this->ordered_package->isSpecialPackage() || $this->ordered_package->isCompanyPackage() || !$this->ordered_package->canGetCommission())
             return;
 
         if (!$this->ordered_package->commissions()

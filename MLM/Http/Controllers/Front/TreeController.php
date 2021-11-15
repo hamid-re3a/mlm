@@ -9,7 +9,6 @@ use MLM\Http\Requests\BinaryTreeMultiRequest;
 use MLM\Http\Requests\ReferralTreeMultiRequest;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
-use User\Models\User;
 
 class TreeController extends Controller
 {

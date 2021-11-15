@@ -40,7 +40,8 @@ class IndirectSellCommissionJob implements ShouldQueue
             return;
         $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
         $biggest_active_package = $parent->biggestActivePackage();
-        if ($biggest_active_package) {
+        if ($biggest_active_package && $biggest_active_package->canGetCommission()) {
+
             /** @var  $indirect_found OrderedPackagesIndirectCommission */
             $indirect_found = $biggest_active_package->indirectCommission()->where('level', $this->level)->first();
             if ($indirect_found) {
