@@ -49,7 +49,7 @@ class PackageRoiController extends Controller
     public function index(PackageRoiIndexRequest $request)
     {
 
-        $rois = $this->packageRoiService->getAllByDate($request->from_date,$request->to_date);
+        $rois = $this->packageRoiService->getAllByDate($request->from_date,$request->to_date,$request->package_id);
 
         if(is_null($rois))
             return api()->success(trans('responses.ok'),[]);

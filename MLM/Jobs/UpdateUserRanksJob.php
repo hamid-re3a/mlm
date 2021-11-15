@@ -24,6 +24,7 @@ class UpdateUserRanksJob implements ShouldQueue
 
     public function __construct(User $user)
     {
+        $this->queue = env('QUEUE_DEFAULT_NAME','mlm_default');
         $this->user = $user;
     }
 

@@ -23,6 +23,7 @@ class TradingProfitCommissionJob implements ShouldQueue
 
     public function __construct(OrderedPackage $ordered_package)
     {
+        $this->queue = env('QUEUE_ROI_NAME','mlm_roi');
         $this->ordered_package = $ordered_package;
     }
 
@@ -49,7 +50,7 @@ class TradingProfitCommissionJob implements ShouldQueue
                 $deposit_service_object = app(Deposit::class);
                 $deposit_service_object->setUserId($this->ordered_package->user->id);
                 $deposit_service_object->setAmount($commission_amount);
-                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::JANEX);
 
                 $deposit_service_object->setDescription(serialize([
                     'description' => 'Commission # ' . TRADING_PROFIT_COMMISSION

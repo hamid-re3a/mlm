@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use MLM\Models\EmailContentSetting;
 use User\Models\User;
@@ -34,37 +35,10 @@ if (!function_exists('getRank')) {
     }
 }
 
-//if (!function_exists('payCommission')) {
-//
-//    function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
-//    {
-//        DB::beginTransaction();
-//        try {
-//            $commission = $user->commissions()->create([
-//                'amount' => $deposit_service_object->getAmount(),
-//                'ordered_package_id' => $package_id,
-//                'type' => $type,
-//            ]);
-//            if ($commission) {
-//                $deposit_response = WalletClientFacade::deposit($deposit_service_object);
-//                $commission->transaction_id = $deposit_response->getTransactionId();
-//                $commission->save();
-//            } else {
-//                throw new \Exception('Commission Failed Error');
-//            }
-//        } catch (\Exception $exception) {
-//            DB::rollBack();
-//            throw new \Exception('Commission Error => ' . $exception->getMessage());
-//        }
-//
-//        DB::commit();
-//
-//    }
-//}
 if (!function_exists('getPackageGrpcClient')) {
     function getPackageGrpcClient()
     {
-        return new \Packages\Services\Grpc\PackagesServiceClient('staging-api-gateway.janex.org:9596', [
+        return new \Packages\Services\Grpc\PackagesServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
     }
@@ -72,7 +46,7 @@ if (!function_exists('getPackageGrpcClient')) {
 if (!function_exists('getWalletGrpcClient')) {
     function getWalletGrpcClient()
     {
-        return new \Wallets\Services\Grpc\WalletServiceClient('staging-api-gateway.janex.org:9596', [
+        return new \Wallets\Services\Grpc\WalletServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
     }
@@ -156,4 +130,63 @@ function getEmailAndTextSetting($key)
         return EMAIL_CONTENT_SETTINGS[$key];
 
     throw new Exception(trans('user.responses.main-key-settings-is-missing'));
+}
+
+
+if (!function_exists('chartMaker')) {
+    function chartMaker($duration_type, $repo_function, $sub_function)
+    {
+        switch ($duration_type) {
+            default:
+            case "week":
+
+                $from_day = Carbon::now()->endOfDay()->subDays(7);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+
+                $result = [];
+                foreach (range(-1, 5) as $day) {
+
+                    $timestamp = Carbon::now()->startOfDay()->subDays($day)->timestamp;
+                    $interval = [Carbon::now()->startOfDay()->subDays($day+1), Carbon::now()->startOfDay()->subDays($day)];
+
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+
+                }
+                return $result;
+                break;
+            case "month":
+                $from_day = Carbon::now()->endOfMonth()->subMonths(12);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+                $result = [];
+                foreach (range(-1, 10) as $month) {
+                    $timestamp = Carbon::now()->startOfMonth()->subMonths($month)->timestamp;
+                    $interval = [Carbon::now()->startOfMonth()->subMonths($month+1), Carbon::now()->startOfMonth()->subMonths($month)];
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+                }
+                return $result;
+                break;
+            case "year":
+
+                $from_day = Carbon::now()->endOfYear()->subYears(3);
+                $to_day = Carbon::now();
+
+                $processing_collection = $repo_function($from_day, $to_day);
+                $result = [];
+                foreach (range(-1, 3) as $year) {
+                    $timestamp = Carbon::now()->startOfYear()->subYears($year)->timestamp;
+                    $interval = [Carbon::now()->startOfYear()->subYears($year+1), Carbon::now()->startOfYear()->subYears($year)];
+
+                    $result[$timestamp] = $sub_function($processing_collection, $interval);
+                }
+                return $result;
+                break;
+        }
+
+    }
 }

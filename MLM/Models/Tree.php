@@ -33,9 +33,7 @@ use User\Models\User;
  * @property-read \User\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder|Tree getRoot()
  * @method static \Illuminate\Database\Eloquent\Builder|Tree left()
- * @method static \Illuminate\Database\Eloquent\Builder|Tree leftChild()
  * @method static \Illuminate\Database\Eloquent\Builder|Tree right()
- * @method static \Illuminate\Database\Eloquent\Builder|Tree rightChild()
  * @method static \Illuminate\Database\Eloquent\Builder|Tree whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Tree whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Tree whereLft($value)
@@ -198,7 +196,13 @@ class Tree extends Model
             return false;
         return true;
     }
-
+    public function leftChild()
+    {
+        $left_child = $this->children()->left()->first();
+        if(is_null($left_child))
+            return null;
+        return $left_child;
+    }
     public function leftChildCount()
     {
         $left_child = $this->children()->left()->first();
@@ -232,6 +236,16 @@ class Tree extends Model
             return false;
         return true;
     }
+
+    public function rightChild()
+    {
+        $right_child = $this->children()->right()->first();
+        if(is_null($right_child))
+            return null;
+        return $right_child;
+    }
+
+
     public function rightChildCount()
     {
         /** @var  $right_child Tree*/
@@ -253,6 +267,25 @@ class Tree extends Model
         return  array_merge([$right_child->user_id],$children);
     }
 
+    public function rightDescendants()
+    {
+        /** @var  $right_child Tree*/
+        $right_child = $this->children()->right()->first();
+        if(is_null($right_child))
+            return null;
+
+        return Tree::descendantsAndSelf($right_child->id);
+    }
+
+    public function leftDescendants()
+    {
+        /** @var  $left_child Tree*/
+        $left_child = $this->children()->right()->first();
+        if(is_null($left_child))
+            return null;
+
+        return Tree::descendantsAndSelf($left_child->id);
+    }
     public function rightSideChildrenPackagePrice() : int
     {
         return OrderedPackage::query()->whereIn('user_id',$this->rightSideChildrenIds())->sum('price');

@@ -15,6 +15,7 @@ class DirectSellCommission implements Commission
 
     public function calculate(Order $order): bool
     {
+
         $user = app(UserService::class)->findByIdOrFail($order->getUserId());
         $package = OrderedPackage::query()->where('order_id', $order->getId())->firstOrFail();
         DirectSellCommissionJob::dispatch($user,$package);

@@ -114,7 +114,10 @@ class User extends Model
     {
         return $this->hasOne(Tree::class);
     }
-
+    public function sponsor()
+    {
+        return $this->belongsTo(User::class,'sponsor_id','id');
+    }
     public function referralTree()
     {
         return $this->hasOne(ReferralTree::class);
@@ -142,8 +145,9 @@ class User extends Model
 
     public function buildBinaryTreeNode()
     {
-        if ($this->hasBinaryNode())
+        if ($this->hasBinaryNode()){
             return $this->binaryTree;
+        }
         return $this->binaryTree()->create();
     }
 
@@ -164,6 +168,7 @@ class User extends Model
         $user->setBlockType((string)$this->attributes['block_type']);
         $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
         $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
+        $user->setGender((boolean)$this->attributes['gender']);
 
         if ($this->getRoleNames()->count()) {
             $role_name = implode(",", $this->getRoleNames()->toArray());
@@ -177,6 +182,11 @@ class User extends Model
     public function biggestActivePackage(): ?OrderedPackage
     {
         return $this->ordered_packages()->active()->biggest()->first();
+    }
+
+    public function biggestOrderedPackage(): ?OrderedPackage
+    {
+        return $this->ordered_packages()->biggest()->first();
     }
 
     public function hasActivePackage()

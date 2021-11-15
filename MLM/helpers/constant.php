@@ -401,6 +401,23 @@ const EMAIL_CONTENT_SETTINGS = [
         'variables_description'=>'full_name user full name',
         'type'=>'email',
     ],
-
+    'USER_GOT_COMMISSION'=>[
+        'is_active' => true,
+        'subject'=>'You have received commissions',
+        'from'=>'it@ridetothefuture.com',
+        'from_name'=>'Janex Support Team',
+        'body'=><<<EOT
+                <div>
+                <p>Hello {{full_name}},</p>
+                <div>You have received {{amount}}PF for {{commission_type}} .<span></span></div>
+                <p></p>
+                <p>Cheers,</p>
+                <p>Janex Support Team</p>
+                </div>
+            EOT,
+        'variables'=>'full_name,amount,commission_type',
+        'variables_description'=>'full_name user full name',
+        'type'=>'email',
+    ],
 ];
 

@@ -6,13 +6,10 @@ namespace MLM\Http\Controllers\Front;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use MLM\Http\Requests\BinaryTreeMultiRequest;
-use MLM\Http\Requests\BinaryTreeRequest;
 use MLM\Http\Requests\ReferralTreeMultiRequest;
-use MLM\Http\Requests\ReferralTreeRequest;
-use MLM\Http\Resources\Tree\BinaryTreeResource;
-use MLM\Http\Resources\Tree\ReferralTreeResource;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
+use User\Models\User;
 
 class TreeController extends Controller
 {
@@ -26,12 +23,16 @@ class TreeController extends Controller
      * @queryParam id integer
      * @queryParam level integer
      */
-    public function getBinaryTreeMultiLevel(BinaryTreeMultiRequest  $request)
+    public function getBinaryTreeMultiLevel(BinaryTreeMultiRequest $request)
     {
 
-        $level = $request->has('level') ? (int) $request->level : 6;
+        $level = $request->has('level') ? (int)$request->level : 6;
         if (auth()->check() && !auth()->user()->hasBinaryNode())
             return api()->error();
+
+        if($request->has('id') AND !$this->isTreeNodeInBinaryUserDescendant($request->get('id'))){
+            return api()->notFound();
+        }
 
         if ($request->has('id') && request('id'))
             $tree = Tree::with(['user', 'user.rank_model'])->withDepth()->where('user_id', request('id'))->firstOrFail();
@@ -61,6 +62,11 @@ class TreeController extends Controller
             'position' => $tree->position,
             'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
+            'avatar' => $this->getAvatar($tree),
+            'sponsor_user' => $tree->user->sponsor,
+            'parent_user' => optional($tree->parent)->user,
+            'highest_package_detail' => $tree->user->biggestActivePackage(),
+            'highest_package' => optional($tree->user->biggestActivePackage())->package,
             'has_children' => $tree->children()->exists(),
             'children_count_right' => $tree->rightChildCount(),
             'children_count_left' => $tree->leftChildCount(),
@@ -79,9 +85,13 @@ class TreeController extends Controller
     public function getReferralTreeMultiLevel(ReferralTreeMultiRequest $request)
     {
 
-        $level = $request->has('level') ? (int) $request->level : 6;
+        $level = $request->has('level') ? (int)$request->level : 6;
         if (auth()->check() && !auth()->user()->hasReferralNode())
             return api()->error();
+
+        if($request->has('id') AND !$this->isTreeNodeInReferralUserDescendant($request->get('id'))){
+            return api()->notFound();
+        }
 
         if ($request->has('id') && request('id'))
             $tree = ReferralTree::with('user')->withDepth()->where('user_id', request('id'))->firstOrFail();
@@ -110,84 +120,37 @@ class TreeController extends Controller
             'id' => $tree->id,
             'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
-            'user_rank' => $tree->user->rank,
+            'rank' => $tree->user->rank_model,
+            'sponsor_user' => $tree->user->sponsor,
+            'parent_user' => optional($tree->parent)->user,
+            'avatar' => $this->getAvatar($tree),
+            'highest_package_detail' => $tree->user->biggestActivePackage(),
+            'highest_package' => optional($tree->user->biggestActivePackage())->package,
             'has_children' => $tree->children()->exists(),
             'children_count' => $tree->children()->count(),
         ];
     }
 
-    /**
-     * Get Referral Tree
-     * @group
-     * Public User > Display Tree
-     *
-     * @queryParam id integer
-     * @queryParam page integer
-     */
-    public function getUserReferralTree(ReferralTreeRequest $request)
+    private function getAvatar($tree)
     {
-
-        if (auth()->check() && !auth()->user()->hasReferralNode())
-            return api()->error();
-
-        if ($request->has('id') && request('id'))
-            $tree = ReferralTree::query()->where('user_id', request('id'))->firstOrFail();
+        if ($tree->user->member_id)
+            return env('API_GATEWAY_BASE_URL', "https://staging-api-gateway.janex.org/")
+                . "api/gateway/default/general/user/avatar/" . $tree->user->member_id . "/file";
         else
-            $tree = ReferralTree::query()->where('user_id', auth()->user()->id)->first();
-
-        $page = 1;
-        if ($request->has('page') && request('page'))
-            $page = request('page');
-
-
-        $data = [
-            'children' => ReferralTreeResource::collection($tree->children()->paginate(50)),
-            'id' => $tree->id,
-            'created_at' => $tree->created_at->timestamp,
-            'user' => $tree->user,
-            'user_rank' => $tree->user->rank,
-            'has_children' => $tree->children()->exists(),
-            'children_count' => $tree->children()->count(),
-        ];
-        return api()->success('', $data);
+            return null;
     }
 
-    /**
-     * Get Binary Tree
-     * @group
-     * Public User > Display Tree
-     *
-     * @queryParam id integer
-     */
-    public function getBinaryTree(BinaryTreeRequest $request)
+
+    private function isTreeNodeInBinaryUserDescendant($to_show_user_id): bool
     {
+        if (auth()->user()->hasBinaryNode())
+            return !is_null(Tree::descendantsAndSelf(auth()->user()->binaryTree->id)->where('user_id',$to_show_user_id)->first());
+    }
 
 
-        if (auth()->check() && !auth()->user()->hasBinaryNode())
-            return api()->error();
-
-        if ($request->has('id') && request('id'))
-            $tree = Tree::query()->where('user_id', request('id'))->firstOrFail();
-        else
-            $tree = Tree::query()->where('user_id', auth()->user()->id)->first();
-
-
-        $left_child = $tree->children()->left()->first();
-        $right_child = $tree->children()->right()->first();
-        $data = [
-            'children' => [
-                (is_null($left_child)) ? (object)[] : BinaryTreeResource::make($left_child),
-                (is_null($right_child)) ? (object)[] : BinaryTreeResource::make($right_child),
-            ],
-            'id' => $tree->id,
-            'position' => $tree->position,
-            'created_at' => $tree->created_at->timestamp,
-            'user' => $tree->user,
-            'has_children' => $tree->children()->exists(),
-            'children_count_right' => $tree->rightChildCount(),
-            'children_count_left' => $tree->leftChildCount(),
-            'rank' => getRank($tree->user->rank)
-        ];
-        return api()->success('', $data);
+    private function isTreeNodeInReferralUserDescendant($to_show_user_id): bool
+    {
+        if (auth()->user()->hasBinaryNode())
+            return !is_null(ReferralTree::descendantsAndSelf(auth()->user()->referralTree->id)->where('user_id',$to_show_user_id)->first());
     }
 }

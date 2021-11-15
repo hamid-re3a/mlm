@@ -44,11 +44,14 @@ Route::middleware(['auth'])->group(function () {
 
     //Client routes
     Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer.')->group(function () {
+        Route::name('dashboard.')->prefix('dashboard')->group(function () {
+            Route::post('binary_tree_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'binaryMembers'])->name('binary-members-charts');
+
+        });
         Route::name('trees.')->prefix('trees')->group(function () {
             Route::get('referral_multi_level', [\MLM\Http\Controllers\Front\TreeController::class, 'getReferralTreeMultiLevel'])->name('referral-multi-level');
             Route::get('binary_multi_level', [\MLM\Http\Controllers\Front\TreeController::class, 'getBinaryTreeMultiLevel'])->name('binary-multi-level');
-            Route::get('binary', [\MLM\Http\Controllers\Front\TreeController::class, 'getBinaryTree'])->name('binary');
-            Route::get('referral', [\MLM\Http\Controllers\Front\TreeController::class, 'getUserReferralTree'])->name('referral');
+            Route::get('get_mlm_info', [\MLM\Http\Controllers\Front\MLMController::class, 'getMLMInfo'])->name('mlm-info');
         });
     });
 

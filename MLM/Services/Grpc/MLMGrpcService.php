@@ -4,9 +4,12 @@
 namespace MLM\Services\Grpc;
 
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Mix\Grpc;
 use Mix\Grpc\Context;
 use MLM\Models\OrderedPackage;
+use MLM\Models\Tree;
 use MLM\Services\OrderedPackageService;
 use MLM\Services\OrderResolver;
 use Orders\Services\Grpc as OrderGrpc;
@@ -49,15 +52,43 @@ class MLMGrpcService implements MLMServiceInterface
      */
     public function simulateOrder(Context $context, OrderGrpc\Order $request): Acknowledge
     {
-
         $acknowledge = new Acknowledge();
-        list($status, $message) = (new OrderResolver($request))->simulateValidation();
-        $acknowledge->setStatus($status);
-        $acknowledge->setMessage($message);
-        $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
+        try {
+            DB::beginTransaction();
+            Log::info("simulate order");
+            Log::info($request->getId());
+            /** @var  $package_ordered OrderedPackage */
+            Log::info('updateOrderAndPackage');
+            $package_ordered = app(OrderedPackageService::class)->updateOrderAndPackage($request);
+            Log::info('Done updateOrderAndPackage');
 
+            Log::info('Check is_commission_resolved_at');
+            if (is_null($package_ordered->is_commission_resolved_at)) {
+                Log::info('NULL is_commission_resolved_at');
 
-        return $acknowledge;
+                list($status, $message) = (new OrderResolver($request))->simulateValidation();
+                $acknowledge->setStatus($status);
+                $acknowledge->setMessage($message);
+                $acknowledge->setCreatedAt($request->getIsCommissionResolvedAt());
+
+            } else {
+                Log::info('Not null is_commission_resolved_at');
+
+                $acknowledge->setStatus(true);
+                $acknowledge->setMessage('already processed');
+                $acknowledge->setCreatedAt($package_ordered->is_commission_resolved_at);
+
+            }
+
+            DB::rollBack();
+            return $acknowledge;
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+            Log::error('MLMGrpcService@simulateOrder => ' . $exception->getMessage());
+            $acknowledge->setMessage(trans('mlm.responses.something-went-wrong'));
+            $acknowledge->setStatus(FALSE);
+            return $acknowledge;
+        }
     }
 
     /**
@@ -93,13 +124,13 @@ class MLMGrpcService implements MLMServiceInterface
         if ($request->getId()) {
             try {
                 $user = $this->user_service->findByIdOrFail($request->getId());
-                $rank = getAndUpdateUserRank($user);
+                $rank = $user->rank_model;
 
                 if (!is_null($rank)) {
                     $rank_grpc = $rank->getRankService();
                     $ordered_package = $user->biggestActivePackage();
-                    if(!is_null($ordered_package)) {
-                        if($ordered_package->isCompanyPackage())
+                    if (!is_null($ordered_package)) {
+                        if ($ordered_package->isCompanyPackage())
                             $rank_grpc->setWithdrawalLimit((int)-1);
                         if ($ordered_package->isSpecialPackage())
                             if ($user->directSellAmount() <= $ordered_package->price)
@@ -117,4 +148,18 @@ class MLMGrpcService implements MLMServiceInterface
     }
 
 
+    /**
+     * @inheritDoc
+     */
+    public function isUserInSecondUserDescendant(Context $context, UserDescendantCheck $request): Acknowledge
+    {
+        $acknowledge = new Acknowledge();
+        $tree = Tree::query()->where('user_id',$request->getUserIndexId())->first();
+        if(!is_null($tree) && !is_null(Tree::descendantsAndSelf($tree->id)->where('user_id',$request->getUserToShowId())->first())){
+            $acknowledge->setStatus(true);
+            return $acknowledge;
+        }
+        $acknowledge->setStatus(false);
+        return $acknowledge;
+    }
 }

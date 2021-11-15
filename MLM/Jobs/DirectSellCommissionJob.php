@@ -25,6 +25,7 @@ class DirectSellCommissionJob implements ShouldQueue
 
     public function __construct(User $user, OrderedPackage $package)
     {
+        $this->queue = env('QUEUE_COMMISSIONS_NAME','mlm_commissions');
         $this->package = $package;
         $this->user = $user;
     }
@@ -58,7 +59,7 @@ class DirectSellCommissionJob implements ShouldQueue
                     'description' => 'Commission # ' . $this->getType() . $is_eligible_for_quick_start_bonus ? ' - Quick Start bonus ' : ''
                 ]));
                 $deposit_service_object->setType('Commission');
-                $deposit_service_object->setSubType('Direct Sell');
+                $deposit_service_object->setSubType('Direct Sale');
 
 
                 (new CommissionResolver)->payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);

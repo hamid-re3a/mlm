@@ -46,7 +46,6 @@ class Commission extends Model
     use HasFactory;
 
     protected $guarded = [];
-
     public function scopeType($query,$type)
     {
         return $query->where('type',$type);

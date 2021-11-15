@@ -27,6 +27,7 @@ class IndirectSellCommissionJob implements ShouldQueue
 
     public function __construct(User $user, OrderedPackage $package, $level = 0)
     {
+        $this->queue = env('QUEUE_COMMISSIONS_NAME','mlm_commissions');
         $this->package = $package;
         $this->user = $user;
         $this->level = $level;
@@ -56,7 +57,7 @@ class IndirectSellCommissionJob implements ShouldQueue
                     'description' => 'Commission # ' . $this->getType()
                 ]));
                 $deposit_service_object->setType('Commission');
-                $deposit_service_object->setSubType('Indirect Sell');
+                $deposit_service_object->setSubType('Indirect Sale');
 
 
 
