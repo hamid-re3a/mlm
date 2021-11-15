@@ -23,6 +23,7 @@ class TradingProfitCommissionJob implements ShouldQueue
 
     public function __construct(OrderedPackage $ordered_package)
     {
+        $this->queue = env('QUEUE_ROI_NAME','mlm_roi');
         $this->ordered_package = $ordered_package;
     }
 

@@ -23,6 +23,7 @@ class ResidualBonusCommissionJob implements ShouldQueue
 
     public function __construct(User $user)
     {
+        $this->queue = env('QUEUE_RESIDUAL_NAME','mlm_residual');
         $this->user = $user;
     }
 
