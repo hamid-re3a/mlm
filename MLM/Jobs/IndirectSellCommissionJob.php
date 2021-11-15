@@ -27,6 +27,7 @@ class IndirectSellCommissionJob implements ShouldQueue
 
     public function __construct(User $user, OrderedPackage $package, $level = 0)
     {
+        $this->queue = env('QUEUE_COMMISSIONS_NAME','mlm_commissions');
         $this->package = $package;
         $this->user = $user;
         $this->level = $level;

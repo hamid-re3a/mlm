@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use MLM\Mail\SettingableMail;
 
-class TrivialEmailJob implements ShouldQueue
+class EmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     /**
@@ -28,7 +28,7 @@ class TrivialEmailJob implements ShouldQueue
      */
     public function __construct(SettingableMail $email, $email_address)
     {
-        $this->queue = 'trivial_emails';
+        $this->queue = env('QUEUE_EMAIL_NAME','mlm_emails');
         $this->email = $email;
         $this->email_address = $email_address;
     }

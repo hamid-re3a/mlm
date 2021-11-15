@@ -26,6 +26,7 @@ class TrainerBonusCommissionJob implements ShouldQueue
 
     public function __construct(User $user, OrderedPackage $package)
     {
+        $this->queue = env('QUEUE_COMMISSIONS_NAME','mlm_commissions');
         $this->package = $package;
         $this->user = $user;
     }
