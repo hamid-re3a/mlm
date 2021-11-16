@@ -36,6 +36,9 @@ class IndirectSellCommissionJob implements ShouldQueue
 
     public function handle(UserService $user_service)
     {
+        if(!getSetting('INDIRECT_SELL_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
 
         if (is_null($this->user->referralTree->parent) || is_null($this->user->referralTree->parent->user_id))
             return;

@@ -185,6 +185,8 @@ class OrderResolver
             $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId())->first();
             switch ($this->order->getPlan()) {
                 case OrderPlans::ORDER_PLAN_START:
+                case OrderPlans::ORDER_PLAN_START_50:
+                case OrderPlans::ORDER_PLAN_START_75:
                     if ($this->user->hasAnyValidOrder())
                         return [false, trans('order.responses.you-should-order-other-plan-you-have-already-start-plan')];
                     break;

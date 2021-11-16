@@ -81,7 +81,7 @@ if (!function_exists('getAndUpdateUserRank')) {
 
                 if (User::hasLeastChildrenWithRank($left_binary_sponsored_children, $rank->condition_sub_rank, $rank->condition_number_of_left_children) &&
                     User::hasLeastChildrenWithRank($right_binary_sponsored_children, $rank->condition_sub_rank, $rank->condition_number_of_right_children)) {
-                    if($user->rank >= $rank->rank && now()->isBefore(Carbon::createFromFormat('d/m/Y',  '01/01/2022'))){
+                    if($user->rank >= $rank->rank && now()->isBefore(Carbon::createFromFormat('d/m/Y',  '01/08/2022'))){
                         return $user->rank_model;
                     } else {
                         $user->rank = $rank->rank;

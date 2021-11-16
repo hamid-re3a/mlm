@@ -33,6 +33,9 @@ class TrainerBonusCommissionJob implements ShouldQueue
 
     public function handle(UserService $user_service)
     {
+        if(!getSetting('TRAINER_BONUS_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
         if (!is_null($this->user->referralTree->parent) && !is_null($this->user->referralTree->parent->user_id)) {
             $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
             if (!is_null($parent->referralTree->parent) && !is_null($parent->referralTree->parent->user_id)) {

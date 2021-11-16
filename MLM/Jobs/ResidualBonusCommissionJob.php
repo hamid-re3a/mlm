@@ -29,6 +29,9 @@ class ResidualBonusCommissionJob implements ShouldQueue
 
     public function handle()
     {
+        if(!getSetting('RESIDUAL_BONUS_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
         if ($this->user->commissions()
             ->where('type', RESIDUAL_BONUS_COMMISSION)
             ->whereDate('created_at', now()->toDate())->exists())

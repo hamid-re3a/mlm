@@ -32,6 +32,9 @@ class DirectSellCommissionJob implements ShouldQueue
 
     public function handle(UserService $user_service)
     {
+        if(!getSetting('DIRECT_SELL_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
         if (!CommissionModel::query()->where('ordered_package_id', $this->package->id)->type($this->getType())->exists()) {
 
             $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);

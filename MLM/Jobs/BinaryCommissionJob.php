@@ -33,6 +33,9 @@ class BinaryCommissionJob implements ShouldQueue
 
     public function handle(UserService $user_service)
     {
+        if(!getSetting('BINARY_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
         if (!is_null($this->user->binaryTree->parent) && !is_null($this->user->binaryTree->parent->user_id)) {
             $parent = $user_service->findByIdOrFail($this->user->binaryTree->parent->user_id);
             if ($parent->hasCompletedBinaryLegs()) {
