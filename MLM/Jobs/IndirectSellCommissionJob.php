@@ -43,6 +43,13 @@ class IndirectSellCommissionJob implements ShouldQueue
         if (is_null($this->user->referralTree->parent) || is_null($this->user->referralTree->parent->user_id))
             return;
         $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
+
+        if (arrayHasValue(INDIRECT_SELL_COMMISSION, $parent->deactivated_commission_types)) {
+            if ($this->level == 9)
+                return;
+            IndirectSellCommissionJob::dispatch($parent, $this->package, ++$this->level);
+            return ;
+        }
         $biggest_active_package = $parent->biggestActivePackage();
         if ($biggest_active_package && $biggest_active_package->canGetCommission()) {
 

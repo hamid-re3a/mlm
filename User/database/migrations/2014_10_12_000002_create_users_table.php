@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('email',100)->nullable();
 
             $table->integer('rank')->default(0);
+            $table->text('deactivated_commission_types')->nullable();
             $table->enum('default_binary_position',[\MLM\Models\Tree::LEFT,\MLM\Models\Tree::RIGHT])->default(\MLM\Models\Tree::LEFT);
 
             $table->string('block_type')->nullable();
