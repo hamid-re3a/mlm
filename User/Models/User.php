@@ -81,6 +81,11 @@ class User extends Model
     Protected $guard_name = 'api';
 
 
+    protected $casts = [
+        'deactivated_commission_types'=> 'json'
+    ];
+
+
     public function getFullNameAttribute()
     {
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
