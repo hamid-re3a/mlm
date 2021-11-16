@@ -38,6 +38,10 @@ class TrainerBonusCommissionJob implements ShouldQueue
         }
         if (!is_null($this->user->referralTree->parent) && !is_null($this->user->referralTree->parent->user_id)) {
             $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
+
+            if (arrayHasValue(TRADING_PROFIT_COMMISSION, $parent->deactivated_commission_types)) {
+                return;
+            }
             if (!is_null($parent->referralTree->parent) && !is_null($parent->referralTree->parent->user_id)) {
                 $grand_parent = $user_service->findByIdOrFail($parent->referralTree->parent->user_id);
 

@@ -15,13 +15,13 @@ class UserController extends Controller
      * @group
      * Public User > MLM Settings
      */
-    public function addCommissionToBlacklist(AdminToggleCommissionRequest $request, UserService $userService)
+    public function toggleCommission(AdminToggleCommissionRequest $request, UserService $userService)
     {
 
         $user = User::query()->find(request('user_id'));
         try {
             $deactivated_commission_types = $user->deactivated_commission_types;
-            if (($key = array_search(request('deactivated_commission_type'), $deactivated_commission_types)) !== false) {
+            if ($key = array_search(request('deactivated_commission_type'), $deactivated_commission_types) !== false) {
                 unset($deactivated_commission_types[$key]);
             } else {
                 $deactivated_commission_types[] = request('deactivated_commission_type');

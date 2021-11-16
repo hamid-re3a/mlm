@@ -32,6 +32,10 @@ class TradingProfitCommissionJob implements ShouldQueue
         if(!getSetting('TRADING_PROFIT_COMMISSION_IS_ACTIVE')){
             return ;
         }
+
+        if (arrayHasValue(TRADING_PROFIT_COMMISSION, $this->ordered_package->user->deactivated_commission_types)) {
+            return;
+        }
         if (!$this->ordered_package->active()->exists() || $this->ordered_package->isSpecialPackage() || $this->ordered_package->isCompanyPackage() || !$this->ordered_package->canGetCommission())
             return;
 

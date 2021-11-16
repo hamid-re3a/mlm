@@ -35,11 +35,14 @@ class DirectSellCommissionJob implements ShouldQueue
         if(!getSetting('DIRECT_SELL_COMMISSION_IS_ACTIVE')){
             return ;
         }
+
         if (!CommissionModel::query()->where('ordered_package_id', $this->package->id)->type($this->getType())->exists()) {
 
             $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
 
-
+            if (arrayHasValue(DIRECT_SELL_COMMISSION, $parent->deactivated_commission_types)) {
+                return ;
+            }
             /** @var  $biggest_active_package OrderedPackage */
             $biggest_active_package = $parent->biggestActivePackage();
             if ($biggest_active_package && $biggest_active_package->canGetCommission()) {

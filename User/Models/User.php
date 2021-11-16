@@ -39,6 +39,7 @@ use User\database\factories\UserFactory;
  * @property string|null $email
  * @property string $default_binary_position
  * @property string|null $deleted_at
+ * @property array|null $deactivated_commission_types
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)

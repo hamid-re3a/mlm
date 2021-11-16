@@ -36,8 +36,14 @@ class BinaryCommissionJob implements ShouldQueue
         if(!getSetting('BINARY_COMMISSION_IS_ACTIVE')){
             return ;
         }
+
         if (!is_null($this->user->binaryTree->parent) && !is_null($this->user->binaryTree->parent->user_id)) {
             $parent = $user_service->findByIdOrFail($this->user->binaryTree->parent->user_id);
+
+            if (arrayHasValue(BINARY_COMMISSION, $parent->deactivated_commission_types)) {
+                BinaryCommissionJob::dispatch($parent, $this->package);
+                return ;
+            }
             if ($parent->hasCompletedBinaryLegs()) {
 
                 $biggest_active_package = $parent->biggestActivePackage();
