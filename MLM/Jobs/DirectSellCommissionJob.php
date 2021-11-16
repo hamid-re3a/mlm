@@ -32,6 +32,9 @@ class DirectSellCommissionJob implements ShouldQueue
 
     public function handle(UserService $user_service)
     {
+        if(!getSetting('DIRECT_SELL_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
         if (!CommissionModel::query()->where('ordered_package_id', $this->package->id)->type($this->getType())->exists()) {
 
             $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
@@ -39,7 +42,7 @@ class DirectSellCommissionJob implements ShouldQueue
 
             /** @var  $biggest_active_package OrderedPackage */
             $biggest_active_package = $parent->biggestActivePackage();
-            if ($biggest_active_package) {
+            if ($biggest_active_package && $biggest_active_package->canGetCommission()) {
                 $is_eligible_for_quick_start_bonus = false;
                 if ($parent->eligibleForQuickStartBonus()) {
                     $is_eligible_for_quick_start_bonus = true;
@@ -62,7 +65,7 @@ class DirectSellCommissionJob implements ShouldQueue
                 $deposit_service_object->setSubType('Direct Sale');
 
 
-                (new CommissionResolver)->payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);
+                (new CommissionResolver)->payCommission($deposit_service_object, $parent, $this->getType(), $biggest_active_package->id);
 
             }
         }

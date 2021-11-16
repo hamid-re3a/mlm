@@ -2,6 +2,7 @@
 
 namespace MLM\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use MLM\database\factories\OrderedPackageFactory;
@@ -68,7 +69,6 @@ class OrderedPackage extends Model
     protected $guarded = [];
 
 
-
     protected static function newFactory()
     {
         return OrderedPackageFactory::new();
@@ -79,10 +79,61 @@ class OrderedPackage extends Model
         return $query->whereDate("expires_at", ">", now()->toDate());
     }
 
+    public function canGetCommission()
+    {
+        if (in_array($this->plan, [
+            OrderPlans::ORDER_PLAN_PURCHASE, OrderPlans::ORDER_PLAN_START,
+            OrderPlans::ORDER_PLAN_COMPANY, OrderPlans::ORDER_PLAN_SPECIAL,
+        ])) {
+            return true;
+        } else if ($this->plan == OrderPlans::ORDER_PLAN_START_50) {
+            $childrenIds = $this->user->referralTree->childrenUserIds();
+            $children = ReferralTree::query()->whereIn('user_id',$childrenIds)
+                ->whereDate("created_at", ">", Carbon::make($this->created_at)->toDate())
+                ->get();
+
+            return $this->checkIfChildrenHasSamePackage($children,$this->price);
+        } else if ($this->plan == OrderPlans::ORDER_PLAN_START_75) {
+
+            $left_binary_children = $this->user->binaryTree->leftSideChildrenIds();
+            $right_binary_children = $this->user->binaryTree->rightSideChildrenIds();
+
+            $referral_children = $this->user->referralTree->childrenUserIds();
+
+            $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
+            $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
+
+            $left_children = ReferralTree::query()->whereIn('user_id',$left_binary_sponsored_children)
+                ->whereDate("created_at", ">", Carbon::make($this->created_at)->toDate())
+                ->get();
+            $right_children = ReferralTree::query()->whereIn('user_id',$right_binary_sponsored_children)
+                ->whereDate("created_at", ">", Carbon::make($this->created_at)->toDate())
+                ->get();
+
+            if($this->checkIfChildrenHasSamePackage($left_children,$this->price)
+                && $this->checkIfChildrenHasSamePackage($right_children,$this->price))
+                return true;
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private function checkIfChildrenHasSamePackage($children,$price){
+        foreach ($children as $child){
+            if($child->user->biggestActivePackage()->price == $price){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function scopeNotSpecial($query)
     {
         return $query->whereNotIn("plan", [OrderPlans::ORDER_PLAN_COMPANY, OrderPlans::ORDER_PLAN_SPECIAL]);
     }
+
     public function scopeCanGetRoi($query)
     {
         return $query->where('plan', '!=', 'Special');
