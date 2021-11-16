@@ -11,5 +11,6 @@ Route::middleware(['auth'])->name('users.')->group(function () {
 Route::middleware(['role:' . USER_ROLE_SUPER_ADMIN . '|' . USER_ROLE_ADMIN_MLM])->prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth'])->name('users.')->group(function () {
         Route::put('toggle_commission', [AdminUserController::class, 'toggleCommission'])->name('toggleCommissionToBlacklist');
+        Route::get('commission_info', [AdminUserController::class, 'userInfo'])->name('userInfo');
     });
 });
