@@ -84,7 +84,7 @@ class User extends Model
 
 
     protected $casts = [
-        'deactivated_commission_types'=> 'json'
+        'deactivated_commission_types' => 'json'
     ];
 
     public function scopeFilter($query)
@@ -94,6 +94,20 @@ class User extends Model
         }
         if (request()->has('first_name')) {
             $query->orWhere('first_name', 'LIKE', '%' . request()->get('first_name') . '%');
+        }
+
+        if (request()->has('rank')) {
+            $ids = Rank::query()->where('name', 'LIKE', '%' . request()->get('rank') . '%')->pluck('id');
+            if ($ids)
+                $query->orWhereIn('rank', $ids);
+        }
+
+        if (request()->has('ranks') AND is_array(request()->get('ranks'))) {
+            $ids = [];
+            foreach (request()->get('ranks') AS $rank)
+                array_merge($ids, Rank::query()->where('name', 'LIKE', '%' . $rank . '%')->pluck('id'));
+
+            $query->orWhereIn('rank', $ids);
         }
 
         if (request()->has('last_name')) {
@@ -144,10 +158,12 @@ class User extends Model
     {
         return $this->hasOne(Tree::class);
     }
+
     public function sponsor()
     {
-        return $this->belongsTo(User::class,'sponsor_id','id');
+        return $this->belongsTo(User::class, 'sponsor_id', 'id');
     }
+
     public function referralTree()
     {
         return $this->hasOne(ReferralTree::class);
@@ -175,7 +191,7 @@ class User extends Model
 
     public function buildBinaryTreeNode()
     {
-        if ($this->hasBinaryNode()){
+        if ($this->hasBinaryNode()) {
             return $this->binaryTree;
         }
         return $this->binaryTree()->create();
@@ -223,6 +239,7 @@ class User extends Model
     {
         return is_null($this->ordered_packages()->active()->first()) ? false : true;
     }
+
     public function hasAnyValidOrder()
     {
         return $this->ordered_packages()->whereNotNull('is_commission_resolved_at')->exists();
@@ -270,14 +287,14 @@ class User extends Model
 
     public function residualBonusSetting()
     {
-        return $this->hasMany(ResidualBonusSetting::class,'rank','rank');
+        return $this->hasMany(ResidualBonusSetting::class, 'rank', 'rank');
     }
 
     public function directSellAmount()
     {
         $referral_children = $this->referralTree->childrenUserIds();
-        if(count($referral_children) == 0)
+        if (count($referral_children) == 0)
             return 0;
-        return OrderedPackage::query()->whereIn('user_id',$referral_children)->whereIn('plan',[OrderPlans::ORDER_PLAN_PURCHASE,OrderPlans::ORDER_PLAN_START])->sum('price');
+        return OrderedPackage::query()->whereIn('user_id', $referral_children)->whereIn('plan', [OrderPlans::ORDER_PLAN_PURCHASE, OrderPlans::ORDER_PLAN_START])->sum('price');
     }
 }

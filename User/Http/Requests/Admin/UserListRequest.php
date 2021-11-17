@@ -31,7 +31,7 @@ class UserListRequest extends FormRequest
             'ranks' => 'nullable|array',
             'ranks.*' => 'nullable|string',
             'email' => 'nullable|email:rfc,dns',
-            'membership_id' => 'nullable|numeric'
+            'member_id' => 'nullable|numeric'
         ];
     }
 }
