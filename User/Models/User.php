@@ -26,6 +26,7 @@ use User\database\factories\UserFactory;
  * @property-read ReferralTree|null $referralTree
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Role[] $roles
  * @property-read int|null $roles_count
+ * @method static \Illuminate\Database\Eloquent\Builder|User filter()
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User permission($permissions)
@@ -85,6 +86,29 @@ class User extends Model
     protected $casts = [
         'deactivated_commission_types'=> 'json'
     ];
+
+    public function scopeFilter($query)
+    {
+        if (request()->has('username')) {
+            $query->orWhere('username', 'LIKE', '%' . request()->get('username') . '%');
+        }
+        if (request()->has('first_name')) {
+            $query->orWhere('first_name', 'LIKE', '%' . request()->get('first_name') . '%');
+        }
+
+        if (request()->has('last_name')) {
+            $query->orWhere('last_name', 'LIKE', '%' . request()->get('last_name') . '%');
+        }
+
+        if (request()->has('email'))
+            $query->orWhere('email', 'LIKE', '%' . request()->get('email') . '%');
+
+        if (request()->has('member_id'))
+            $query->orWhere('member_id', 'LIKE', '%' . request()->get('member_id') . '%');
+
+        return $query;
+
+    }
 
 
     public function getFullNameAttribute()

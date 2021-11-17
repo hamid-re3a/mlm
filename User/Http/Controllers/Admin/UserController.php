@@ -2,15 +2,36 @@
 
 namespace User\Http\Controllers\Admin;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use User\Http\Requests\Admin\AdminToggleCommissionRequest;
 use User\Http\Requests\Admin\AdminUserInfoRequest;
+use User\Http\Requests\Admin\UserListRequest;
+use User\Http\Resources\Auth\ProfileResource;
 use User\Models\User;
 use User\Services\UserService;
 
 class UserController extends Controller
 {
 
+    /**
+     * Get user's list
+     * @group
+     * Admin > User
+     * @param UserListRequest $request
+     * @return JsonResponse
+     */
+    public function index(UserListRequest $request)
+    {
+        $list = User::query()->filter()->paginate();
+        return api()->success(null, [
+            'list' => ProfileResource::collection($list),
+            'pagination' => [
+                'total' => $list->total(),
+                'per_page' => $list->perPage(),
+            ]
+        ]);
+    }
     /**
      * User info
      * @group
