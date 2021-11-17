@@ -4,7 +4,8 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Payments\Commands\BtcpayserverInvoiceAddToQueue;
+use MLM\Models\ReferralTree;
+use MLM\Models\Tree;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,7 +25,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-
+        $schedule->command('roi:trading')->dailyAt('00:00');
+        $schedule->command('roi:residual')->dailyAt('12:00');
+        $schedule->command('queue:retry all')->everyThreeHours();
+        $schedule->call(function(){
+            Tree::withoutEvents(function(){Tree::fixTree();});
+            ReferralTree::withoutEvents(function(){ReferralTree::fixTree();});
+        })->daily();
     }
 
     /**

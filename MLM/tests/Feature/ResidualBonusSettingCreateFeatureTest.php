@@ -117,19 +117,6 @@ class ResidualBonusSettingCreateFeatureTest extends MLMTest
         ])->assertStatus(422);
 
     }
-    /**
-    * @test
-     */
-    public function rank_should_be_integer_for_creating_residualBonusSetting()
-    {
-        $this->withHeaders($this->getHeaders());
-        $this->post(route('admin.residualBonusSetting.store'), [
-            'level' =>  mt_rand(0, 100),
-            'rank' =>  mt_rand(0, 99)/100,
-            'percentage' =>mt_rand(0, 1000)/10,
-        ])->assertStatus(422);
-
-    }
 
     /**
     * @test
