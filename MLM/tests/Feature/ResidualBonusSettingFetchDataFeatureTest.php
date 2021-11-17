@@ -31,7 +31,7 @@ class ResidualBonusSettingFetchDataFeatureTest extends MLMTest
                 "data",
             ]
         );
-      
+
 
     }
 
@@ -66,17 +66,7 @@ class ResidualBonusSettingFetchDataFeatureTest extends MLMTest
                 "data",
             ]
         );
-        $response->assertJsonFragment([
-            'id' => $residualBonusSetting->id,
-            'percentage' => "$residualBonusSetting->percentage",
-            'level' => "$residualBonusSetting->level",
-            'rank' => "$rank->rank",
-            'rank_name' => $rank->rank_name,
-            'condition_converted_in_bp' => "$rank->condition_converted_in_bp",
-            'condition_sub_rank' => "$rank->condition_sub_rank",
-            'condition_direct_or_indirect' => "$rank->condition_direct_or_indirect",
 
-        ]);
 
     }
 
