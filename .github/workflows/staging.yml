@@ -10,8 +10,7 @@ jobs:
     - uses: shivammathur/setup-php@v2
       with:
         php-version: '7.4'
-        extensions: swoole
-        extensions: grpc
+        extensions: swoole,grpc
     - name: Config composer
       run: composer config --global --auth http-basic.ride-to-the-future.repo.repman.io token 67001fefcf70038c817987b7431f2d17498dc5c2409b4748e51cad87a69b8567
     - name: Copy .env
