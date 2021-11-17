@@ -40,7 +40,15 @@ class UserController extends Controller
     public function userInfo(AdminUserInfoRequest $request, UserService $userService)
     {
 
-        $user = User::query()->find(request('user_id'));
+        /** @var  $user User */
+        if ($request->has('user_id') && request('user_id'))
+            $user = User::query()->find(request('user_id'));
+        else if ($request->has('member_id') && request('member_id'))
+            $user = User::query()->where('member_id',request('member_id'))->first();
+        else
+            return api()->validation('users.responses.user-not-found',[
+                'user_id'=>'users.responses.user-not-found'
+            ]);
         try {
             return api()->success(trans('user.responses.user-info'), $user);
         } catch (\Throwable $e) {
