@@ -39,7 +39,8 @@ class UserController extends Controller
         $user = User::query()->find(request('user_id'));
         try {
             $deactivated_commission_types = $user->deactivated_commission_types;
-            if ($key = array_search(request('deactivated_commission_type'), $deactivated_commission_types) !== false) {
+
+            if (is_array($deactivated_commission_types) && $key = array_search(request('deactivated_commission_type'), $deactivated_commission_types) !== false) {
                 unset($deactivated_commission_types[$key]);
             } else {
                 $deactivated_commission_types[] = request('deactivated_commission_type');
