@@ -15,8 +15,8 @@ class AdminUserInfoRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id'=>'required|exists:users,id',
-
+            'user_id' => 'sometimes|exists:users',
+            'member_id' => 'sometimes|exists:users,member_id',
         ];
     }
 }
