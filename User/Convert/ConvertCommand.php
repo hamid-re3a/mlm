@@ -54,36 +54,18 @@ class ConvertCommand extends Command
         chunk(50, function ($users) use ($bar) {
 
             foreach ($users as $item) {
-                $current_user = User::query()->find($item->id);
-                if (!$current_user)
-                    $current_user = User::factory()->create(['id' => $item->id]);
-                if (!is_null($item->detail)
-                    && !is_null($item->detail->user_detail_email)
-                    && !empty($item->detail->user_detail_email) &&
-                    filter_var($item->detail->user_detail_email, FILTER_VALIDATE_EMAIL)
-                ) {
-                    if (User::query()->where('email', $item->detail->user_detail_email)->exists())
-                        $email = $item->user_name . '@dreamcometrue.ai';
-                    else
-                        $email = $item->detail->user_detail_email;
-                } else {
-                    $email = $item->user_name . '@dreamcometrue.ai';
-                }
+                $current_user = User::factory()->create(['id' => $item->id]);
 
-                $current_user->update([
-                    'email' => $email,
-                    'first_name' => (!is_null($item->detail) && !is_null($item->detail->user_detail_name)) ? $item->detail->user_detail_name : "Unknown",
-                    'last_name' => (!is_null($item->detail) && !is_null($item->detail->user_detail_second_name)) ? $item->detail->user_detail_second_name : "Unknown",
-                    'gender' => (!is_null($item->detail) && !is_null($item->detail->user_detail_gender)) ? ($item->detail->user_detail_gender == "F") ? "Female" : "Male" : "Male",
-                    'sponsor_id' => $item->sponsor_id,
-                    'username' => $item->user_name,
-                ]);
                 $current_user->rank = $this->rankConvert($item->user_rank_id);
                 $current_user->saveQuietly();
                 $current_user->assignRole(USER_ROLE_CLIENT);
 
                 if ($item->sponsor_id) {
                     $sponsor = User::query()->firstOrCreate(['id' => $item->sponsor_id]);
+                    $sponsor_tree = $sponsor->buildReferralTreeNode();
+                    $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
+                } else if ($item->father_id) {
+                    $sponsor = User::query()->firstOrCreate(['id' => $item->father_id]);
                     $sponsor_tree = $sponsor->buildReferralTreeNode();
                     $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
                 }

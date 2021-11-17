@@ -12,11 +12,11 @@ $order->setIsPaidAt(now()->toString());
 //$order->setPlan(OrderPlans::ORDER_PLAN_START);
 $order->setPlan(OrderPlans::ORDER_PLAN_PURCHASE);
 $order->setPackageId((int)1);
-$client = new \MLM\Services\Grpc\MLMServiceClient('staging.janex.org:9598', [
+$client = new \MLM\Services\Grpc\MLMServiceClient('development.dreamcometrue.ai:9598', [
 //$client = new \MLM\Services\Grpc\MLMServiceClient('127.0.0.1:9598', [
     'credentials' => \Grpc\ChannelCredentials::createInsecure()
 ]);
-list($reply, $status) = $client->submitOrder($order)->wait();
+list($reply, $status) = $client->simulateOrder($order)->wait();
 var_dump($status);
 var_dump($reply->getStatus());
 var_dump($reply->getMessage());
