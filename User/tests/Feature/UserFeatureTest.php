@@ -15,6 +15,21 @@ class UserFeatureTest extends UserTest
     /**
      * @test
      */
+    public function admin_can_edit_commission_of_user()
+    {
+        $user = User::factory()->create();
+        $this->withHeaders($this->getHeaders(1));
+        $this->put(route('admin.users.toggleCommissionToBlacklist'), [
+            'user_id' => $user->id,
+            'deactivated_commission_type'=> TRAINER_BONUS_COMMISSION
+        ])->assertOk();
+        $user->refresh();
+        $this->assertEquals($user->deactivated_commission_types,[TRAINER_BONUS_COMMISSION]);
+
+    }
+    /**
+     * @test
+     */
     public function user_can_edit_binary_position()
     {
         $user = User::factory()->create([
