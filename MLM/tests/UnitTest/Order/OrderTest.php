@@ -9,7 +9,7 @@ use MLM\Models\PackageRoi;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use MLM\Services\OrderResolver;
-use Wallets\Services\WalletClientFacade;
+use Wallets\Services\Grpc\WalletClientFacade;
 use MLM\tests\MLMTest;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;

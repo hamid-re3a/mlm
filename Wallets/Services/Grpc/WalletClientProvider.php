@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Wallets\Services;
+namespace Wallets\Services\Grpc;
 
 
 use Wallets\Services\Grpc\Deposit;

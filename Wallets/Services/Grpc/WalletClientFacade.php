@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Wallets\Services;
+namespace Wallets\Services\Grpc;
 
 
 use Illuminate\Support\Facades\Facade;
