@@ -1,5 +1,7 @@
 <?php
 
+
+
 return [
 
     /*
@@ -179,6 +181,7 @@ return [
         \ResponseTransformer\ResponseTransformerServiceProvider::class,
         \User\UserServiceProvider::class,
         \MLM\MLMServiceProvider::class,
+        \Packages\PackageServiceProvider::class,
         /*
          * Package Service Providers...
          */

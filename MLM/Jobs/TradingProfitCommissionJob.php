@@ -23,12 +23,20 @@ class TradingProfitCommissionJob implements ShouldQueue
 
     public function __construct(OrderedPackage $ordered_package)
     {
+        $this->queue = env('QUEUE_ROI_NAME','mlm_roi');
         $this->ordered_package = $ordered_package;
     }
 
     public function handle(PackageService $package_service)
     {
-        if (!$this->ordered_package->active()->exists() || $this->ordered_package->isSpecialPackage() || $this->ordered_package->isCompanyPackage())
+        if(!getSetting('TRADING_PROFIT_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
+
+        if (arrayHasValue(TRADING_PROFIT_COMMISSION, $this->ordered_package->user->deactivated_commission_types)) {
+            return;
+        }
+        if (!$this->ordered_package->active()->exists() || $this->ordered_package->isSpecialPackage() || $this->ordered_package->isCompanyPackage() || !$this->ordered_package->canGetCommission())
             return;
 
         if (!$this->ordered_package->commissions()
@@ -49,7 +57,7 @@ class TradingProfitCommissionJob implements ShouldQueue
                 $deposit_service_object = app(Deposit::class);
                 $deposit_service_object->setUserId($this->ordered_package->user->id);
                 $deposit_service_object->setAmount($commission_amount);
-                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::JANEX);
 
                 $deposit_service_object->setDescription(serialize([
                     'description' => 'Commission # ' . TRADING_PROFIT_COMMISSION

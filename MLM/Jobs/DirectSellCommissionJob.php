@@ -25,20 +25,27 @@ class DirectSellCommissionJob implements ShouldQueue
 
     public function __construct(User $user, OrderedPackage $package)
     {
+        $this->queue = env('QUEUE_COMMISSIONS_NAME','mlm_commissions');
         $this->package = $package;
         $this->user = $user;
     }
 
     public function handle(UserService $user_service)
     {
+        if(!getSetting('DIRECT_SELL_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
+
         if (!CommissionModel::query()->where('ordered_package_id', $this->package->id)->type($this->getType())->exists()) {
 
             $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
 
-
+            if (arrayHasValue(DIRECT_SELL_COMMISSION, $parent->deactivated_commission_types)) {
+                return ;
+            }
             /** @var  $biggest_active_package OrderedPackage */
             $biggest_active_package = $parent->biggestActivePackage();
-            if ($biggest_active_package) {
+            if ($biggest_active_package && $biggest_active_package->canGetCommission()) {
                 $is_eligible_for_quick_start_bonus = false;
                 if ($parent->eligibleForQuickStartBonus()) {
                     $is_eligible_for_quick_start_bonus = true;
@@ -58,10 +65,10 @@ class DirectSellCommissionJob implements ShouldQueue
                     'description' => 'Commission # ' . $this->getType() . $is_eligible_for_quick_start_bonus ? ' - Quick Start bonus ' : ''
                 ]));
                 $deposit_service_object->setType('Commission');
-                $deposit_service_object->setSubType('Direct Sell');
+                $deposit_service_object->setSubType('Direct Sale');
 
 
-                (new CommissionResolver)->payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);
+                (new CommissionResolver)->payCommission($deposit_service_object, $parent, $this->getType(), $biggest_active_package->id);
 
             }
         }

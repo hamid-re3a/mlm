@@ -2,6 +2,7 @@
 
 return [
     'responses' => [
+        'something-went-wrong' => 'Oops, Something went wrong, Try again please.',
         'settings' => [
             'key-doesnt-exists' => ':key setting is not valid.',
         ],

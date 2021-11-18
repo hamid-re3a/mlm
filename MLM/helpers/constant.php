@@ -8,9 +8,17 @@ const TRAINER_BONUS_COMMISSION = 'trainer-bonus-commission';
 const INDIRECT_SELL_COMMISSION = 'indirect-sell-commission';
 const RESIDUAL_BONUS_COMMISSION = 'residual-bonus-commission';
 
+const TRADING_PROFIT_COMMISSION_IS_ACTIVE = true;
+const DIRECT_SELL_COMMISSION_IS_ACTIVE = true;
+const BINARY_COMMISSION_IS_ACTIVE = true;
+const TRAINER_BONUS_COMMISSION_IS_ACTIVE = true;
+const INDIRECT_SELL_COMMISSION_IS_ACTIVE = true;
+const RESIDUAL_BONUS_COMMISSION_IS_ACTIVE = true;
+
 const COMMISSIONS = [
     TRADING_PROFIT_COMMISSION,
     DIRECT_SELL_COMMISSION,
+    BINARY_COMMISSION,
     TRAINER_BONUS_COMMISSION,
     INDIRECT_SELL_COMMISSION,
     RESIDUAL_BONUS_COMMISSION,
@@ -350,45 +358,46 @@ CONST MLM_SETTINGS = [
         'title' => 'MLM is Under construction',
         'description' => 'If this setting is true, Then MLM is not working.'
     ],
-];
-
-const APP_NAME = 'Ride To Future';
-const OTP_LENGTH = 6;
-const OTP_CONTAIN_ALPHABET = false;
-const OTP_CONTAIN_ALPHABET_LOWER_CASE = true;
-const SETTINGS = [
-    'APP_NAME' => [
-        'value' => APP_NAME,
-        'description' => 'Website name',
-        'category' => 'General',
+    'TRADING_PROFIT_COMMISSION_IS_ACTIVE' => [
+        'value' => TRADING_PROFIT_COMMISSION_IS_ACTIVE,
+        'title' => 'TRADING_PROFIT_COMMISSION',
+        'description' => 'TRADING_PROFIT_COMMISSION is enabled or not.'
+    ],
+    'DIRECT_SELL_COMMISSION_IS_ACTIVE' => [
+        'value' => DIRECT_SELL_COMMISSION_IS_ACTIVE,
+        'title' => 'DIRECT_SELL_COMMISSION',
+        'description' => 'DIRECT_SELL_COMMISSION is enabled or not.'
+    ],
+    'BINARY_COMMISSION_IS_ACTIVE' => [
+        'value' => BINARY_COMMISSION_IS_ACTIVE,
+        'title' => 'BINARY_COMMISSION',
+        'description' => 'BINARY_COMMISSION is enabled or not.'
+    ],
+    'TRAINER_BONUS_COMMISSION_IS_ACTIVE' => [
+        'value' => TRAINER_BONUS_COMMISSION_IS_ACTIVE,
+        'title' => 'TRAINER_BONUS_COMMISSION',
+        'description' => 'TRAINER_BONUS_COMMISSION is enabled or not.'
+    ],
+    'INDIRECT_SELL_COMMISSION_IS_ACTIVE' => [
+        'value' => INDIRECT_SELL_COMMISSION_IS_ACTIVE,
+        'title' => 'INDIRECT_SELL_COMMISSION',
+        'description' => 'INDIRECT_SELL_COMMISSION is enabled or not.'
+    ],
+    'RESIDUAL_BONUS_COMMISSION_IS_ACTIVE' => [
+        'value' => RESIDUAL_BONUS_COMMISSION_IS_ACTIVE,
+        'title' => 'RESIDUAL_BONUS_COMMISSION',
+        'description' => 'RESIDUAL_BONUS_COMMISSION is enabled or not.'
     ],
 
 ];
-const LOGIN_ATTEMPT_SETTINGS = [
-    [
-        'priority' => 0,
-        'times' => 3,
-        'duration' => 90,
-        'blocking_duration' => 5 * 60,
-    ], [
-        'priority' => 0,
-        'times' => 2,
-        'duration' => 90,
-        'blocking_duration' => 10 * 60,
-    ], [
-        'priority' => 0,
-        'times' => 6,
-        'duration' => 90,
-        'blocking_duration' => 20 * 60,
-    ],
-];
+
 const EMAIL_CONTENT_SETTINGS = [
-    'USER_RANK_HAS_BEEN_CHANGED'=>[
+    'USER_RANK_HAS_BEEN_CHANGED' => [
         'is_active' => true,
-        'subject'=>'Your rank has been changed',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+        'subject' => 'Your rank has been changed',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
                 <div>Your rank has been changed to {{rank}} .<span></span></div>
@@ -397,16 +406,16 @@ const EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,rank',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,rank',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
-    'USER_GOT_COMMISSION'=>[
+    'USER_GOT_COMMISSION' => [
         'is_active' => true,
-        'subject'=>'You have received commissions',
-        'from'=>'it@ridetothefuture.com',
-        'from_name'=>'Janex Support Team',
-        'body'=><<<EOT
+        'subject' => 'You have received commissions',
+        'from' => 'it@ridetothefuture.com',
+        'from_name' => 'Janex Support Team',
+        'body' => <<<EOT
                 <div>
                 <p>Hello {{full_name}},</p>
                 <div>You have received {{amount}}PF for {{commission_type}} .<span></span></div>
@@ -415,9 +424,9 @@ const EMAIL_CONTENT_SETTINGS = [
                 <p>Janex Support Team</p>
                 </div>
             EOT,
-        'variables'=>'full_name,amount,commission_type',
-        'variables_description'=>'full_name user full name',
-        'type'=>'email',
+        'variables' => 'full_name,amount,commission_type',
+        'variables_description' => 'full_name user full name',
+        'type' => 'email',
     ],
 ];
 

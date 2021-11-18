@@ -1,4 +1,5 @@
 User Feature (User\tests\Feature\UserFeature)
+ [x] Admin can edit commission of user
  [x] User can edit binary position
  [x] Default binary position is required for editing binary position
  [x] Default binary position is correct enum value for editing binary position
@@ -14,8 +15,10 @@ Order (MLM\tests\UnitTest\Order\Order)
  [x] User activate binary after adding new member to each side of binary tree
  [x] Trainer bonus to our very diligent user because of his team
  [x] Binary commission to first user
+ [x] Binary commission to first user prohibited
  [x] Binary commission cap
  [x] Trading profit commission
+ [x] Trading profit commission not should pay to user prohibited
  [x] No trading profit commission
  [x] Residual bonus commission
  [x] Direct sell to father package
@@ -30,6 +33,9 @@ Binary Tree (MLM\tests\UnitTest\Tree\BinaryTree)
  [x] Tree can count left and right side children count
  [x] Find sub set of nodes
  [x] It belongs to user
+
+Dashboard (MLM\tests\Feature\Tree\Dashboard)
+ [x] Binary chart
 
 Package Roi Create Feature (MLM\tests\Feature\PackageRoiCreateFeature)
  [x] User can create packageRoi
@@ -69,7 +75,6 @@ Residual Bonus Setting Create Feature (MLM\tests\Feature\ResidualBonusSettingCre
  [x] Percentage is required for creating residualBonusSetting
  [x] Rank and level should be unique for creating residualBonusSetting
  [x] Percentage should be numeric for creating residualBonusSetting
- [x] Rank should be integer for creating residualBonusSetting
  [x] Level should be integer for creating residualBonusSetting
 
 Residual Bonus Setting Delete Feature (MLM\tests\Feature\ResidualBonusSettingDeleteFeature)
@@ -97,4 +102,5 @@ Residual Bonus Setting Update Feature (MLM\tests\Feature\ResidualBonusSettingUpd
 
 Tree Feature (MLM\tests\Feature\Tree\TreeFeature)
  [x] Tree display multi level
+ [x] Tree display multi level with id
 

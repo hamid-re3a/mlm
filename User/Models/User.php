@@ -26,6 +26,7 @@ use User\database\factories\UserFactory;
  * @property-read ReferralTree|null $referralTree
  * @property-read \Illuminate\Database\Eloquent\Collection|\Spatie\Permission\Models\Role[] $roles
  * @property-read int|null $roles_count
+ * @method static \Illuminate\Database\Eloquent\Builder|User filter()
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User permission($permissions)
@@ -39,6 +40,7 @@ use User\database\factories\UserFactory;
  * @property string|null $email
  * @property string $default_binary_position
  * @property string|null $deleted_at
+ * @property array|null $deactivated_commission_types
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
@@ -81,6 +83,48 @@ class User extends Model
     Protected $guard_name = 'api';
 
 
+    protected $casts = [
+        'deactivated_commission_types' => 'json'
+    ];
+
+    public function scopeFilter($query)
+    {
+        if (request()->has('username')) {
+            $query->orWhere('username', 'LIKE', '%' . request()->get('username') . '%');
+        }
+        if (request()->has('first_name')) {
+            $query->orWhere('first_name', 'LIKE', '%' . request()->get('first_name') . '%');
+        }
+
+        if (request()->has('rank')) {
+            $ids = Rank::query()->where('name', 'LIKE', '%' . request()->get('rank') . '%')->pluck('id');
+            if ($ids)
+                $query->orWhereIn('rank', $ids);
+        }
+
+        if (request()->has('ranks') AND is_array(request()->get('ranks'))) {
+            $ids = [];
+            foreach (request()->get('ranks') AS $rank)
+                array_merge($ids, Rank::query()->where('name', 'LIKE', '%' . $rank . '%')->pluck('id'));
+
+            $query->orWhereIn('rank', $ids);
+        }
+
+        if (request()->has('last_name')) {
+            $query->orWhere('last_name', 'LIKE', '%' . request()->get('last_name') . '%');
+        }
+
+        if (request()->has('email'))
+            $query->orWhere('email', 'LIKE', '%' . request()->get('email') . '%');
+
+        if (request()->has('member_id'))
+            $query->orWhere('member_id', 'LIKE', '%' . request()->get('member_id') . '%');
+
+        return $query;
+
+    }
+
+
     public function getFullNameAttribute()
     {
         return ucwords(strtolower($this->first_name . ' ' . $this->last_name));
@@ -114,10 +158,12 @@ class User extends Model
     {
         return $this->hasOne(Tree::class);
     }
+
     public function sponsor()
     {
-        return $this->belongsTo(User::class,'sponsor_id','id');
+        return $this->belongsTo(User::class, 'sponsor_id', 'id');
     }
+
     public function referralTree()
     {
         return $this->hasOne(ReferralTree::class);
@@ -145,8 +191,9 @@ class User extends Model
 
     public function buildBinaryTreeNode()
     {
-        if ($this->hasBinaryNode())
+        if ($this->hasBinaryNode()) {
             return $this->binaryTree;
+        }
         return $this->binaryTree()->create();
     }
 
@@ -167,6 +214,7 @@ class User extends Model
         $user->setBlockType((string)$this->attributes['block_type']);
         $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
         $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
+        $user->setGender((boolean)$this->attributes['gender']);
 
         if ($this->getRoleNames()->count()) {
             $role_name = implode(",", $this->getRoleNames()->toArray());
@@ -182,10 +230,16 @@ class User extends Model
         return $this->ordered_packages()->active()->biggest()->first();
     }
 
+    public function biggestOrderedPackage(): ?OrderedPackage
+    {
+        return $this->ordered_packages()->biggest()->first();
+    }
+
     public function hasActivePackage()
     {
         return is_null($this->ordered_packages()->active()->first()) ? false : true;
     }
+
     public function hasAnyValidOrder()
     {
         return $this->ordered_packages()->whereNotNull('is_commission_resolved_at')->exists();
@@ -233,14 +287,14 @@ class User extends Model
 
     public function residualBonusSetting()
     {
-        return $this->hasMany(ResidualBonusSetting::class,'rank','rank');
+        return $this->hasMany(ResidualBonusSetting::class, 'rank', 'rank');
     }
 
     public function directSellAmount()
     {
         $referral_children = $this->referralTree->childrenUserIds();
-        if(count($referral_children) == 0)
+        if (count($referral_children) == 0)
             return 0;
-        return OrderedPackage::query()->whereIn('user_id',$referral_children)->whereIn('plan',[OrderPlans::ORDER_PLAN_PURCHASE,OrderPlans::ORDER_PLAN_START])->sum('price');
+        return OrderedPackage::query()->whereIn('user_id', $referral_children)->whereIn('plan', [OrderPlans::ORDER_PLAN_PURCHASE, OrderPlans::ORDER_PLAN_START])->sum('price');
     }
 }

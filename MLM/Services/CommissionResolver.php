@@ -6,7 +6,7 @@ namespace MLM\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use MLM\Jobs\Emails\UrgentEmailJob;
+use MLM\Jobs\Emails\EmailJob;
 use MLM\Mail\UserCommissionEmail;
 use MLM\Models\Commission;
 use MLM\Services\Wallet\WalletClientFacade;
@@ -55,7 +55,7 @@ class CommissionResolver
     {
         try {
             $type = $deposit_service_object->getType() . ' ' . $deposit_service_object->getSubType();
-            UrgentEmailJob::dispatch(new UserCommissionEmail($user, $commission, $type),$user->email);
+            EmailJob::dispatch(new UserCommissionEmail($user, $commission, $type),$user->email);
         } catch (\Throwable $exception) {
             Log::info('Commission email is not sent because => ' . $exception->getMessage());
         }

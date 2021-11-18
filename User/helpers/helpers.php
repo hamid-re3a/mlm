@@ -4,7 +4,6 @@
  * user_roles
  */
 
-use Illuminate\Http\Request;
 use User\Services\UserService;
 const USER_ROLE_SUPER_ADMIN = 'super-admin';
 const USER_ROLE_ADMIN_GATEWAY = 'user-gateway-admin';
@@ -32,13 +31,49 @@ const USER_ROLES = [
 ];
 
 
+if (!function_exists('updateUserFromGrpcServerByMemberId')) {
+
+    function updateUserFromGrpcServerByMemberId($input_id): ?\User\Services\Grpc\User
+    {
+        if (!is_numeric($input_id))
+            return null;
+        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL', 'staging-api-gateway.janex.org:9595'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+        $id = new \User\Services\Grpc\Id();
+        $id->setId((int)$input_id);
+        try {
+            /** @var $user \User\Services\Grpc\User */
+            list($user, $status) = $client->getUserByMemberId($id)->wait();
+            if ($status->code == 0 && $user->getId()) {
+                \Illuminate\Support\Facades\Log::info('User Updated by GRPC/MemberID => ' . $user->getId());
+                app(UserService::class)->userUpdate($user);
+                return $user;
+            }
+            return null;
+        } catch (\Exception $exception) {
+            return null;
+        }
+    }
+}
+if (!function_exists('arrayHasValue')) {
+    function arrayHasValue($value, $array)
+    {
+        if (!is_array($array) )
+            return false;
+        if ($key = array_search($value, $array) !== false){
+            return true;
+        }
+        return false;
+    }
+}
 if (!function_exists('updateUserFromGrpcServer')) {
 
     function updateUserFromGrpcServer($input_id): ?\User\Services\Grpc\User
     {
         if (!is_numeric($input_id))
             return null;
-        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL','staging-api-gateway.janex.org:9595'), [
+        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL', 'staging-api-gateway.janex.org:9595'), [
             'credentials' => \Grpc\ChannelCredentials::createInsecure()
         ]);
         $id = new \User\Services\Grpc\Id();
