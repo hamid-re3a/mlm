@@ -21,7 +21,7 @@ class UserFeatureTest extends UserTest
         $this->withHeaders($this->getHeaders(1));
         $res = $this->put(route('admin.users.toggleCommissionToBlacklist'), [
             'user_id' => $user->id,
-            'deactivated_commission_type'=> TRAINER_BONUS_COMMISSION
+            'deactivated_commission_type'=> [TRAINER_BONUS_COMMISSION]
         ]);
         $res->assertOk();
         $user->refresh();
