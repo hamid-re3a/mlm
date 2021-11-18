@@ -32,6 +32,7 @@ class UserController extends Controller
             ]
         ]);
     }
+
     /**
      * User info
      * @group
@@ -44,10 +45,10 @@ class UserController extends Controller
         if ($request->has('user_id') && request('user_id'))
             $user = User::query()->find(request('user_id'));
         else if ($request->has('member_id') && request('member_id'))
-            $user = User::query()->where('member_id',request('member_id'))->first();
+            $user = User::query()->where('member_id', request('member_id'))->first();
         else
-            return api()->validation('users.responses.user-not-found',[
-                'user_id'=>'users.responses.user-not-found'
+            return api()->validation('users.responses.user-not-found', [
+                'user_id' => 'users.responses.user-not-found'
             ]);
         try {
             return api()->success(trans('user.responses.user-info'), $user);
@@ -65,17 +66,18 @@ class UserController extends Controller
     public function toggleCommission(AdminToggleCommissionRequest $request, UserService $userService)
     {
 
-        $user = User::query()->find(request('user_id'));
+        /** @var  $user User */
+        if ($request->has('user_id') && request('user_id'))
+            $user = User::query()->find(request('user_id'));
+        else if ($request->has('member_id') && request('member_id'))
+            $user = User::query()->where('member_id', request('member_id'))->first();
+        else
+            return api()->validation('users.responses.user-not-found', [
+                'user_id' => 'users.responses.user-not-found'
+            ]);
         try {
-            $deactivated_commission_types = $user->deactivated_commission_types;
 
-            if (is_array($deactivated_commission_types) && $key = array_search(request('deactivated_commission_type'), $deactivated_commission_types) !== false) {
-                unset($deactivated_commission_types[$key]);
-            } else {
-                $deactivated_commission_types[] = request('deactivated_commission_type');
-                $user->deactivated_commission_types = $deactivated_commission_types;
-            }
-
+            $user->deactivated_commission_types = request('deactivated_commission_type');
             $user->save();
 
             return api()->success(trans('user.responses.user-updated-successfully'), $user);

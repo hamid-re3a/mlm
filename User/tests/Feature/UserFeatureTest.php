@@ -19,10 +19,11 @@ class UserFeatureTest extends UserTest
     {
         $user = User::factory()->create();
         $this->withHeaders($this->getHeaders(1));
-        $this->put(route('admin.users.toggleCommissionToBlacklist'), [
+        $res = $this->put(route('admin.users.toggleCommissionToBlacklist'), [
             'user_id' => $user->id,
-            'deactivated_commission_type'=> TRAINER_BONUS_COMMISSION
-        ])->assertOk();
+            'deactivated_commission_type'=> [TRAINER_BONUS_COMMISSION]
+        ]);
+        $res->assertOk();
         $user->refresh();
         $this->assertEquals($user->deactivated_commission_types,[TRAINER_BONUS_COMMISSION]);
 
