@@ -1,14 +1,7 @@
 <?php
 
 
-namespace User\Services;
-
-use User\Services\Grpc\Acknowledge;
-use User\Services\Grpc\Id;
-use User\Services\Grpc\User;
-use User\Services\Grpc\UserTransactionPassword;
-use User\Services\Grpc\WalletInfo;
-use User\Services\Grpc\WalletRequest;
+namespace User\Services\Grpc;
 
 class GatewayGrpcClientProvider
 {

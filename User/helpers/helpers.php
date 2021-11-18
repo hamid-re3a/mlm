@@ -42,6 +42,33 @@ if (!function_exists('arrayHasValue')) {
     }
 }
 
+if (!function_exists('getPackageGrpcClient')) {
+    function getPackageGrpcClient()
+    {
+        return new \Packages\Services\Grpc\PackagesServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+if (!function_exists('getGatewayGrpcClient')) {
+    function getGatewayGrpcClient()
+    {
+        return new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL', 'development.dreamcometrue.ai:9595'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+if (!function_exists('getWalletGrpcClient')) {
+    function getWalletGrpcClient()
+    {
+        return new \Wallets\Services\Grpc\WalletServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
 if (!function_exists('updateUserFromGrpcServer')) {
 
     function updateUserFromGrpcServer($input_id): ?\User\Services\Grpc\User
@@ -51,7 +78,7 @@ if (!function_exists('updateUserFromGrpcServer')) {
         $id = new \User\Services\Grpc\Id();
         $id->setId((int)$input_id);
         try {
-            $grpc_user = \User\Services\GatewayClientFacade::getUserById($id);
+            $grpc_user = \User\Services\Grpc\GatewayClientFacade::getUserById($id);
             if(!$grpc_user->getId())
                 return null;
             app(UserService::class)->userUpdate($grpc_user);
@@ -71,7 +98,7 @@ if (!function_exists('updateUserFromGrpcServerByMemberId')) {
         $id = new \User\Services\Grpc\Id();
         $id->setId((int)$input_id);
         try {
-            $grpc_user = \User\Services\GatewayClientFacade::getUserById($id);
+            $grpc_user = \User\Services\Grpc\GatewayClientFacade::getUserById($id);
             if(!$grpc_user->getId())
                 return null;
             app(UserService::class)->userUpdate($grpc_user);

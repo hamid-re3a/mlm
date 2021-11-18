@@ -16,6 +16,7 @@ use Orders\Services\Grpc\OrderPlans;
 use Packages\Services\Grpc\Acknowledge;
 use Packages\Services\Grpc\Package;
 use Packages\Services\Grpc\PackageCheck;
+use Packages\Services\Grpc\PackageClientFacade;
 use User\Models\User;
 use User\Services\UserService;
 
@@ -210,11 +211,7 @@ class OrderResolver
                 $packages->setPackageIndexId($this->user->biggestOrderedPackage()->package_id);
                 $packages->setPackageToBuyId($ordered_package->package_id);
                 /** @var $ack Acknowledge */
-                list($ack, $status) = getPackageGrpcClient()->packageIsInBiggestPackageCategory($packages)->wait();
-                if ($status->code != 0){
-                    Log::error($status->metadata);
-                    throw new \Exception('Not a valid package in packages');
-                }
+                $ack = PackageClientFacade::packageIsInBiggestPackageCategory($packages);
                 if(!$ack->getStatus())
                     return [false, trans('order.responses.selected-package-should-be-greater-or-equal-to-previous-package')];
 
