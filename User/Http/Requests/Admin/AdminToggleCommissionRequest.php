@@ -15,7 +15,8 @@ class AdminToggleCommissionRequest extends FormRequest
     public function rules()
     {
         return [
-            'deactivated_commission_type' => 'required|in:'.implode(',',COMMISSIONS),
+            'deactivated_commission_type' => 'required|array',
+            'deactivated_commission_type.*' => 'required|in:'.implode(',',COMMISSIONS),
             'user_id' => 'sometimes|exists:users,id',
             'member_id' => 'sometimes|exists:users,member_id',
         ];
