@@ -54,7 +54,9 @@ class ConvertCommand extends Command
         chunk(50, function ($users) use ($bar) {
 
             foreach ($users as $item) {
-                $current_user = User::factory()->create(['id' => $item->id]);
+                $current_user = User::query()->find( $item->id);
+                if (!$current_user)
+                    $current_user = User::factory()->create(['id' => $item->id]);
 
                 $current_user->rank = $this->rankConvert($item->user_rank_id);
                 $current_user->saveQuietly();
