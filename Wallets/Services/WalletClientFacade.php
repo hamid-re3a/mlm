@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MLM\Services\Wallet;
+namespace Wallets\Services;
 
 
 use Illuminate\Support\Facades\Facade;

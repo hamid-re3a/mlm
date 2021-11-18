@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Wallets\Services\WalletClientFacade;
+use Wallets\Services\WalletClientProvider;
 use User\Convert\ConvertCommand;
 use User\Models\User;
 use User\Observers\UserObserver;
@@ -125,6 +127,8 @@ class UserServiceProvider extends ServiceProvider
     private function registerFacades()
     {
         GatewayClientFacade::shouldProxyTo(GatewayGrpcClientProvider::class);
+        WalletClientFacade::shouldProxyTo(WalletClientProvider::class);
+
     }
 
     /**

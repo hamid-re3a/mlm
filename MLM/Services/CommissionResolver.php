@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use MLM\Jobs\Emails\EmailJob;
 use MLM\Mail\UserCommissionEmail;
 use MLM\Models\Commission;
-use MLM\Services\Wallet\WalletClientFacade;
+use Wallets\Services\WalletClientFacade;
 use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
 
