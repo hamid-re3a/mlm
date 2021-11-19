@@ -35,23 +35,6 @@ if (!function_exists('getRank')) {
     }
 }
 
-if (!function_exists('getPackageGrpcClient')) {
-    function getPackageGrpcClient()
-    {
-        return new \Packages\Services\Grpc\PackagesServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-if (!function_exists('getWalletGrpcClient')) {
-    function getWalletGrpcClient()
-    {
-        return new \Wallets\Services\Grpc\WalletServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-
 
 if (!function_exists('userRankBasedOnConvertedPoint')) {
     function userRankBasedOnConvertedPoint($converted_point): \MLM\Models\Rank

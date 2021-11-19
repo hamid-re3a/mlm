@@ -5,13 +5,17 @@ namespace User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Packages\Services\Grpc\PackageClientFacade;
+use Packages\Services\Grpc\PackageGrpcClientProvider;
+use Wallets\Services\Grpc\WalletClientFacade;
+use Wallets\Services\Grpc\WalletClientProvider;
 use User\Convert\ConvertCommand;
 use User\Models\User;
 use User\Observers\UserObserver;
-use User\Services\Grpc\UserUpdate;
+use User\Services\Grpc\GatewayClientFacade;
+use User\Services\Grpc\GatewayGrpcClientProvider;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -27,6 +31,8 @@ class UserServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerFacades();
+
         if (!$this->app->runningInConsole()) {
             return;
         }
@@ -118,6 +124,13 @@ class UserServiceProvider extends ServiceProvider
         }
 
         User::observe(UserObserver::class);
+    }
+
+    private function registerFacades()
+    {
+        GatewayClientFacade::shouldProxyTo(GatewayGrpcClientProvider::class);
+        WalletClientFacade::shouldProxyTo(WalletClientProvider::class);
+        PackageClientFacade::shouldProxyTo(PackageGrpcClientProvider::class);
     }
 
     /**
