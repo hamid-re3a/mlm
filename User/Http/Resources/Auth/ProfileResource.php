@@ -26,7 +26,7 @@ class ProfileResource extends JsonResource
             'roles' => $this->roles,
             'username' => $this->username,
 
-            'user_rank' => $this->user->rank,
+            'user_rank' => $this->rank,
             'rank' => $this->rank_model,
             'sponsor_user' => $this->sponsor,
             'highest_package_detail' => $this->biggestActivePackage(),
