@@ -10,8 +10,6 @@ use MLM\Models\Setting;
 use MLM\Models\Tree;
 use MLM\Observers\SettingObserver;
 use MLM\Observers\TreeObserver;
-use MLM\Services\Wallet\WalletClientFacade;
-use MLM\Services\Wallet\WalletClientProvider;
 
 class MLMServiceProvider extends ServiceProvider
 {
@@ -27,7 +25,6 @@ class MLMServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        WalletClientFacade::shouldProxyTo(WalletClientProvider::class);
 
         if (!$this->app->runningInConsole()) {
             return;
