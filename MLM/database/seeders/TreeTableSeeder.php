@@ -34,12 +34,12 @@ class TreeTableSeeder extends Seeder
     public function buildBinaryTree($data = null)
     {
         if (is_null($data))
-            if (!in_array(app()->environment(), ['production', 'staging'])) {
+            if (!in_array(app()->environment(), ['production'])) {
 
                 $data = [
                     ['id' => 1, 'user_id' => 1, 'position' => null, 'parent_id' => null],
                     ['id' => 2, 'user_id' => 2, 'position' => 'left', 'parent_id' => 1],
-                    ['id' => 3, 'user_id' => 3, 'position' => 'right', 'parent_id' => 1],
+//                    ['id' => 3, 'user_id' => 3, 'position' => 'right', 'parent_id' => 1],
                     ['id' => 4, 'user_id' => 4, 'position' => 'right', 'parent_id' => 2],
                     ['id' => 5, 'user_id' => 5, 'position' => 'left', 'parent_id' => 2],
                     ['id' => 6, 'user_id' => 6, 'position' => 'right', 'parent_id' => 3],
@@ -59,11 +59,10 @@ class TreeTableSeeder extends Seeder
                     ['id' => 20, 'user_id' => 20, 'position' => 'right', 'parent_id' => 12],
                     ['id' => 21, 'user_id' => 21, 'position' => 'left', 'parent_id' => 13],
                     ['id' => 22, 'user_id' => 22, 'position' => 'right', 'parent_id' => 13],
+                    ['id' => 3, 'user_id' => 3, 'position' => 'right', 'parent_id' => 14],
                 ];
             } else {
-                $data = [
-                    ['id' => 1, 'user_id' => 1, 'position' => null, 'parent_id' => null],
-                ];
+                $data = [];
             }
         foreach ($data as $item) {
             /** @var  $_user User */
@@ -96,12 +95,12 @@ class TreeTableSeeder extends Seeder
     public function buildReferralTree($data = null)
     {
         if (is_null($data))
-            if (!in_array(app()->environment(), ['production', 'staging'])) {
+            if (!in_array(app()->environment(), ['production'])) {
 
                 $data = [
                     ['id' => 1, 'user_id' => 1, 'parent_id' => null],
                     ['id' => 2, 'user_id' => 2, 'parent_id' => 1],
-                    ['id' => 3, 'user_id' => 3, 'parent_id' => 1],
+//                    ['id' => 3, 'user_id' => 3, 'parent_id' => 1],
                     ['id' => 4, 'user_id' => 4, 'parent_id' => 1],
                     ['id' => 5, 'user_id' => 5, 'parent_id' => 1],
                     ['id' => 6, 'user_id' => 6, 'parent_id' => 1],
@@ -121,11 +120,10 @@ class TreeTableSeeder extends Seeder
                     ['id' => 20, 'user_id' => 20, 'parent_id' => 12],
                     ['id' => 21, 'user_id' => 21, 'parent_id' => 12],
                     ['id' => 22, 'user_id' => 22, 'parent_id' => 12],
+                    ['id' => 3, 'user_id' => 3, 'parent_id' => 14],
                 ];
             } else {
-                $data = [
-                    ['id' => 1, 'user_id' => 1, 'parent_id' => null],
-                ];
+                $data = [];
             }
         foreach ($data as $item) {
             ReferralTree::query()->create($item);

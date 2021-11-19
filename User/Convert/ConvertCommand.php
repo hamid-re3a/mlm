@@ -4,6 +4,7 @@ namespace User\Convert;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\In;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
@@ -54,7 +55,7 @@ class ConvertCommand extends Command
         chunk(50, function ($users) use ($bar) {
 
             foreach ($users as $item) {
-                $current_user = User::query()->find( $item->id);
+                $current_user = User::query()->find($item->id);
                 if (!$current_user)
                     $current_user = User::factory()->create(['id' => $item->id]);
 
@@ -62,31 +63,35 @@ class ConvertCommand extends Command
                 $current_user->saveQuietly();
                 $current_user->assignRole(USER_ROLE_CLIENT);
 
-                if ($item->sponsor_id) {
-                    $sponsor = User::query()->firstOrCreate(['id' => $item->sponsor_id]);
-                    $sponsor_tree = $sponsor->buildReferralTreeNode();
-                    $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
-                } else if ($item->father_id) {
-                    $sponsor = User::query()->firstOrCreate(['id' => $item->father_id]);
-                    $sponsor_tree = $sponsor->buildReferralTreeNode();
-                    $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
+                try {
+                    if ($item->sponsor_id) {
+                        $sponsor = User::query()->firstOrCreate(['id' => $item->sponsor_id]);
+                        $sponsor_tree = $sponsor->buildReferralTreeNode();
+                        $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
+                    } else if ($item->father_id) {
+                        $sponsor = User::query()->firstOrCreate(['id' => $item->father_id]);
+                        $sponsor_tree = $sponsor->buildReferralTreeNode();
+                        $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
+                    }
+                    if ($item->father_id) {
+                        $parent = User::query()->firstOrCreate(['id' => $item->father_id]);
+                        if (is_null($parent->binaryTree))
+                            $parent->binaryTree()->create();
+                        if (is_null($current_user->binaryTree))
+                            $current_user->binaryTree()->create();
+
+                        $parent->refresh();
+                        $current_user->refresh();
+
+                        if ($item->position == "L")
+                            $parent->binaryTree->appendAsLeftNode($current_user->binaryTree);
+                        else
+                            $parent->binaryTree->appendAsRightNode($current_user->binaryTree);
+                    }
+
+                } catch (\Throwable $exception) {
+                    Log::info('@UserConversion,  shitty record => ' . $exception->getMessage());
                 }
-                if ($item->father_id) {
-                    $parent = User::query()->firstOrCreate(['id' => $item->father_id]);
-                    if (is_null($parent->binaryTree))
-                        $parent->binaryTree()->create();
-                    if (is_null($current_user->binaryTree))
-                        $current_user->binaryTree()->create();
-
-                    $parent->refresh();
-                    $current_user->refresh();
-
-                    if ($item->position == "L")
-                        $parent->binaryTree->appendAsLeftNode($current_user->binaryTree);
-                    else
-                        $parent->binaryTree->appendAsRightNode($current_user->binaryTree);
-                }
-
                 $bar->advance();
             }
 
