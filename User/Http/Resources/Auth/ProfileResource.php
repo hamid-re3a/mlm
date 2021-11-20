@@ -30,7 +30,7 @@ class ProfileResource extends JsonResource
             'user_rank' => $this->rank,
             'rank' => $this->rank_model,
             'sponsor_user' => $this->sponsor,
-            'parent_user' => optional($this->binaryTree)->parent,
+            'parent_user' => optional(optional($this->binaryTree)->parent)->user,
             'highest_package_detail' => $this->biggestActivePackage(),
             'highest_package' => optional($this->biggestActivePackage())->package,
             'created_at' => $this->created_at->timestamp,
