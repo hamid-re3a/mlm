@@ -63,41 +63,47 @@ class ConvertCommand extends Command
                 $current_user->saveQuietly();
                 $current_user->assignRole(USER_ROLE_CLIENT);
 
-                try {
                     if ($item->sponsor_id) {
                         $sponsor = User::query()->firstOrCreate(['id' => $item->sponsor_id]);
                         $sponsor_tree = $sponsor->buildReferralTreeNode();
-                        $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
-                    } else if ($item->father_id) {
-                        $sponsor = User::query()->firstOrCreate(['id' => $item->father_id]);
-                        $sponsor_tree = $sponsor->buildReferralTreeNode();
-                        $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
-                    }
-                    if ($item->father_id) {
+                        ReferralTree::query()->firstOrCreate(['parent_id' => $sponsor_tree->id, 'user_id' => $current_user->id]);
+//                        $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
+                    } 
+                    if ($item->father_id && $item->active == "yes") {
                         $parent = User::query()->firstOrCreate(['id' => $item->father_id]);
                         if (is_null($parent->binaryTree))
                             $parent->binaryTree()->create();
-                        if (is_null($current_user->binaryTree))
-                            $current_user->binaryTree()->create();
+//                        if (is_null($current_user->binaryTree))
+//                            $current_user->binaryTree()->create();
 
                         $parent->refresh();
-                        $current_user->refresh();
+//                        $current_user->refresh();
 
                         if ($item->position == "L")
-                            $parent->binaryTree->appendAsLeftNode($current_user->binaryTree);
+                            Tree::query()->firstOrCreate([
+                                'parent_id' => $parent->binaryTree->id,
+                                'user_id' => $current_user->id,
+                                'position' => 'left'
+                            ]);
+//                            $parent->binaryTree->appendAsLeftNode($current_user->binaryTree);
                         else
-                            $parent->binaryTree->appendAsRightNode($current_user->binaryTree);
+                            Tree::query()->firstOrCreate([
+                                'parent_id' => $parent->binaryTree->id,
+                                'user_id' => $current_user->id,
+                                'position' => 'right'
+                            ]);
+//                            $parent->binaryTree->appendAsRightNode($current_user->binaryTree);
                     }
 
-                } catch (\Throwable $exception) {
-                    Log::info('@UserConversion,  shitty record => ' . $exception->getMessage());
-                }
+
+
                 $bar->advance();
             }
 
 
         });
-
+        Tree::withoutEvents(function(){Tree::fixTree();});
+        ReferralTree::withoutEvents(function(){ReferralTree::fixTree();});
         $bar->finish();
         $this->info(PHP_EOL . 'User Conversion Finished' . PHP_EOL);
     }
