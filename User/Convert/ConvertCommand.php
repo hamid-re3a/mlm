@@ -4,6 +4,7 @@ namespace User\Convert;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\In;
 use MLM\Models\ReferralTree;
@@ -51,8 +52,11 @@ class ConvertCommand extends Command
 
         $this->info(PHP_EOL . 'Start user conversion');
         $bar->start();
+
+        $last_insert_referral = [];
+        $last_insert_binary = [];
         $users = Individual::with('detail')->
-        chunk(50, function ($users) use ($bar) {
+        chunk(50, function ($users) use ($bar,$last_insert_referral,$last_insert_binary) {
 
             foreach ($users as $item) {
                 $current_user = User::query()->find($item->id);
@@ -63,47 +67,37 @@ class ConvertCommand extends Command
                 $current_user->saveQuietly();
                 $current_user->assignRole(USER_ROLE_CLIENT);
 
-                    if ($item->sponsor_id) {
-                        $sponsor = User::query()->firstOrCreate(['id' => $item->sponsor_id]);
-                        $sponsor_tree = $sponsor->buildReferralTreeNode();
-                        ReferralTree::query()->firstOrCreate(['parent_id' => $sponsor_tree->id, 'user_id' => $current_user->id]);
-//                        $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
-                    } 
-                    if ($item->father_id && $item->active == "yes") {
-                        $parent = User::query()->firstOrCreate(['id' => $item->father_id]);
-                        if (is_null($parent->binaryTree))
-                            $parent->binaryTree()->create();
-//                        if (is_null($current_user->binaryTree))
-//                            $current_user->binaryTree()->create();
+                if ($item->sponsor_id) {
+                    $last_insert_referral[] = ['id'=> $current_user->id,'parent_id' =>$item->sponsor_id, 'user_id' => $current_user->id];
+                }
+                if ($item->father_id && $item->active == "yes") {
 
-                        $parent->refresh();
-//                        $current_user->refresh();
-
-                        if ($item->position == "L")
-                            Tree::query()->firstOrCreate([
-                                'parent_id' => $parent->binaryTree->id,
-                                'user_id' => $current_user->id,
-                                'position' => 'left'
-                            ]);
-//                            $parent->binaryTree->appendAsLeftNode($current_user->binaryTree);
-                        else
-                            Tree::query()->firstOrCreate([
-                                'parent_id' => $parent->binaryTree->id,
-                                'user_id' => $current_user->id,
-                                'position' => 'right'
-                            ]);
-//                            $parent->binaryTree->appendAsRightNode($current_user->binaryTree);
-                    }
-
-
-
+                    if ($item->position == "L")
+                        $last_insert_binary[] = [
+                            'id'=> $current_user->id,
+                            'parent_id' => $item->father_id,
+                            'user_id' => $current_user->id,
+                            'position' => 'left'
+                        ];
+                    else
+                        $last_insert_binary[] = [
+                            'id'=> $current_user->id,
+                            'parent_id' => $item->father_id,
+                            'user_id' => $current_user->id,
+                            'position' => 'right'
+                        ];
+                }
                 $bar->advance();
             }
-
-
         });
-        Tree::withoutEvents(function(){Tree::fixTree();});
-        ReferralTree::withoutEvents(function(){ReferralTree::fixTree();});
+        DB::table('trees')->insert($last_insert_binary);
+        DB::table('referral_trees')->insert($last_insert_referral);
+        Tree::withoutEvents(function () {
+            Tree::fixTree();
+        });
+        ReferralTree::withoutEvents(function () {
+            ReferralTree::fixTree();
+        });
         $bar->finish();
         $this->info(PHP_EOL . 'User Conversion Finished' . PHP_EOL);
     }
