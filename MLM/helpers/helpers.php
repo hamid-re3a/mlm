@@ -94,7 +94,7 @@ if (!function_exists('getMLMSetting')) {
         if ($setting)
             return $setting->value;
 
-
+        dd($key);
         if (defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) AND array_key_exists($key, MLM_SETTINGS))
             return MLM_SETTINGS[$key]['value'];
 
