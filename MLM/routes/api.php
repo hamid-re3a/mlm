@@ -60,6 +60,11 @@ Route::middleware(['auth'])->group(function () {
             Route::get('binary_multi_level', [\MLM\Http\Controllers\Front\TreeController::class, 'getBinaryTreeMultiLevel'])->name('binary-multi-level');
             Route::get('get_mlm_info', [\MLM\Http\Controllers\Front\MLMController::class, 'getMLMInfo'])->name('mlm-info');
         });
+
+
+        Route::prefix('ranks')->name('ranks.')->group(function () {
+            Route::get('', [RankController::class, 'index'])->name('index');
+        });
     });
 
 });
