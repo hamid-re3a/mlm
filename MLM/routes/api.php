@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use MLM\Http\Controllers\Admin\EmailContentController;
 use MLM\Http\Controllers\Admin\PackageRoiController;
 use MLM\Http\Controllers\Admin\RankController;
 use MLM\Http\Controllers\Admin\ResidualBonusSettingController;
@@ -40,6 +41,12 @@ Route::middleware(['auth'])->group(function () {
             Route::get('', [AdminSettingController::class, 'index'])->name('list');
             Route::patch('', [AdminSettingController::class, 'update'])->name('update');
         });
+
+        Route::name('email-contents.')->prefix('email-contents')->group(function () {
+            Route::get('', [EmailContentController::class, 'index'])->name('list');
+            Route::patch('', [EmailContentController::class, 'update'])->name('update');
+        });
+
     });
 
     //Client routes
