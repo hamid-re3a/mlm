@@ -48,6 +48,10 @@ class UpdateSettingRequest extends FormRequest
                 case 'IS_UNDER_MAINTENANCE' :
                     return 'required|boolean';
                     break;
+                case 'MAX_ROI_PERCENTAGE' :
+                case 'MIN_ROI_PERCENTAGE' :
+                    return 'required|boolean|min:0|max:100';
+                    break;
                 default:
                     return 'required';
             }

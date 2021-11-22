@@ -351,7 +351,8 @@ const RANKS = [
     13 => RANK_13_PRESIDENT,
     14 => RANK_14_ROYAL_PRESIDENT,
 ];
-
+const MIN_ROI_PERCENTAGE = 0;
+const MAX_ROI_PERCENTAGE = 100;
 CONST MLM_SETTINGS = [
     'IS_UNDER_MAINTENANCE' => [
         'value' => false,
@@ -387,6 +388,16 @@ CONST MLM_SETTINGS = [
         'value' => RESIDUAL_BONUS_COMMISSION_IS_ACTIVE,
         'title' => 'RESIDUAL_BONUS_COMMISSION',
         'description' => 'RESIDUAL_BONUS_COMMISSION is enabled or not.'
+    ],
+    'MIN_ROI_PERCENTAGE' => [
+        'value' => MIN_ROI_PERCENTAGE,
+        'title' => 'MIN_ROI_PERCENTAGE',
+        'description' => 'MIN_ROI_PERCENTAGE'
+    ],
+    'MAX_ROI_PERCENTAGE' => [
+        'value' => MAX_ROI_PERCENTAGE,
+        'title' => 'MAX_ROI_PERCENTAGE',
+        'description' => 'MAX_ROI_PERCENTAGE'
     ],
 
 ];
