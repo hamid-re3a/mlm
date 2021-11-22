@@ -53,53 +53,73 @@ class ConvertCommand extends Command
         $this->info(PHP_EOL . 'Start user conversion');
         $bar->start();
 
-        $last_insert_referral = [];
-        $last_insert_binary = [];
-        $users = Individual::with('detail')->
-        chunk(50, function ($users) use ($bar,$last_insert_referral,$last_insert_binary) {
-
+        Individual::with('detail')->
+        chunk(2000, function ($users) use ($bar) {
+            $last_users = [];
+            $last_insert_referral = [];
+            $last_insert_binary = [];
             foreach ($users as $item) {
-                $current_user = User::query()->find($item->id);
-                if (!$current_user)
-                    $current_user = User::factory()->create(['id' => $item->id]);
-
-                $current_user->rank = $this->rankConvert($item->user_rank_id);
-                $current_user->saveQuietly();
-                $current_user->assignRole(USER_ROLE_CLIENT);
+                $last_users[] = ['id' => $item->id, 'rank' => $this->rankConvert($item->user_rank_id)];
 
                 if ($item->sponsor_id) {
-                    $last_insert_referral[] = ['id'=> $current_user->id,'parent_id' =>$item->sponsor_id, 'user_id' => $current_user->id];
+                    $last_insert_referral[] = ['id' => $item->id, 'parent_id' => $item->sponsor_id, 'user_id' => $item->id];
                 }
                 if ($item->father_id && $item->active == "yes") {
 
                     if ($item->position == "L")
                         $last_insert_binary[] = [
-                            'id'=> $current_user->id,
+                            'id' => $item->id,
                             'parent_id' => $item->father_id,
-                            'user_id' => $current_user->id,
+                            'user_id' => $item->id,
                             'position' => 'left'
                         ];
                     else
                         $last_insert_binary[] = [
-                            'id'=> $current_user->id,
+                            'id' => $item->id,
                             'parent_id' => $item->father_id,
-                            'user_id' => $current_user->id,
+                            'user_id' => $item->id,
                             'position' => 'right'
                         ];
                 }
                 $bar->advance();
             }
-        });
-        DB::table('trees')->insert($last_insert_binary);
-        DB::table('referral_trees')->insert($last_insert_referral);
-        Tree::withoutEvents(function () {
-            Tree::fixTree();
-        });
-        ReferralTree::withoutEvents(function () {
-            ReferralTree::fixTree();
+            $insert_data = collect($last_users);
+            $chunks = $insert_data->chunk(500);
+
+            foreach ($chunks as $chunk) {
+                DB::table('users')->insert($chunk->toArray());
+
+            }
+            $insert_data = collect($last_insert_binary);
+            $chunks = $insert_data->chunk(500);
+
+            foreach ($chunks as $chunk) {
+                DB::table('trees')->insert($chunk->toArray());
+
+            }
+            $insert_data = collect($last_insert_referral);
+            $chunks = $insert_data->chunk(500);
+
+            foreach ($chunks as $chunk) {
+                DB::table('referral_trees')->insert($chunk->toArray());
+
+            }
         });
         $bar->finish();
         $this->info(PHP_EOL . 'User Conversion Finished' . PHP_EOL);
+
+        ini_set('memory_limit', '-1');
+        $this->info(PHP_EOL . 'Fixing Trees Started' . PHP_EOL);
+        $bar = $this->output->createProgressBar(2);
+        Tree::withoutEvents(function () {
+            Tree::fixTree();
+        });
+        $bar->advance();
+        ReferralTree::withoutEvents(function () {
+            ReferralTree::fixTree();
+        });
+        $bar->advance();
+        $this->info(PHP_EOL . ' Finished' . PHP_EOL);
     }
 
     public function rankConvert($rank)
