@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Packages\Services\Grpc\PackageClientFacade;
 use Packages\Services\Grpc\PackageGrpcClientProvider;
+use User\Convert\FixTreeConvertCommand;
 use Wallets\Services\Grpc\WalletClientFacade;
 use Wallets\Services\Grpc\WalletClientProvider;
 use User\Convert\ConvertCommand;
@@ -119,7 +120,8 @@ class UserServiceProvider extends ServiceProvider
 
 
             $this->commands([
-                ConvertCommand::class
+                ConvertCommand::class,
+                FixTreeConvertCommand::class
             ]);
         }
 
