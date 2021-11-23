@@ -68,10 +68,18 @@ class ConvertCommand extends Command
                     'last_name' => (!is_null($item->detail) && !is_null($item->detail->user_detail_second_name)) ? $item->detail->user_detail_second_name : "Unknown",
                     'gender' => (!is_null($item->detail) && !is_null($item->detail->user_detail_gender)) ? ($item->detail->user_detail_gender == "F") ? "Female" : "Male" : "Male",
                     'sponsor_id' => $item->sponsor_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ];
 
                 if ($item->sponsor_id) {
-                    $last_insert_referral[] = ['id' => $item->id, 'parent_id' => $item->sponsor_id, 'user_id' => $item->id];
+                    $last_insert_referral[] = [
+                        'id' => $item->id,
+                        'parent_id' => $item->sponsor_id,
+                        'user_id' => $item->id,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
                 }
                 if ($item->father_id && $item->active == "yes") {
 
@@ -80,14 +88,20 @@ class ConvertCommand extends Command
                             'id' => $item->id,
                             'parent_id' => $item->father_id,
                             'user_id' => $item->id,
-                            'position' => 'left'
+                            'position' => 'left',
+
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ];
                     else
                         $last_insert_binary[] = [
                             'id' => $item->id,
                             'parent_id' => $item->father_id,
                             'user_id' => $item->id,
-                            'position' => 'right'
+                            'position' => 'right',
+
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ];
                 }
                 $bar->advance();

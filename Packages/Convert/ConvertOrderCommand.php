@@ -79,7 +79,7 @@ class ConvertOrderCommand extends Command
                         $order->setIsCommissionResolvedAt(now()->toDateString());
                         $order->setCreatedAt(now()->toDateString());
                         $order->setUpdatedAt(now()->toDateString());
-                        $order->setValidityInDays((int)$new_package->validity_in_days);
+                        $order->setValidityInDays((int)200);
                         (new OrderedPackageRepository)->updateOrderAndPackage($order, $package_grpc);
                     }
                 }
