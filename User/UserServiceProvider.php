@@ -63,12 +63,8 @@ class UserServiceProvider extends ServiceProvider
                 && is_numeric($request->header('X-user-id'))
             ) {
 
-
-
                 $user_hash_request = $request->header('X-user-hash');
                 $user = User::query()->whereId($request->header('X-user-id'))->first();
-
-
                 /**
                  * if there is not exist user. get data user complete from api gateway
                  * error code 470 is for data user not exist log for development
@@ -79,11 +75,9 @@ class UserServiceProvider extends ServiceProvider
                         throw new Exception('please try another time!', 470);
 
                     $user = User::query()->whereId($request->header('X-user-id'))->first();
-
                 }
 
-                $hash_user_service = md5(serialize($user->getUserService()));
-
+                $hash_user_service = md5(serialize($user->getGrpcMessage()));
                 /**
                  * if there is not update data user. get data user complete from api gateway
                  * error code 471 is for data user not update log for development
