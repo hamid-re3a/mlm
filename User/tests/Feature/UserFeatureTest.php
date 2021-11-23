@@ -106,7 +106,7 @@ class UserFeatureTest extends UserTest
 //        $user = User::factory()->create();
 //        $user->assignRole(USER_ROLE_CLIENT);
 //        $user->save();
-//        $hash = md5(serialize($user->getUserService()));
+//        $hash = md5(serialize($user->getGrpcMessage()));
 //        $this->put(route('users.binaryPosition'), [
 //            'id' => $user->id,
 //            'default_binary_position' => \MLM\Models\Tree::RIGHT
