@@ -18,10 +18,20 @@ class SettingsSeeder extends Seeder
      */
     public function run()
     {
-        if(defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) && Setting::query()->count() == 0 ) {
+        if(defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS)) {
             $settings = [];
             $now = now()->toDateTimeString();
-            foreach(MLM_SETTINGS AS $key => $setting)
+            foreach(MLM_SETTINGS AS $key => $setting){
+                Setting::query()->updateOrInsert(
+                    ['name' => $key],
+                    [
+                        'value' => $setting['value'],
+                        'title' => $setting['title'],
+                        'description' => $setting['description'],
+                        'created_at' => $now,
+                        'updated_at' => $now
+                    ]
+                );
                 $settings[] = [
                     'name' => $key,
                     'value' => $setting['value'],
@@ -30,7 +40,7 @@ class SettingsSeeder extends Seeder
                     'created_at' => $now,
                     'updated_at' => $now
                 ];
-            Setting::insert($settings);
+            }
             cache(['mlm_settings' =>  $settings]);
         }
 

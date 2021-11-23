@@ -59,7 +59,16 @@ class ConvertCommand extends Command
             $last_insert_referral = [];
             $last_insert_binary = [];
             foreach ($users as $item) {
-                $last_users[] = ['id' => $item->id, 'rank' => $this->rankConvert($item->user_rank_id)];
+                $last_users[] = [
+                    'id' => $item->id,
+                    'rank' => $this->rankConvert($item->user_rank_id),
+                    'email' => $item->email,
+                    'username' => $item->user_name,
+                    'first_name' => (!is_null($item->detail) && !is_null($item->detail->user_detail_name)) ? $item->detail->user_detail_name : "Unknown",
+                    'last_name' => (!is_null($item->detail) && !is_null($item->detail->user_detail_second_name)) ? $item->detail->user_detail_second_name : "Unknown",
+                    'gender' => (!is_null($item->detail) && !is_null($item->detail->user_detail_gender)) ? ($item->detail->user_detail_gender == "F") ? "Female" : "Male" : "Male",
+                    'sponsor_id' => $item->sponsor_id,
+                ];
 
                 if ($item->sponsor_id) {
                     $last_insert_referral[] = ['id' => $item->id, 'parent_id' => $item->sponsor_id, 'user_id' => $item->id];
