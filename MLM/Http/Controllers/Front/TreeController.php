@@ -104,6 +104,7 @@ class TreeController extends Controller
         $users = ReferralTree::with('user')
             ->where('_dpt', '>', $depth )
             ->where('_dpt', '<=', $depth + $level)
+            ->limit(2000)
             ->descendantsAndSelf($tree->id)
             ->groupBy('parent_id');
 
