@@ -40,13 +40,16 @@ class ResidualBonusCommissionJob implements ShouldQueue
             ->where('type', RESIDUAL_BONUS_COMMISSION)
             ->whereDate('created_at', now()->toDate())->exists())
             return;
-        $tree = ReferralTree::withDepth()->where('user_id', $this->user->id)->first();
-        $depth = $tree->depth;
+        $tree = ReferralTree::query()->where('user_id', $this->user->id)->first();
+        $depth = $tree->_dpt;
         $commission_amount = (double)0;
         foreach ($this->user->residualBonusSetting as $residual_bonus_setting) {
 
-            $users = ReferralTree::withDepth()->descendantsAndSelf($tree->id)
-                ->where('depth', $depth + $residual_bonus_setting->level)
+            $users = ReferralTree::query()
+                ->where('_dpt', '>=', $depth )
+                ->where('_dpt', '<=', $depth +  $residual_bonus_setting->level)
+                ->descendantsAndSelf($tree->id)
+
                 ->pluck('user_id')->toArray();
 
             $descendants_commission = CommissionModel::query()->where('type', TRADING_PROFIT_COMMISSION)

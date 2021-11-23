@@ -50,7 +50,7 @@ class UpdateSettingRequest extends FormRequest
                     break;
                 case 'MAX_ROI_PERCENTAGE' :
                 case 'MIN_ROI_PERCENTAGE' :
-                    return 'required|boolean|min:0|max:100';
+                    return 'required|numeric|min:0|max:100';
                     break;
                 default:
                     return 'required';

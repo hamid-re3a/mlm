@@ -46,17 +46,41 @@ class FixTreeConvertCommand extends Command
     public function handle()
     {
         ini_set('memory_limit', '-1');
-        $this->info(PHP_EOL . 'Fixing Trees Started' . PHP_EOL);
-        $bar = $this->output->createProgressBar(2);
-        Tree::withoutEvents(function () {
-            Tree::fixTree();
+        $this->info(PHP_EOL . 'Binary Trees Started' . PHP_EOL);
+        $bar = $this->output->createProgressBar(Tree::count());
+
+        $bar->start();
+        Tree::withoutEvents(function ()  use ($bar){
+            Tree::withDepth()->
+            chunk(200, function ($nodes) use ($bar) {
+                foreach ($nodes as $node) {
+                    $node->_dpt = $node->depth;
+                    $node->save();
+                    $bar->advance();
+
+                }
+            });
         });
-        $bar->advance();
-        ReferralTree::withoutEvents(function () {
-            ReferralTree::fixTree();
+        $bar->finish();
+        $this->info(PHP_EOL . 'Binary Finished' . PHP_EOL);
+
+        $this->info(PHP_EOL . 'Referral Trees Started' . PHP_EOL);
+        $bar = $this->output->createProgressBar(ReferralTree::count());
+
+        $bar->start();
+        ReferralTree::withoutEvents(function () use ($bar) {
+            ReferralTree::withDepth()->
+            chunk(200, function ($nodes) use ($bar) {
+                foreach ($nodes as $node) {
+                    $node->_dpt = $node->depth;
+                    $node->save();
+                    $bar->advance();
+
+                }
+            });
         });
-        $bar->advance();
-        $this->info(PHP_EOL . ' Finished' . PHP_EOL);
+        $bar->finish();
+        $this->info(PHP_EOL . 'Referral Finished' . PHP_EOL);
     }
 
 

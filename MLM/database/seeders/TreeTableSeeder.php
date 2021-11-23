@@ -38,7 +38,7 @@ class TreeTableSeeder extends Seeder
 
                 $data = [
                     ['id' => 1, 'user_id' => 1, 'position' => null, 'parent_id' => null],
-                    ['id' => 2, 'user_id' => 2, 'position' => 'left', 'parent_id' => 1],
+                    ['id' => 2, 'user_id' => 2, 'position' => 'right', 'parent_id' => 1],
 //                    ['id' => 3, 'user_id' => 3, 'position' => 'right', 'parent_id' => 1],
                     ['id' => 4, 'user_id' => 4, 'position' => 'right', 'parent_id' => 2],
                     ['id' => 5, 'user_id' => 5, 'position' => 'left', 'parent_id' => 2],
