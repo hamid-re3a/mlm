@@ -46,8 +46,7 @@ class ResidualBonusCommissionJob implements ShouldQueue
         foreach ($this->user->residualBonusSetting as $residual_bonus_setting) {
 
             $users = ReferralTree::query()
-                ->where('_dpt', '>=', $depth )
-                ->where('_dpt', '<=', $depth +  $residual_bonus_setting->level)
+                ->where('_dpt', $depth + $residual_bonus_setting->level)
                 ->descendantsAndSelf($tree->id)
 
                 ->pluck('user_id')->toArray();
