@@ -11,6 +11,7 @@ use MLM\Repository\PackageRepository;
 use Orders\Services\Grpc\Order;
 use Packages\Services\Grpc\Id;
 use Packages\Services\Grpc\Package;
+use Packages\Services\Grpc\PackageClientFacade;
 use User\Models\User;
 
 class OrderedPackageService
@@ -45,11 +46,7 @@ class OrderedPackageService
         $id->setId($order->getPackageId());
 
         /** @var $package Package */
-        list($package, $status) = getPackageGrpcClient()->packageById($id)->wait();
-        if ($status->code != 0){
-            Log::error($status->metadata);
-            throw new \Exception('Not a valid package in order');
-        }
+        $package = PackageClientFacade::packageById($id);
 
         $this->package_repository->updatePackage($package);
         return $package;

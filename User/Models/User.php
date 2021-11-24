@@ -97,7 +97,7 @@ class User extends Model
         }
 
         if (request()->has('rank')) {
-            $ids = Rank::query()->where('name', 'LIKE', '%' . request()->get('rank') . '%')->pluck('id');
+            $ids = Rank::query()->where('rank_name', 'LIKE', '%' . request()->get('rank') . '%')->pluck('id');
             if ($ids)
                 $query->orWhereIn('rank', $ids);
         }
@@ -105,7 +105,7 @@ class User extends Model
         if (request()->has('ranks') AND is_array(request()->get('ranks'))) {
             $ids = [];
             foreach (request()->get('ranks') AS $rank)
-                array_merge($ids, Rank::query()->where('name', 'LIKE', '%' . $rank . '%')->pluck('id'));
+                array_merge($ids, Rank::query()->where('rank_name', 'LIKE', '%' . $rank . '%')->pluck('id'));
 
             $query->orWhereIn('rank', $ids);
         }
@@ -200,7 +200,7 @@ class User extends Model
     /**
      * Methods
      */
-    public function getUserService()
+    public function getGrpcMessage()
     {
         $this->fresh();
         $user = new \User\Services\Grpc\User();
@@ -214,13 +214,12 @@ class User extends Model
         $user->setBlockType((string)$this->attributes['block_type']);
         $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
         $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
-        $user->setGender((boolean)$this->attributes['gender']);
+        $user->setGender((string)$this->attributes['gender']);
 
         if ($this->getRoleNames()->count()) {
             $role_name = implode(",", $this->getRoleNames()->toArray());
             $user->setRole($role_name);
         }
-
 
         return $user;
     }

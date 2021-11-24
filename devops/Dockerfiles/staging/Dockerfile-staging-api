@@ -20,7 +20,7 @@ RUN echo 'extension=grpc.so' >> /usr/local/etc/php/conf.d/grpc.ini
 # apache configuration
 ENV WEB_DOCUMENT_ROOT /app/public
 #supervisor
-COPY devops/supervisor.d/ /opt/docker/etc/supervisor.d/
+COPY devops/supervisor.d/api/ /opt/docker/etc/supervisor.d/
 
 
 # src
@@ -36,7 +36,7 @@ RUN su application -c "composer install"
 RUN su application -c "composer require aws/aws-sdk-php"
 RUN su application -c "php artisan key:generate"
 RUN su application -c "php artisan vendor:publish --all"
-RUN su application -c "php artisan migrate:fresh"
+RUN su application -c "php artisan migrate"
 RUN su application -c "php artisan db:seed"
 RUN su application -c "php artisan scribe:generate"
 RUN su application -c "php artisan optimize:clear"

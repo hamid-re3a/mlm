@@ -29,7 +29,7 @@ class PackageRoiBulkUpdateRequest extends FormRequest
 
             'package_id' => 'required|array',
             'due_date' => 'required|array',
-            'roi_percentage' => 'required|numeric',
+            'roi_percentage' => 'required|numeric'.'|max:'.getSetting('MAX_ROI_PERCENTAGE').'|min:'.getSetting('MIN_ROI_PERCENTAGE'),
         ];
     }
 }
