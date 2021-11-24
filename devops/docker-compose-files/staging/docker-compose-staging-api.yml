@@ -1,7 +1,7 @@
 version: '3.9'
 services:
-  mlm:
-    image: staging-reg.dreamcometrue.ai/staging-mlm:1
+  mlm-api:
+    image: staging-reg.dreamcometrue.ai/staging-mlm-api:1
     restart: unless-stopped
     networks:
       - mysql_wo_r2f
