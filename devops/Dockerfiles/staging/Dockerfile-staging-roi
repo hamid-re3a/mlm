@@ -20,7 +20,7 @@ RUN echo 'extension=grpc.so' >> /usr/local/etc/php/conf.d/grpc.ini
 # apache configuration
 ENV WEB_DOCUMENT_ROOT /app/public
 #supervisor
-COPY devops/supervisor.d/ /opt/docker/etc/supervisor.d/
+COPY devops/supervisor.d/roi/ /opt/docker/etc/supervisor.d/
 
 
 # src
