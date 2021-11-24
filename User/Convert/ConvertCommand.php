@@ -4,6 +4,8 @@ namespace User\Convert;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\In;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
@@ -50,65 +52,135 @@ class ConvertCommand extends Command
 
         $this->info(PHP_EOL . 'Start user conversion');
         $bar->start();
-        $users = Individual::with('detail')->
-        chunk(50, function ($users) use ($bar) {
 
+        Individual::with('detail')->
+        chunk(2000, function ($users) use ($bar) {
+            $last_users = [];
+            $last_insert_referral = [];
+            $last_insert_binary = [];
             foreach ($users as $item) {
-                $current_user = User::query()->find($item->id);
-                if (!$current_user)
-                    $current_user = User::factory()->create(['id' => $item->id]);
-                if (!is_null($item->detail)
-                    && !is_null($item->detail->user_detail_email)
-                    && !empty($item->detail->user_detail_email) &&
-                    filter_var($item->detail->user_detail_email, FILTER_VALIDATE_EMAIL)
-                ) {
-                    if (User::query()->where('email', $item->detail->user_detail_email)->exists())
-                        $email = $item->user_name . '@dreamcometrue.ai';
-                    else
-                        $email = $item->detail->user_detail_email;
-                } else {
-                    $email = $item->user_name . '@dreamcometrue.ai';
-                }
-
-                $current_user->update([
-                    'email' => $email,
+                $last_users[] = [
+                    'id' => $item->id,
+                    'rank' => $this->rankConvert($item->user_rank_id),
+                    'email' => $item->email,
+                    'username' => $item->user_name,
                     'first_name' => (!is_null($item->detail) && !is_null($item->detail->user_detail_name)) ? $item->detail->user_detail_name : "Unknown",
                     'last_name' => (!is_null($item->detail) && !is_null($item->detail->user_detail_second_name)) ? $item->detail->user_detail_second_name : "Unknown",
                     'gender' => (!is_null($item->detail) && !is_null($item->detail->user_detail_gender)) ? ($item->detail->user_detail_gender == "F") ? "Female" : "Male" : "Male",
                     'sponsor_id' => $item->sponsor_id,
-                    'username' => $item->user_name,
-                ]);
-                $current_user->assignRole(USER_ROLE_CLIENT);
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
 
                 if ($item->sponsor_id) {
-                    $sponsor = User::query()->firstOrCreate(['id' => $item->sponsor_id]);
-                    $sponsor_tree = $sponsor->buildReferralTreeNode();
-                    $sponsor_tree->appendNode($current_user->buildReferralTreeNode());
+                    $last_insert_referral[] = [
+                        'id' => $item->id,
+                        'parent_id' => $item->sponsor_id,
+                        'user_id' => $item->id,
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
                 }
-                if ($item->father_id) {
-                    $parent = User::query()->firstOrCreate(['id' => $item->father_id]);
-                    if(is_null($parent->binaryTree))
-                        $parent->binaryTree()->create();
-                    if(is_null($current_user->binaryTree))
-                        $current_user->binaryTree()->create();
-
-                    $parent->refresh();
-                    $current_user->refresh();
+                if ($item->father_id && $item->active == "yes") {
 
                     if ($item->position == "L")
-                        $parent->binaryTree->appendAsLeftNode($current_user->binaryTree);
-                    else
-                        $parent->binaryTree->appendAsRightNode($current_user->binaryTree);
-                }
+                        $last_insert_binary[] = [
+                            'id' => $item->id,
+                            'parent_id' => $item->father_id,
+                            'user_id' => $item->id,
+                            'position' => 'left',
 
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    else
+                        $last_insert_binary[] = [
+                            'id' => $item->id,
+                            'parent_id' => $item->father_id,
+                            'user_id' => $item->id,
+                            'position' => 'right',
+
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                }
                 $bar->advance();
             }
+            $insert_data = collect($last_users);
+            $chunks = $insert_data->chunk(500);
 
+            foreach ($chunks as $chunk) {
+                DB::table('users')->insert($chunk->toArray());
 
+            }
+            $insert_data = collect($last_insert_binary);
+            $chunks = $insert_data->chunk(500);
+
+            foreach ($chunks as $chunk) {
+                DB::table('trees')->insert($chunk->toArray());
+
+            }
+            $insert_data = collect($last_insert_referral);
+            $chunks = $insert_data->chunk(500);
+
+            foreach ($chunks as $chunk) {
+                DB::table('referral_trees')->insert($chunk->toArray());
+
+            }
         });
-
         $bar->finish();
         $this->info(PHP_EOL . 'User Conversion Finished' . PHP_EOL);
+
+        ini_set('memory_limit', '-1');
+        $this->info(PHP_EOL . 'Fixing Trees Started' . PHP_EOL);
+        $bar = $this->output->createProgressBar(2);
+        Tree::withoutEvents(function () {
+            Tree::fixTree();
+        });
+        $bar->advance();
+        ReferralTree::withoutEvents(function () {
+            ReferralTree::fixTree();
+        });
+        $bar->advance();
+        $this->info(PHP_EOL . ' Finished' . PHP_EOL);
+    }
+
+    public function rankConvert($rank)
+    {
+        $output_rank = 0;
+        switch ((int)$rank) {
+            case 1:
+                $output_rank = 2;
+                break;
+            case 2:
+                $output_rank = 3;
+                break;
+            case 3:
+                $output_rank = 4;
+                break;
+            case 4:
+                $output_rank = 6;
+                break;
+            case 5:
+                $output_rank = 7;
+                break;
+            case 6:
+                $output_rank = 8;
+                break;
+            case 7:
+                $output_rank = 9;
+                break;
+            case 8:
+                $output_rank = 10;
+                break;
+            case 9:
+                $output_rank = 11;
+                break;
+            case 10:
+                $output_rank = 12;
+                break;
+        }
+        return $output_rank;
     }
 
 

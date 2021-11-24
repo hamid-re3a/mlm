@@ -8,9 +8,8 @@ use MLM\Models\OrderedPackage;
 use MLM\Models\PackageRoi;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
-use MLM\Services\Commissions\BinaryCommission;
 use MLM\Services\OrderResolver;
-use MLM\Services\Wallet\WalletClientFacade;
+use Wallets\Services\Grpc\WalletClientFacade;
 use MLM\tests\MLMTest;
 use Orders\Services\Grpc\Order;
 use Orders\Services\Grpc\OrderPlans;
@@ -150,6 +149,29 @@ class OrderTest extends MLMTest
         $this->assertEquals($user->binaryTree->converted_points, 99);
 
     }
+    /**
+     * @test
+     */
+    public function binary_commission_to_first_user_prohibited()
+    {
+
+
+        $user = $this->registerUser();
+        $user->deactivated_commission_types = [BINARY_COMMISSION];
+        $user->save();
+
+        $second_user = $this->registerUser($user->id);
+
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+
+        $this->assertEquals(0, $user->commissions()->type(BINARY_COMMISSION)->count(), 'Number of binary commissions');
+        $this->assertEquals(0, $user->commissions()->type(BINARY_COMMISSION)->sum('amount'));
+        $this->assertEquals($user->binaryTree->converted_points, 0);
+
+    }
 
     /**
      * @test
@@ -200,6 +222,33 @@ class OrderTest extends MLMTest
 
     }
 
+    /**
+     * @test
+     */
+    public function trading_profit_commission_not_should_pay_to_user_prohibited()
+    {
+        $user = $this->registerUser(1, 99, 1);
+        $user->deactivated_commission_types = [TRADING_PROFIT_COMMISSION];
+        $user->save();
+
+        $second_user = $this->registerUser($user->id);
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+
+        PackageRoi::factory()->create([
+            'package_id' => 1,
+            'roi_percentage' => 3,
+            'due_date' => now()->toDate()
+        ]);
+        $this->artisan('roi:trading')
+            ->execute();
+
+        $this->assertEquals(0, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
+        $this->assertEquals(0, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
+
+    }
     /**
      * @test
      */

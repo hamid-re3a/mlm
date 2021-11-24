@@ -16,6 +16,7 @@ use Orders\Services\Grpc\OrderPlans;
 use Packages\Services\Grpc\Acknowledge;
 use Packages\Services\Grpc\Package;
 use Packages\Services\Grpc\PackageCheck;
+use Packages\Services\Grpc\PackageClientFacade;
 use User\Models\User;
 use User\Services\UserService;
 
@@ -91,7 +92,7 @@ class OrderResolver
         DB::beginTransaction();
         $problem_level = 0;
 
-//        try {
+        try {
             list($bool, $msg) = $this->isValid();
             if ($bool) {
 
@@ -117,9 +118,9 @@ class OrderResolver
             } else {
                 $problem_level = 1;
             }
-//        } catch (\Exception $exception) {
-//            Log::error('OrderResolver@resolve =>' . $exception->getMessage());
-//        }
+        } catch (\Exception $exception) {
+            Log::error('OrderResolver@resolve =>' . $exception->getMessage());
+        }
 
 
         DB::rollBack();
@@ -155,7 +156,7 @@ class OrderResolver
     {
         if (!$this->order->getIsCommissionResolvedAt()) {
             $isItOk = true;
-//            try {
+            try {
                 DB::beginTransaction();
                 /** @var  $commission Commission */
                 foreach ($this->plan->getCommissions() as $commission)
@@ -167,10 +168,10 @@ class OrderResolver
 
                 DB::commit();
                 $this->order->setIsCommissionResolvedAt(now()->toDateTimeString());
-//            } catch (\Throwable $e) {
-//                DB::rollBack();
-//                return [false, trans('responses.resolveCommission')];
-//            }
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                return [false, trans('responses.resolveCommission')];
+            }
 
         }
         return [true, trans('responses.resolveCommission')];
@@ -185,6 +186,8 @@ class OrderResolver
             $ordered_package = OrderedPackage::query()->where('order_id', $this->order->getId())->first();
             switch ($this->order->getPlan()) {
                 case OrderPlans::ORDER_PLAN_START:
+                case OrderPlans::ORDER_PLAN_START_50:
+                case OrderPlans::ORDER_PLAN_START_75:
                     if ($this->user->hasAnyValidOrder())
                         return [false, trans('order.responses.you-should-order-other-plan-you-have-already-start-plan')];
                     break;
@@ -208,11 +211,7 @@ class OrderResolver
                 $packages->setPackageIndexId($this->user->biggestOrderedPackage()->package_id);
                 $packages->setPackageToBuyId($ordered_package->package_id);
                 /** @var $ack Acknowledge */
-                list($ack, $status) = getPackageGrpcClient()->packageIsInBiggestPackageCategory($packages)->wait();
-                if ($status->code != 0){
-                    Log::error($status->metadata);
-                    throw new \Exception('Not a valid package in packages');
-                }
+                $ack = PackageClientFacade::packageIsInBiggestPackageCategory($packages);
                 if(!$ack->getStatus())
                     return [false, trans('order.responses.selected-package-should-be-greater-or-equal-to-previous-package')];
 

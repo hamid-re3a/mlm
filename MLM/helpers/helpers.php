@@ -35,23 +35,6 @@ if (!function_exists('getRank')) {
     }
 }
 
-if (!function_exists('getPackageGrpcClient')) {
-    function getPackageGrpcClient()
-    {
-        return new \Packages\Services\Grpc\PackagesServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-if (!function_exists('getWalletGrpcClient')) {
-    function getWalletGrpcClient()
-    {
-        return new \Wallets\Services\Grpc\WalletServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-
 
 if (!function_exists('userRankBasedOnConvertedPoint')) {
     function userRankBasedOnConvertedPoint($converted_point): \MLM\Models\Rank
@@ -81,8 +64,12 @@ if (!function_exists('getAndUpdateUserRank')) {
 
                 if (User::hasLeastChildrenWithRank($left_binary_sponsored_children, $rank->condition_sub_rank, $rank->condition_number_of_left_children) &&
                     User::hasLeastChildrenWithRank($right_binary_sponsored_children, $rank->condition_sub_rank, $rank->condition_number_of_right_children)) {
-                    $user->rank = $rank->rank;
-                    $user->save();
+                    if($user->rank >= $rank->rank && now()->isBefore(Carbon::createFromFormat('d/m/Y',  '01/08/2022'))){
+                        return $user->rank_model;
+                    } else {
+                        $user->rank = $rank->rank;
+                        $user->save();
+                    }
                     return $rank;
                 }
             }
@@ -107,7 +94,7 @@ if (!function_exists('getMLMSetting')) {
         if ($setting)
             return $setting->value;
 
-
+        dd($key);
         if (defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) AND array_key_exists($key, MLM_SETTINGS))
             return MLM_SETTINGS[$key]['value'];
 

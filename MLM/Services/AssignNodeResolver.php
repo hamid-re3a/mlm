@@ -7,6 +7,7 @@ namespace MLM\Services;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use MLM\Interfaces\Commission;
+use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use MLM\Services\Plans\AssignNode;
 use Orders\Services\Grpc\Order;
@@ -50,7 +51,7 @@ class AssignNodeResolver
                 $this->attachUserToBinary($this->to_user->binaryTree, $position);
                 // add user to referral tree
                 $this->to_user->referralTree->appendNode($this->user->buildReferralTreeNode());
-
+                $this->fixNodeDepth();
                 if ($this->resolve($simulate)) {
                     if (!$simulate)
                         DB::commit();
@@ -141,5 +142,23 @@ class AssignNodeResolver
                 return $this->attachUserToBinary($to_user->children()->right()->first(), $string,++$call);
             }
 
+    }
+
+    private function fixNodeDepth(): void
+    {
+        $user = $this->user;
+        $user->refresh();
+        Tree::withoutEvents(function () use ($user){
+            $tree = Tree::withDepth()->find($user->binaryTree->id);
+            $tree->_dpt = $tree->depth;
+            $tree->save();
+        });
+        ReferralTree::withoutEvents(function ()use ($user){
+            $referral = ReferralTree::withDepth()->find($user->referralTree->id);
+            $referral->_dpt = $referral->depth;
+            $referral->save();
+        });
+
+       ;
     }
 }

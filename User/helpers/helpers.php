@@ -4,7 +4,6 @@
  * user_roles
  */
 
-use Illuminate\Http\Request;
 use User\Services\UserService;
 const USER_ROLE_SUPER_ADMIN = 'super-admin';
 const USER_ROLE_ADMIN_GATEWAY = 'user-gateway-admin';
@@ -31,6 +30,64 @@ const USER_ROLES = [
     USER_ROLE_HELP_DESK,
 ];
 
+if (!function_exists('arrayHasValue')) {
+    function arrayHasValue($value, $array)
+    {
+        if (!is_array($array) )
+            return false;
+        if ($key = array_search($value, $array) !== false){
+            return true;
+        }
+        return false;
+    }
+}
+
+if (!function_exists('getPackageGrpcClient')) {
+    function getPackageGrpcClient()
+    {
+        return new \Packages\Services\Grpc\PackagesServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+if (!function_exists('getGatewayGrpcClient')) {
+    function getGatewayGrpcClient()
+    {
+        return new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL', 'development.dreamcometrue.ai:9595'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+if (!function_exists('getWalletGrpcClient')) {
+    function getWalletGrpcClient()
+    {
+        return new \Wallets\Services\Grpc\WalletServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
+            'credentials' => \Grpc\ChannelCredentials::createInsecure()
+        ]);
+    }
+}
+
+if (!function_exists('updateUserFromGrpcServer')) {
+
+    function updateUserFromGrpcServer($input_id): ?\User\Services\Grpc\User
+    {
+        if(!is_numeric($input_id))
+            return null;
+        $id = new \User\Services\Grpc\Id();
+        $id->setId((int)$input_id);
+        try {
+            $grpc_user = \User\Services\Grpc\GatewayClientFacade::getUserById($id);
+            if(!$grpc_user->getId())
+                return null;
+            app(UserService::class)->userUpdate($grpc_user);
+            return $grpc_user;
+        } catch (\Exception $exception) {
+            return null;
+        }
+    }
+}
 
 if (!function_exists('updateUserFromGrpcServerByMemberId')) {
 
@@ -38,44 +95,14 @@ if (!function_exists('updateUserFromGrpcServerByMemberId')) {
     {
         if(!is_numeric($input_id))
             return null;
-        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL','staging-api-gateway.janex.org:9595'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
         $id = new \User\Services\Grpc\Id();
         $id->setId((int)$input_id);
         try {
-            /** @var $user \User\Services\Grpc\User */
-            list($user, $status) = $client->getUserByMemberId($id)->wait();
-            if ($status->code == 0 && $user->getId()) {
-                \Illuminate\Support\Facades\Log::info('User Updated by GRPC/MemberID => ' . $user->getId());
-                app(UserService::class)->userUpdate($user);
-                return $user;
-            }
-            return null;
-        } catch (\Exception $exception) {
-            return null;
-        }
-    }
-}
-if (!function_exists('updateUserFromGrpcServer')) {
-
-    function updateUserFromGrpcServer($input_id): ?\User\Services\Grpc\User
-    {
-        if (!is_numeric($input_id))
-            return null;
-        $client = new \User\Services\Grpc\UserServiceClient(env('API_GATEWAY_GRPC_URL','staging-api-gateway.janex.org:9595'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-        $id = new \User\Services\Grpc\Id();
-        $id->setId((int)$input_id);
-        try {
-            /** @var $user \User\Services\Grpc\User */
-            list($user, $status) = $client->getUserById($id)->wait();
-            if ($status->code == 0 && $user->getId()) {
-                app(UserService::class)->userUpdate($user);
-                return $user;
-            }
-            return null;
+            $grpc_user = \User\Services\Grpc\GatewayClientFacade::getUserById($id);
+            if(!$grpc_user->getId())
+                return null;
+            app(UserService::class)->userUpdate($grpc_user);
+            return $grpc_user;
         } catch (\Exception $exception) {
             return null;
         }

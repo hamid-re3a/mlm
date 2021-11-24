@@ -15,6 +15,22 @@ class UserFeatureTest extends UserTest
     /**
      * @test
      */
+    public function admin_can_edit_commission_of_user()
+    {
+        $user = User::factory()->create();
+        $this->withHeaders($this->getHeaders(1));
+        $res = $this->put(route('admin.users.toggleCommissionToBlacklist'), [
+            'user_id' => $user->id,
+            'deactivated_commission_type'=> [TRAINER_BONUS_COMMISSION]
+        ]);
+        $res->assertOk();
+        $user->refresh();
+        $this->assertEquals($user->deactivated_commission_types,[TRAINER_BONUS_COMMISSION]);
+
+    }
+    /**
+     * @test
+     */
     public function user_can_edit_binary_position()
     {
         $user = User::factory()->create([
@@ -90,7 +106,7 @@ class UserFeatureTest extends UserTest
 //        $user = User::factory()->create();
 //        $user->assignRole(USER_ROLE_CLIENT);
 //        $user->save();
-//        $hash = md5(serialize($user->getUserService()));
+//        $hash = md5(serialize($user->getGrpcMessage()));
 //        $this->put(route('users.binaryPosition'), [
 //            'id' => $user->id,
 //            'default_binary_position' => \MLM\Models\Tree::RIGHT

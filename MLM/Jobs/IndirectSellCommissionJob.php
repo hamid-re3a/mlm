@@ -36,12 +36,23 @@ class IndirectSellCommissionJob implements ShouldQueue
 
     public function handle(UserService $user_service)
     {
+        if(!getSetting('INDIRECT_SELL_COMMISSION_IS_ACTIVE')){
+            return ;
+        }
 
         if (is_null($this->user->referralTree->parent) || is_null($this->user->referralTree->parent->user_id))
             return;
         $parent = $user_service->findByIdOrFail($this->user->referralTree->parent->user_id);
+
+        if (arrayHasValue(INDIRECT_SELL_COMMISSION, $parent->deactivated_commission_types)) {
+            if ($this->level == 9)
+                return;
+            IndirectSellCommissionJob::dispatch($parent, $this->package, ++$this->level);
+            return ;
+        }
         $biggest_active_package = $parent->biggestActivePackage();
-        if ($biggest_active_package) {
+        if ($biggest_active_package && $biggest_active_package->canGetCommission()) {
+
             /** @var  $indirect_found OrderedPackagesIndirectCommission */
             $indirect_found = $biggest_active_package->indirectCommission()->where('level', $this->level)->first();
             if ($indirect_found) {

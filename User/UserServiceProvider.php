@@ -5,13 +5,18 @@ namespace User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Packages\Services\Grpc\PackageClientFacade;
+use Packages\Services\Grpc\PackageGrpcClientProvider;
+use User\Convert\FixTreeConvertCommand;
+use Wallets\Services\Grpc\WalletClientFacade;
+use Wallets\Services\Grpc\WalletClientProvider;
 use User\Convert\ConvertCommand;
 use User\Models\User;
 use User\Observers\UserObserver;
-use User\Services\Grpc\UserUpdate;
+use User\Services\Grpc\GatewayClientFacade;
+use User\Services\Grpc\GatewayGrpcClientProvider;
 
 class UserServiceProvider extends ServiceProvider
 {
@@ -27,6 +32,8 @@ class UserServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerFacades();
+
         if (!$this->app->runningInConsole()) {
             return;
         }
@@ -56,12 +63,8 @@ class UserServiceProvider extends ServiceProvider
                 && is_numeric($request->header('X-user-id'))
             ) {
 
-
-
                 $user_hash_request = $request->header('X-user-hash');
                 $user = User::query()->whereId($request->header('X-user-id'))->first();
-
-
                 /**
                  * if there is not exist user. get data user complete from api gateway
                  * error code 470 is for data user not exist log for development
@@ -72,11 +75,9 @@ class UserServiceProvider extends ServiceProvider
                         throw new Exception('please try another time!', 470);
 
                     $user = User::query()->whereId($request->header('X-user-id'))->first();
-
                 }
 
-                $hash_user_service = md5(serialize($user->getUserService()));
-
+                $hash_user_service = md5(serialize($user->getGrpcMessage()));
                 /**
                  * if there is not update data user. get data user complete from api gateway
                  * error code 471 is for data user not update log for development
@@ -113,11 +114,19 @@ class UserServiceProvider extends ServiceProvider
 
 
             $this->commands([
-                ConvertCommand::class
+                ConvertCommand::class,
+                FixTreeConvertCommand::class
             ]);
         }
 
         User::observe(UserObserver::class);
+    }
+
+    private function registerFacades()
+    {
+        GatewayClientFacade::shouldProxyTo(GatewayGrpcClientProvider::class);
+        WalletClientFacade::shouldProxyTo(WalletClientProvider::class);
+        PackageClientFacade::shouldProxyTo(PackageGrpcClientProvider::class);
     }
 
     /**

@@ -9,7 +9,6 @@ use MLM\Http\Requests\BinaryTreeMultiRequest;
 use MLM\Http\Requests\ReferralTreeMultiRequest;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
-use User\Models\User;
 
 class TreeController extends Controller
 {
@@ -35,13 +34,16 @@ class TreeController extends Controller
         }
 
         if ($request->has('id') && request('id'))
-            $tree = Tree::with(['user', 'user.rank_model'])->withDepth()->where('user_id', request('id'))->firstOrFail();
+            $tree = Tree::with(['user', 'user.rank_model'])->where('user_id', request('id'))->firstOrFail();
         else
-            $tree = Tree::with(['user', 'user.rank_model'])->withDepth()->where('user_id', auth()->user()->id)->first();
-        $depth = $tree->depth;
+            $tree = Tree::with(['user', 'user.rank_model'])->where('user_id', auth()->user()->id)->first();
+        $depth = $tree->_dpt;
 
-        $users = Tree::with(['user', 'user.rank_model'])->withDepth()->descendantsAndSelf($tree->id)
-            ->where('depth', '<=', $depth + $level)->groupBy('parent_id');
+        $users = Tree::with(['user', 'user.rank_model'])
+            ->where('_dpt', '>', $depth )
+            ->where('_dpt', '<=', $depth + $level)
+            ->descendantsAndSelf($tree->id)
+            ->groupBy('parent_id');
         return api()->success('', $this->binaryTreeResource($tree, $users));
     }
 
@@ -94,13 +96,17 @@ class TreeController extends Controller
         }
 
         if ($request->has('id') && request('id'))
-            $tree = ReferralTree::with('user')->withDepth()->where('user_id', request('id'))->firstOrFail();
+            $tree = ReferralTree::with('user')->where('user_id', request('id'))->firstOrFail();
         else
-            $tree = ReferralTree::with('user')->withDepth()->where('user_id', auth()->user()->id)->first();
-        $depth = $tree->depth;
+            $tree = ReferralTree::with('user')->where('user_id', auth()->user()->id)->first();
+        $depth = $tree->_dpt;
 
-        $users = ReferralTree::with('user')->withDepth()->descendantsAndSelf($tree->id)
-            ->where('depth', '<=', $depth + 10)->groupBy('parent_id');
+        $users = ReferralTree::with('user')
+            ->where('_dpt', '>', $depth )
+            ->where('_dpt', '<=', $depth + $level)
+            ->limit(2000)
+            ->descendantsAndSelf($tree->id)
+            ->groupBy('parent_id');
 
         return api()->success('', $this->referralTreeResource($tree, $users));
     }

@@ -50,11 +50,16 @@ class MLMController extends Controller
             ];
         } else {
             $binary_tree = Tree::query()->where('user_id', $user->id)->first();
-            $referral_tree = ReferralTree::withDepth()->where('user_id', $user->id)->first();
-            $depth = $referral_tree->depth;
-            $max_depth = ReferralTree::withDepth()->descendantsAndSelf($referral_tree->id)->max('depth');
+            $binary_depth = $binary_tree->_dpt;
+            $max_binary_depth = Tree::query()->descendantsAndSelf($binary_tree->id)->max('_dpt');
+
+
+            $referral_tree = ReferralTree::query()->where('user_id', $user->id)->first();
+            $referral_depth = $referral_tree->_dpt;
+            $max_referral_depth = ReferralTree::query()->descendantsAndSelf($referral_tree->id)->max('_dpt');
             $info = [
-                'level' => $max_depth - $depth,
+                'binary_level' => $max_binary_depth - $binary_depth,
+                'referral_level' => $max_referral_depth - $referral_depth,
                 'converted_points' => $binary_tree->converted_points,
                 'left_leg_points' => $binary_tree->leftSideChildrenPackagePrice(),
                 'right_leg_points' => $binary_tree->rightSideChildrenPackagePrice(),

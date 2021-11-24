@@ -29,13 +29,13 @@ class DashboardController extends Controller
             if(!$user->binaryTree->hasLeftChild()){
                 return null;
             }
-            return Tree::query()->whereBetween('created_at',[$from_day,$to_day])->descendantsAndSelf($user->binaryTree->leftChild()->id);
+            return Tree::query()->select('created_at')->whereBetween('created_at',[$from_day,$to_day])->descendantsAndSelf($user->binaryTree->leftChild()->id);
         };
         $function_right_members = function ($from_day, $to_day) use ($user){
             if(!$user->binaryTree->hasRightChild()){
                 return null;
             }
-            return Tree::query()->whereBetween('created_at',[$from_day,$to_day])->descendantsAndSelf($user->binaryTree->rightChild()->id);
+            return Tree::query()->select('created_at')->whereBetween('created_at',[$from_day,$to_day])->descendantsAndSelf($user->binaryTree->rightChild()->id);
         };
         $sub_function = function ($collection, $intervals) {
             if(is_null($collection))

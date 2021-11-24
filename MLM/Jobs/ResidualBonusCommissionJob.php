@@ -23,23 +23,32 @@ class ResidualBonusCommissionJob implements ShouldQueue
 
     public function __construct(User $user)
     {
-        $this->queue = env('QUEUE_RESIDUAL_NAME','mlm_residual');
+        $this->queue = env('QUEUE_RESIDUAL_NAME', 'mlm_residual');
         $this->user = $user;
     }
 
     public function handle()
     {
+        if (!getSetting('RESIDUAL_BONUS_COMMISSION_IS_ACTIVE')) {
+            return;
+        }
+
+        if (arrayHasValue(RESIDUAL_BONUS_COMMISSION, $this->user->deactivated_commission_types)) {
+            return;
+        }
         if ($this->user->commissions()
             ->where('type', RESIDUAL_BONUS_COMMISSION)
             ->whereDate('created_at', now()->toDate())->exists())
             return;
-        $tree = ReferralTree::withDepth()->where('user_id', $this->user->id)->first();
-        $depth = $tree->depth;
+        $tree = ReferralTree::query()->where('user_id', $this->user->id)->first();
+        $depth = $tree->_dpt;
         $commission_amount = (double)0;
         foreach ($this->user->residualBonusSetting as $residual_bonus_setting) {
 
-            $users = ReferralTree::withDepth()->descendantsAndSelf($tree->id)
-                ->where('depth', $depth + $residual_bonus_setting->level)
+            $users = ReferralTree::query()
+                ->where('_dpt', $depth + $residual_bonus_setting->level)
+                ->descendantsAndSelf($tree->id)
+
                 ->pluck('user_id')->toArray();
 
             $descendants_commission = CommissionModel::query()->where('type', TRADING_PROFIT_COMMISSION)
@@ -48,8 +57,6 @@ class ResidualBonusCommissionJob implements ShouldQueue
 
             $commission_amount += ($residual_bonus_setting->percentage / 100) * $descendants_commission;
         }
-
-
 
 
         /** @var $deposit_service_object  Deposit */
@@ -65,10 +72,7 @@ class ResidualBonusCommissionJob implements ShouldQueue
         $deposit_service_object->setSubType('Residual Bonus');
 
 
-
-
-        (new CommissionResolver)->payCommission($deposit_service_object,$this->user,RESIDUAL_BONUS_COMMISSION);
-
+        (new CommissionResolver)->payCommission($deposit_service_object, $this->user, RESIDUAL_BONUS_COMMISSION);
 
 
     }
