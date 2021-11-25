@@ -406,7 +406,7 @@ const EMAIL_CONTENT_SETTINGS = [
     'USER_RANK_HAS_BEEN_CHANGED' => [
         'is_active' => true,
         'subject' => 'Your rank has been changed',
-        'from' => 'it@dreamcometrue.com',
+        'from' => 'it@dreamcometrue.ai',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -424,7 +424,7 @@ const EMAIL_CONTENT_SETTINGS = [
     'USER_GOT_COMMISSION' => [
         'is_active' => true,
         'subject' => 'You have received commissions',
-        'from' => 'it@dreamcometrue.com',
+        'from' => 'it@dreamcometrue.ai',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -440,4 +440,3 @@ const EMAIL_CONTENT_SETTINGS = [
         'type' => 'email',
     ],
 ];
-
