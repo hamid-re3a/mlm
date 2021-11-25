@@ -15,6 +15,8 @@ class AddDepthTreesTable extends Migration
     {
         Schema::table('trees', function (Blueprint $table) {
             $table->unsignedInteger('_dpt')->default(0);
+            $table->tinyInteger('vacancy')->default(VACANCY_ALL);
+            $table->index('vacancy');
             $table->index('_dpt');
         });
     }
@@ -29,6 +31,9 @@ class AddDepthTreesTable extends Migration
         Schema::table('trees', function (Blueprint $table) {
             $table->dropColumn('_dpt');
             $table->dropIndex('_dpt');
+            $table->dropColumn('vacancy');
+            $table->dropIndex('vacancy');
+
         });
     }
 }

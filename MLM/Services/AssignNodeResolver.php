@@ -116,30 +116,105 @@ class AssignNodeResolver
         return true;
     }
 
-    private function attachUserToBinary(Tree $to_user, string $string, $call = 1)
+//    private function attachUserToBinary(Tree $to_user, string $string, $call = 1)
+//    {
+//        if ($string == Tree::LEFT) {
+//
+////            Do not remove this comment
+//
+////            $lefty = Tree::query()->whereRaw('_rgt - _lft = 3')->where('position','left')->orderBy('_lft','asc')->descendantsAndSelf(1)->first();
+////            $leaf_lefty = Tree::query()->whereRaw('_rgt - _lft = 1')->where('position','left')->orderBy('_lft','asc')->descendantsAndSelf(1)->first();
+////            if(is_null($lefty) || $lefty->_lft >= $leaf_lefty->_lft || $lefty->hasLeftChild()){
+////                $nominee = $leaf_lefty;
+////            } else {
+////                $nominee = $lefty;
+////            }
+//
+//            if (!$to_user->hasLeftChild()) {
+//                return $to_user->appendAsLeftNode($this->user->buildBinaryTreeNode());
+//            } else {
+//                return $this->attachUserToBinary($to_user->children()->left()->first(), $string, ++$call);
+//            }
+//        } else
+//            if (!$to_user->hasRightChild()) {
+//                return $to_user->appendAsRightNode($this->user->buildBinaryTreeNode());
+//            } else {
+//                return $this->attachUserToBinary($to_user->children()->right()->first(), $string,++$call);
+//            }
+//
+//    }
+    private function updateNodeVacancy(Tree $node)
     {
+
+        if ($node->children()->count() == 0) {
+            $node->vacancy = VACANCY_ALL;
+        } else if ($node->children()->count() == 2) {
+            $node->vacancy = VACANCY_NONE;
+        } else if ($node->children()->count() == 1 && $node->hasLeftChild()) {
+            $node->vacancy = VACANCY_RIGHT;
+        } else {
+            $node->vacancy = VACANCY_LEFT;
+        }
+        $node->save();
+
+    }
+
+    private function attachUserToBinary(Tree $to_user, string $string)
+    {
+        $new_tree_node = $this->user->buildBinaryTreeNode();
+
         if ($string == Tree::LEFT) {
 
-//            Do not remove this comment
-
-//            $lefty = Tree::query()->whereRaw('_rgt - _lft = 3')->where('position','left')->orderBy('_lft','asc')->descendantsAndSelf(1)->first();
-//            $leaf_lefty = Tree::query()->whereRaw('_rgt - _lft = 1')->where('position','left')->orderBy('_lft','asc')->descendantsAndSelf(1)->first();
-//            if(is_null($lefty) || $lefty->_lft >= $leaf_lefty->_lft || $lefty->hasLeftChild()){
-//                $nominee = $leaf_lefty;
-//            } else {
-//                $nominee = $lefty;
-//            }
-
             if (!$to_user->hasLeftChild()) {
-                return $to_user->appendAsLeftNode($this->user->buildBinaryTreeNode());
+                $to_user->appendAsLeftNode($new_tree_node);
+                if ($to_user->hasRightChild()) {
+                    if ($new_tree_node->_lft > $to_user->rightChild()->_lft)
+                        $new_tree_node->insertBeforeNode($to_user->rightChild());
+                }
+                $this->updateNodeVacancy($to_user);
             } else {
-                return $this->attachUserToBinary($to_user->children()->left()->first(), $string, ++$call);
+                $lefty = Tree::query()
+                    ->where('_lft', '>', $to_user->_lft)
+                    ->where('_rgt', '<', $to_user->_rgt)
+                    ->where('position', 'left')
+                    ->whereIn('vacancy', [VACANCY_ALL, VACANCY_LEFT])
+                    ->orderBy('_lft', 'asc')
+                    ->limit(1)
+                    ->first();
+                $lefty->appendAsLeftNode($new_tree_node);
+                if ($lefty->hasRightChild()) {
+                    if ($new_tree_node->_lft > $to_user->rightChild()->_lft)
+                        $new_tree_node->insertBeforeNode($lefty->rightChild());
+                }
+                $this->updateNodeVacancy($lefty);
             }
         } else
+
             if (!$to_user->hasRightChild()) {
-                return $to_user->appendAsRightNode($this->user->buildBinaryTreeNode());
+
+                $to_user->appendAsRightNode($new_tree_node);
+                if ($to_user->hasLeftChild()) {
+                    if ($new_tree_node->_rgt < $to_user->rightChild()->_rgt)
+                        $new_tree_node->insertAfterNode($to_user->leftChild());
+                }
+                $this->updateNodeVacancy($to_user);
             } else {
-                return $this->attachUserToBinary($to_user->children()->right()->first(), $string,++$call);
+                $righty = Tree::query()
+                    ->where('_lft', '>', $to_user->_lft)
+                    ->where('_rgt', '<', $to_user->_rgt)
+                    ->whereIn('vacancy', [VACANCY_ALL, VACANCY_RIGHT])
+                    ->where('position', 'right')
+                    ->orderBy('_rgt', 'desc')
+                    ->limit(1)
+                    ->first();
+
+
+                $righty->appendAsRightNode($new_tree_node);
+                if ($righty->hasLeftChild()) {
+                    if ($new_tree_node->_rgt < $to_user->rightChild()->_rgt)
+                        $new_tree_node->insertAfterNode($righty->leftChild());
+                }
+                $this->updateNodeVacancy($righty);
             }
 
     }
@@ -148,17 +223,15 @@ class AssignNodeResolver
     {
         $user = $this->user;
         $user->refresh();
-        Tree::withoutEvents(function () use ($user){
+        Tree::withoutEvents(function () use ($user) {
             $tree = Tree::withDepth()->find($user->binaryTree->id);
             $tree->_dpt = $tree->depth;
             $tree->save();
         });
-        ReferralTree::withoutEvents(function ()use ($user){
+        ReferralTree::withoutEvents(function () use ($user) {
             $referral = ReferralTree::withDepth()->find($user->referralTree->id);
             $referral->_dpt = $referral->depth;
             $referral->save();
-        });
-
-       ;
+        });;
     }
 }
