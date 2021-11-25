@@ -12,6 +12,9 @@ User Unit (User\tests\Unit\UserUnit)
 Order (MLM\tests\UnitTest\Order\Order)
  [x] Add user to both tree with valid ordered package
  [x] Add four user to same sponsor cause no problem
+ [x] User attach to right child
+ [x] User attach to random
+ [x] User attach to left child
  [x] User activate binary after adding new member to each side of binary tree
  [x] Trainer bonus to our very diligent user because of his team
  [x] Binary commission to first user

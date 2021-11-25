@@ -28,10 +28,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('roi:trading')->dailyAt('00:00');
         $schedule->command('roi:residual')->dailyAt('12:00');
         $schedule->command('queue:retry all')->everyThreeHours();
-        $schedule->call(function(){
-            Tree::withoutEvents(function(){Tree::fixTree();});
-            ReferralTree::withoutEvents(function(){ReferralTree::fixTree();});
-        })->daily();
+//        $schedule->call(function(){
+//            Tree::withoutEvents(function(){Tree::fixTree();});
+//            ReferralTree::withoutEvents(function(){ReferralTree::fixTree();});
+//        })->daily();
     }
 
     /**

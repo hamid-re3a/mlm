@@ -42,6 +42,7 @@ class TreeController extends Controller
         $users = Tree::with(['user', 'user.rank_model'])
             ->where('_dpt', '>', $depth )
             ->where('_dpt', '<=', $depth + $level)
+            ->limit(500)
             ->descendantsAndSelf($tree->id)
             ->groupBy('parent_id');
         return api()->success('', $this->binaryTreeResource($tree, $users));
@@ -104,7 +105,7 @@ class TreeController extends Controller
         $users = ReferralTree::with('user')
             ->where('_dpt', '>', $depth )
             ->where('_dpt', '<=', $depth + $level)
-            ->limit(2000)
+            ->limit(500)
             ->descendantsAndSelf($tree->id)
             ->groupBy('parent_id');
 

@@ -3,12 +3,14 @@
 namespace MLM\tests\UnitTest\Order;
 
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Mail;
 use MLM\Models\OrderedPackage;
 use MLM\Models\PackageRoi;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use MLM\Services\OrderResolver;
+use User\Models\User;
 use Wallets\Services\Grpc\WalletClientFacade;
 use MLM\tests\MLMTest;
 use Orders\Services\Grpc\Order;
@@ -22,7 +24,7 @@ class OrderTest extends MLMTest
         parent::setUp();
         Mail::fake();
         ReferralTree::create(['user_id' => 1]);
-        Tree::create(['user_id' => 1]);
+        Tree::create(['user_id' => 1,'position'=>'left']);
         WalletClientFacade::shouldReceive('deposit')->andReturn( new Deposit());
 
     }
@@ -70,7 +72,146 @@ class OrderTest extends MLMTest
 
     }
 
+    /**
+     * @test
+     */
+    public function user_attach_to_right_child()
+    {
 
+        //register first user
+        $user = $this->registerUser();
+
+        $this->registerUser($user->id);
+
+        $user->default_binary_position = "right";
+        $user->save();
+
+
+
+        //register second user
+        $second_user = $this->registerUser($user->id);
+        $this->assertEquals($second_user->binaryTree->parent->id,$user->binaryTree->id);
+        // register $third_user
+        $third_user = $this->registerUser($user->id);
+        $this->assertEquals($third_user->binaryTree->parent->id,$second_user->binaryTree->id);
+
+        // register $forth_user
+        $forth_user = $this->registerUser($user->id);
+        $this->assertEquals($forth_user->binaryTree->parent->id,$third_user->binaryTree->id);
+
+        // register $fifth_user
+        $fifth_user = $this->registerUser($user->id);
+
+        $this->assertEquals($fifth_user->binaryTree->parent->id,$forth_user->binaryTree->id);
+    }
+
+    /**
+     * @test
+     */
+    public function user_attach_to_random()
+    {
+        /**
+         *    ['id' => 1, 'position' => null, 'parent_id' => null],
+        ['id' => 2, 'position' => 'left', 'parent_id' => 1],
+        ['id' => 3, 'position' => 'right', 'parent_id' => 1],
+        ['id' => 4, 'position' => 'right', 'parent_id' => 2],
+        ['id' => 5, 'position' => 'left', 'parent_id' => 2],
+        ['id' => 6, 'position' => 'right', 'parent_id' => 3],
+        ['id' => 7, 'position' => 'left', 'parent_id' => 3],
+        ['id' => 8, 'position' => 'right', 'parent_id' => 4],
+        ['id' => 9, 'position' => 'left', 'parent_id' => 4],
+        ['id' => 10, 'position' => 'right', 'parent_id' => 5],
+        ['id' => 11, 'position' => 'left', 'parent_id' => 5],
+         */
+        $user1 = User::query()->find(1);
+        $user2 = $this->registerUser();
+
+        $user1->default_binary_position = "right";
+        $user1->save();
+        $user3 = $this->registerUser();
+
+        $user2->default_binary_position = "right";
+        $user2->save();
+        $user4 = $this->registerUser($user2->id);
+
+        $user2->default_binary_position = "left";
+        $user2->save();
+        $user5 = $this->registerUser($user2->id);
+
+        $user3->default_binary_position = "right";
+        $user3->save();
+        $user6 = $this->registerUser($user3->id);
+
+        $user3->default_binary_position = "left";
+        $user3->save();
+        $user7 = $this->registerUser($user3->id);
+
+        $user4->default_binary_position = "right";
+        $user4->save();
+        $user8 = $this->registerUser($user4->id);
+
+        $user4->default_binary_position = "left";
+        $user4->save();
+        $user9 = $this->registerUser($user4->id);
+
+        $user5->default_binary_position = "right";
+        $user5->save();
+        $user10 = $this->registerUser($user5->id);
+
+
+        $this->assertEquals($user10->binaryTree->parent->id,$user5->binaryTree->id);
+
+        $user5->default_binary_position = "left";
+        $user5->save();
+        $user11 = $this->registerUser($user5->id);
+
+
+        $user1->default_binary_position = "right";
+        $user1->save();
+        $user12 = $this->registerUser($user1->id);
+        $this->assertEquals(6,$user12->binaryTree->parent->id);
+
+
+
+
+        $user1->default_binary_position = "left";
+        $user1->save();
+        $user13 = $this->registerUser($user1->id);
+        $this->assertEquals(11,$user13->binaryTree->parent->id);
+    }
+    /**
+     * @test
+     */
+    public function user_attach_to_left_child()
+    {
+
+        //register first user
+        $user = $this->registerUser();
+
+        $user->default_binary_position = "right";
+        $user->save();
+        $this->registerUser($user->id);
+
+        $user->default_binary_position = "left";
+        $user->save();
+
+
+        //register second user
+        $second_user = $this->registerUser($user->id);
+        $this->assertEquals($second_user->binaryTree->parent->id,$user->binaryTree->id);
+        // register $third_user
+        $third_user = $this->registerUser($user->id);
+        $this->assertEquals($third_user->binaryTree->parent->id,$second_user->binaryTree->id);
+
+        // register $forth_user
+        $forth_user = $this->registerUser($user->id);
+        $this->assertEquals($forth_user->binaryTree->parent->id,$third_user->binaryTree->id);
+
+        // register $fifth_user
+        $fifth_user = $this->registerUser($user->id);
+
+        $this->assertEquals($fifth_user->binaryTree->parent->id,$forth_user->binaryTree->id);
+    }
     /**
      * @test
      */
@@ -385,9 +526,8 @@ class OrderTest extends MLMTest
             'sponsor_id' => $sponsor_id
         ]);
         $order = $this->createOrderWithUser($user, $package_price, $package_id);
-
         list($bool, $msg) = (new OrderResolver($order))->handle();
-        $this->assertTrue($bool);
+        $this->assertTrue($bool,$msg);
         return $user;
     }
 

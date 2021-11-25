@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDepthTreesTable extends Migration
+class AddVacancyTreesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,8 +14,8 @@ class AddDepthTreesTable extends Migration
     public function up()
     {
         Schema::table('trees', function (Blueprint $table) {
-            $table->unsignedInteger('_dpt')->default(0)->after('_rgt');
-            $table->index('_dpt');
+            $table->tinyInteger('vacancy')->default(VACANCY_ALL)->after('position');
+            $table->index('vacancy');
         });
     }
 
@@ -27,8 +27,8 @@ class AddDepthTreesTable extends Migration
     public function down()
     {
         Schema::table('trees', function (Blueprint $table) {
-            $table->dropColumn('_dpt');
-            $table->dropIndex('_dpt');
+            $table->dropColumn('vacancy');
+            $table->dropIndex('vacancy');
 
         });
     }
