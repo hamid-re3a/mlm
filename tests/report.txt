@@ -40,6 +40,10 @@ Binary Tree (MLM\tests\UnitTest\Tree\BinaryTree)
 Dashboard (MLM\tests\Feature\Tree\Dashboard)
  [x] Binary chart
 
+Email Content Fetch And Update Data (MLM\tests\Feature\EmailContentFetchAndUpdateData)
+ [x] Admin can fetch email contents
+ [x] Admin can update email content
+
 Package Roi Create Feature (MLM\tests\Feature\PackageRoiCreateFeature)
  [x] User can create packageRoi
  [x] Only super admin and mlm admin can create packageRoi
