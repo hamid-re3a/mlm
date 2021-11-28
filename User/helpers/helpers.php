@@ -5,6 +5,16 @@
  */
 
 use User\Services\UserService;
+
+
+const VACANCY_NONE = 0;
+const VACANCY_LEFT = 1;
+const VACANCY_RIGHT = 3;
+const VACANCY_ALL = 2;
+
+
+
+
 const USER_ROLE_SUPER_ADMIN = 'super-admin';
 const USER_ROLE_ADMIN_GATEWAY = 'user-gateway-admin';
 const USER_ROLE_ADMIN_KYC = 'kyc-admin';

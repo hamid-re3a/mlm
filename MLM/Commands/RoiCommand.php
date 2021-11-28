@@ -47,15 +47,18 @@ class RoiCommand extends Command
             return;
         }
 
-        $ordered_packages = OrderedPackage::query()->active()->notSpecial()->canGetRoi()->get();
-        $bar = $this->output->createProgressBar($ordered_packages->count());
+        $ordered_packages_count = OrderedPackage::query()->active()->notSpecial()->canGetRoi()->count();
+        $bar = $this->output->createProgressBar($ordered_packages_count);
         $this->info(PHP_EOL . 'Start trading profits');
         $bar->start();
-
-        foreach ($ordered_packages as $item) {
-            TradingProfitCommissionJob::dispatch($item);
-            $bar->advance();
-        }
+        OrderedPackage::
+        query()->active()->notSpecial()->canGetRoi()->
+        chunk(100, function ($ordered_packages) use ($bar) {
+            foreach ($ordered_packages as $item) {
+                TradingProfitCommissionJob::dispatch($item);
+                $bar->advance();
+            }
+        });
 
 
         $bar->finish();

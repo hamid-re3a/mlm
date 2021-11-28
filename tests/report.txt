@@ -12,6 +12,9 @@ User Unit (User\tests\Unit\UserUnit)
 Order (MLM\tests\UnitTest\Order\Order)
  [x] Add user to both tree with valid ordered package
  [x] Add four user to same sponsor cause no problem
+ [x] User attach to right child
+ [x] User attach to random
+ [x] User attach to left child
  [x] User activate binary after adding new member to each side of binary tree
  [x] Trainer bonus to our very diligent user because of his team
  [x] Binary commission to first user
@@ -36,6 +39,10 @@ Binary Tree (MLM\tests\UnitTest\Tree\BinaryTree)
 
 Dashboard (MLM\tests\Feature\Tree\Dashboard)
  [x] Binary chart
+
+Email Content Fetch And Update Data (MLM\tests\Feature\EmailContentFetchAndUpdateData)
+ [x] Admin can fetch email contents
+ [x] Admin can update email content
 
 Package Roi Create Feature (MLM\tests\Feature\PackageRoiCreateFeature)
  [x] User can create packageRoi

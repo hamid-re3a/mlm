@@ -51,17 +51,20 @@ class ResidualBonusCommand extends Command
 
         $min_rank =ResidualBonusSetting::query()->min('rank');
 
-        $users = User::query()->where('rank','>=',$min_rank)->get();
+        $count = User::query()->where('rank','>=',$min_rank)->count();
 
 
-        $bar = $this->output->createProgressBar($users->count());
+        $bar = $this->output->createProgressBar($count);
         $this->info(PHP_EOL . 'Start residual bonus commissions');
         $bar->start();
-
-        foreach ($users as $item) {
-            ResidualBonusCommissionJob::dispatch($item);
-            $bar->advance();
-        }
+        User::
+        query()->where('rank','>=',$min_rank)->
+        chunk(100, function ($users) use ($bar) {
+            foreach ($users as $item) {
+                ResidualBonusCommissionJob::dispatch($item);
+                $bar->advance();
+            }
+        });
 
 
         $bar->finish();

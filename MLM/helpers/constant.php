@@ -37,7 +37,7 @@ const RANK_1_BINARY_ACTIVE = [
 const RANK_2_BRONZE = [
     'rank_name' => 'bronze',
     'rank' => 2,
-    'condition_converted_in_bp' => 1000, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
+    'condition_converted_in_bp' => 1000, 'condition_sub_rank' => 0, 'condition_direct_or_indirect' => false,
     'prize_in_pf' => null, 'prize_alternative' => 'PIN',
     'cap' => 1000,
     'condition_number_of_right_children' => 1,
@@ -47,7 +47,7 @@ const RANK_2_BRONZE = [
 const RANK_3_SILVER = [
     'rank_name' => 'silver',
     'rank' => 3,
-    'condition_converted_in_bp' => 2500, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
+    'condition_converted_in_bp' => 2500, 'condition_sub_rank' => 0, 'condition_direct_or_indirect' => false,
     'prize_in_pf' => 150, 'prize_alternative' => 'Watch',
     'cap' => 1500,
     'condition_number_of_right_children' => 1,
