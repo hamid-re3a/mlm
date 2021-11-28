@@ -6,6 +6,7 @@ namespace MLM\Http\Controllers\Front;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use MLM\Http\Requests\BinaryTreeMultiRequest;
+use MLM\Http\Requests\BinaryTreePositionMultiRequest;
 use MLM\Http\Requests\ReferralTreeMultiRequest;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
@@ -49,7 +50,7 @@ class TreeController extends Controller
      * @queryParam id integer
      * @queryParam level integer
      */
-    public function getBinaryTreePositionMultiLevel(BinaryTreeMultiRequest $request)
+    public function getBinaryTreePositionMultiLevel(BinaryTreePositionMultiRequest $request)
     {
 
         $level = $request->has('level') ? (int)$request->level : 4;
@@ -71,7 +72,7 @@ class TreeController extends Controller
         else
             $node = $this->getRighty($tree);
 
-        if ($node) {
+        if ($node) {    
             $to_show_node = $this->findTopThreeNode($node);
         } else {
             $to_show_node = $tree;
