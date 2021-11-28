@@ -47,10 +47,11 @@ class FixTreeConvertCommand extends Command
     {
         ini_set('memory_limit', '-1');
         $this->info(PHP_EOL . 'Binary Trees Started' . PHP_EOL);
+        Tree::withoutEvents(function () {
+            Tree::fixTree();
+        });
         $bar = $this->output->createProgressBar(Tree::count());
-
         $bar->start();
-//        Tree::withoutEvents(function ()  use ($bar){
             Tree::
             withDepth()->
             chunk(200, function ($nodes) use ($bar) {
@@ -67,24 +68,34 @@ class FixTreeConvertCommand extends Command
                         $node->vacancy = VACANCY_LEFT;
                     }
                     $node->save();
-
-                    if(!is_null($node->parent) && $node->parent->children()->count()>1){
-                        $sib = $node->parent->children()->where('id','!=',$node->id)->first();
-
-                        if($node->position == Tree::LEFT){
-                            if($node->_lft > $sib->_lft)
-                                $node->insertBeforeNode($sib);
-                        } else {
-                            if($node->_rgt < $sib->_rgt)
-                                $node->insertAfterNode($sib);
-                        }
-                    }
-
                     $bar->advance();
 
                 }
             });
-//        });
+        $bar->finish();
+        $this->info(PHP_EOL . 'Binary Finished' . PHP_EOL);
+        $this->info(PHP_EOL . 'position check Finished' . PHP_EOL);
+        $bar = $this->output->createProgressBar(Tree::count());
+        $bar->start();
+        Tree::
+        withDepth()->
+        chunk(200, function ($nodes) use ($bar) {
+            foreach ($nodes as $node) {
+                if(!is_null($node->parent) && $node->parent->children()->count()>1){
+                    $sib = $node->parent->children()->where('id','!=',$node->id)->first();
+
+                    if($node->position == Tree::LEFT){
+                        if($node->_lft > $sib->_lft)
+                            $node->insertBeforeNode($sib);
+                    } else {
+                        if($node->_rgt < $sib->_rgt)
+                            $node->insertAfterNode($sib);
+                    }
+                }
+                $bar->advance();
+
+            }
+        });
         $bar->finish();
         $this->info(PHP_EOL . 'Binary Finished' . PHP_EOL);
 
