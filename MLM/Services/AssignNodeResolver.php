@@ -26,6 +26,10 @@ class AssignNodeResolver
      */
     private $to_user;
     /**
+     * @var \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|User|User[]
+     */
+    private $attach_to_user;
+    /**
      * @var AssignNode
      */
     private $plan;
@@ -36,6 +40,9 @@ class AssignNodeResolver
         $user_service = app(UserService::class);
         $this->user = $user_service->findByIdOrFail($order->getUserId());
         $this->to_user = $user_service->findByIdOrFail($this->user->sponsor_id);
+        $this->attach_to_user = null;
+        if ($this->order->getAttachUserId() != 0)
+            $this->attach_to_user = $user_service->findByIdOrFail($this->order->getAttachUserId());
         $this->plan = app(AssignNode::class);
     }
 
@@ -45,10 +52,14 @@ class AssignNodeResolver
         $msg = trans('responses.error');
         try {
             if ($this->to_user->hasBinaryNode() || $this->to_user->hasReferralNode()) {
-                $position = $this->to_user->default_binary_position;
 
-                // add user to binary tree
-                $this->attachUserToBinary($this->to_user->binaryTree, $position);
+                $flag = $this->attachBinary();
+                if ($flag == false) {
+                    DB::rollBack();
+                    return [false, trans('responses.tree-node-not-attached-successful')];
+                }
+
+
                 // add user to referral tree
                 $this->to_user->referralTree->appendNode($this->user->buildReferralTreeNode());
                 $this->fixNodeDepth();
@@ -233,5 +244,45 @@ class AssignNodeResolver
             $referral->_dpt = $referral->depth;
             $referral->save();
         });;
+    }
+
+    /**
+     * @return bool
+     */
+    private function attachBinary(): bool
+    {
+        $flag = true;
+        if (!is_null($this->attach_to_user)) {
+            if ($this->user->hasRole(USER_ROLE_SUPER_ADMIN)) {
+                if ($this->attach_to_user->binaryTree->children->count() < 2) {
+                    $new_tree_node = $this->user->buildBinaryTreeNode();
+                    if ($this->attach_to_user->binaryTree->hasLeftChild()) {
+                        $this->attach_to_user->binaryTree->appendAsRightNode($new_tree_node);
+                        if ($new_tree_node->_rgt < $this->attach_to_user->binaryTree->rightChild()->_rgt)
+                            $new_tree_node->insertAfterNode($this->attach_to_user->binaryTree->leftChild());
+                        $this->updateNodeVacancy($this->attach_to_user->binaryTree);
+                    } else {
+                        $this->attach_to_user->binaryTree->appendAsLeftNode($new_tree_node);
+                        if ($this->attach_to_user->binaryTree->hasRightChild()) {
+                            if ($new_tree_node->_lft > $this->attach_to_user->binaryTree->rightChild()->_lft)
+                                $new_tree_node->insertBeforeNode($this->attach_to_user->binaryTree->rightChild());
+                        }
+                        $this->updateNodeVacancy($this->attach_to_user->binaryTree);
+                    }
+
+                } else {
+                    $flag = false;
+                }
+            } else {
+                $flag = false;
+            }
+
+
+        } else {
+            $position = $this->to_user->default_binary_position;
+            // add user to binary tree
+            $this->attachUserToBinary($this->to_user->binaryTree, $position);
+        }
+        return $flag;
     }
 }

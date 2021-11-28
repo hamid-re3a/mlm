@@ -4,6 +4,7 @@
 namespace MLM\tests\Feature\Tree;
 
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Mail;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
@@ -20,9 +21,11 @@ class TreeFeatureTest extends MLMTest
         Mail::fake();
         $this->buildBinaryTree();
         $this->buildReferralTree();
+        Artisan::call('convert:fix');
+
         $this->withHeaders($this->getHeaders(1, USER_ROLE_CLIENT));
 
-        $response = $this->get(route('customer.trees.binary-multi-level').'?level=10');
+        $response = $this->get(route('customer.trees.binary-multi-level').'?level=3&position=left');
         $response->assertOk();
         $response = $this->get(route('customer.trees.referral-multi-level'));
         $response->assertOk();

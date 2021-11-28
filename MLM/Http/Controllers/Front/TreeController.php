@@ -6,7 +6,6 @@ namespace MLM\Http\Controllers\Front;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use MLM\Http\Requests\BinaryTreeMultiRequest;
-use MLM\Http\Requests\BinaryTreePositionMultiRequest;
 use MLM\Http\Requests\ReferralTreeMultiRequest;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
@@ -42,25 +41,22 @@ class TreeController extends Controller
 
 
         $to_show_node = $tree;
-        if (request('position') == 'right'){
+        if (request('position') == 'right') {
             $node = $this->getRighty($tree);
             if ($node) {
                 $to_show_node = $this->findTopThreeNode($node);
             }
-        } else if (request('position') == 'left'){
+        } else if (request('position') == 'left') {
             $node = $this->getLefty($tree);
             if ($node) {
                 $to_show_node = $this->findTopThreeNode($node);
             }
-        } else if (request('position') == 'top'){
+        } else if (request('position') == 'top') {
             $to_show_node = $this->findTopThreeNode($tree);
         }
-
         list($users, $lefty, $righty) = $this->showBinaryTree($to_show_node, $level);
-        return api()->success('', $this->binaryTreeResource($tree, $users, $lefty, $righty));
+        return api()->success('', $this->binaryTreeResource($to_show_node, $users, $lefty, $righty));
     }
-
-
 
 
     private function binaryTreeResource($tree, &$array, $lefty, $righty)
@@ -83,6 +79,8 @@ class TreeController extends Controller
             'left_carry' => $tree->leftSideChildrenPackagePrice() - $tree->converted_points,
             'right_carry' => $tree->rightSideChildrenPackagePrice() - $tree->converted_points,
             'position' => $tree->position,
+            'country' => $tree->user->country,
+            'country_iso2' => $tree->user->country_iso2,
             'created_at' => $tree->created_at->timestamp,
             'user' => $tree->user,
             'avatar' => $this->getAvatar($tree),
@@ -151,6 +149,8 @@ class TreeController extends Controller
             'sponsor_user' => $tree->user->sponsor,
             'parent_user' => optional($tree->parent)->user,
             'avatar' => $this->getAvatar($tree),
+            'country' => $tree->user->country,
+            'country_iso2' => $tree->user->country_iso2,
             'highest_package_detail' => $tree->user->biggestActivePackage(),
             'highest_package' => optional($tree->user->biggestActivePackage())->package,
             'has_children' => $tree->children()->exists(),
@@ -222,22 +222,21 @@ class TreeController extends Controller
         return $righty;
     }
 
-    private function findTopThreeNode(Tree $lefty)
+    private function findTopThreeNode(Tree $lefty, $level = 3)
     {
         $to_show = $lefty;
-        if (!is_null($lefty->parent)) {
+        if (!is_null($lefty->parent) && $level != 1) {
             $to_show = $lefty->parent;
-            if (!is_null($lefty->parent)) {
-                $to_show = $lefty->parent;
-                if (!is_null($lefty->parent)) {
-                    $to_show = $lefty->parent;
-                    if (!is_null($lefty->parent)) {
-                        $to_show = $lefty->parent;
+            if (!is_null($to_show->parent) && $level != 2) {
+                $to_show = $to_show->parent;
+                if (!is_null($to_show->parent) && $level != 3) {
+                    $to_show = $to_show->parent;
+                    if (!is_null($to_show->parent) && $level != 4) {
+                        $to_show = $to_show->parent;
                     }
                 }
             }
         }
-
         return $to_show;
     }
 
