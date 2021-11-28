@@ -41,6 +41,8 @@ class MLMController extends Controller
                 'converted_points' => 0,
                 'left_leg_points' => 0,
                 'right_leg_points' => 0,
+                'children_count_left' => 0,
+                'children_count_right' => 0,
 
                 'default_binary_position' => $user->default_binary_position,
                 'sponsor_user' => $user->sponsor,
@@ -64,6 +66,7 @@ class MLMController extends Controller
                 'left_leg_points' => $binary_tree->leftSideChildrenPackagePrice(),
                 'right_leg_points' => $binary_tree->rightSideChildrenPackagePrice(),
                 'children_count_left' => $binary_tree->leftChildCount(),
+                'children_count_right' => $binary_tree->rightChildCount(),
 
 
                 'default_binary_position' => $user->default_binary_position,

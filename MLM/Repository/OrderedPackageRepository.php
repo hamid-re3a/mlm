@@ -40,6 +40,8 @@ class OrderedPackageRepository
             "expires_at" => Carbon::make($order->getIsPaidAt())->addDays($order->getValidityInDays()),
             "created_at" => Carbon::make($order->getCreatedAt()),
             "updated_at" => Carbon::make($order->getUpdatedAt()),
+            "attach_user_id" => $order->getAttachUserId(),
+            "attach_user_position" => $order->getAttachUserPosition(),
         ]);
 
 

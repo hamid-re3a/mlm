@@ -9,6 +9,13 @@ User Feature (User\tests\Feature\UserFeature)
 User Unit (User\tests\Unit\UserUnit)
  [x] User can should have sponsor
 
+Order Position (MLM\tests\UnitTest\Order\OrderPosition)
+ [x] Add user to tree with position
+ [x] Add user to tree with position
+ [x] Add user to tree with right correct position
+ [x] Admin can insert every where
+ [x] Admin can not add occupied position
+
 Order (MLM\tests\UnitTest\Order\Order)
  [x] Add user to both tree with valid ordered package
  [x] Add four user to same sponsor cause no problem
