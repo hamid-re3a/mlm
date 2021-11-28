@@ -22,6 +22,7 @@ class TreeController extends Controller
      *
      * @queryParam id integer
      * @queryParam level integer
+     * @queryParam position string
      */
     public function getBinaryTreeMultiLevel(BinaryTreeMultiRequest $request)
     {
@@ -38,49 +39,28 @@ class TreeController extends Controller
             $tree = Tree::with(['user', 'user.rank_model'])->where('user_id', request('id'))->firstOrFail();
         else
             $tree = Tree::with(['user', 'user.rank_model'])->where('user_id', auth()->user()->id)->first();
-        list($users, $lefty, $righty) = $this->showBinaryTree($tree, $level);
+
+
+        $to_show_node = $tree;
+        if (request('position') == 'right'){
+            $node = $this->getRighty($tree);
+            if ($node) {
+                $to_show_node = $this->findTopThreeNode($node);
+            }
+        } else if (request('position') == 'left'){
+            $node = $this->getLefty($tree);
+            if ($node) {
+                $to_show_node = $this->findTopThreeNode($node);
+            }
+        } else if (request('position') == 'top'){
+            $to_show_node = $this->findTopThreeNode($tree);
+        }
+
+        list($users, $lefty, $righty) = $this->showBinaryTree($to_show_node, $level);
         return api()->success('', $this->binaryTreeResource($tree, $users, $lefty, $righty));
     }
 
-    /**
-     * Get Binary Tree Multi Level
-     * @group
-     * Public User > Display Tree
-     *
-     * @queryParam id integer
-     * @queryParam level integer
-     */
-    public function getBinaryTreePositionMultiLevel(BinaryTreePositionMultiRequest $request)
-    {
 
-        $level = $request->has('level') ? (int)$request->level : 4;
-        if (auth()->check() && !auth()->user()->hasBinaryNode())
-            return api()->error();
-
-        if ($request->has('id') AND !$this->isTreeNodeInBinaryUserDescendant($request->get('id'))) {
-            return api()->notFound();
-        }
-
-        if ($request->has('id') && request('id'))
-            $tree = Tree::with(['user', 'user.rank_model'])->where('user_id', request('id'))->firstOrFail();
-        else
-            $tree = Tree::with(['user', 'user.rank_model'])->where('user_id', auth()->user()->id)->first();
-
-
-        if (request('position') == 'left')
-            $node = $this->getLefty($tree);
-        else
-            $node = $this->getRighty($tree);
-
-        if ($node) {
-            $to_show_node = $this->findTopThreeNode($node);
-        } else {
-            $to_show_node = $tree;
-        }
-
-        list($users, $node, $righty) = $this->showBinaryTree($to_show_node, $level);
-        return api()->success('', $this->binaryTreeResource($tree, $users, $node, $righty));
-    }
 
 
     private function binaryTreeResource($tree, &$array, $lefty, $righty)
