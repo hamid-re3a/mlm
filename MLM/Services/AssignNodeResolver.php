@@ -127,33 +127,6 @@ class AssignNodeResolver
         return true;
     }
 
-//    private function attachUserToBinary(Tree $to_user, string $string, $call = 1)
-//    {
-//        if ($string == Tree::LEFT) {
-//
-////            Do not remove this comment
-//
-////            $lefty = Tree::query()->whereRaw('_rgt - _lft = 3')->where('position','left')->orderBy('_lft','asc')->descendantsAndSelf(1)->first();
-////            $leaf_lefty = Tree::query()->whereRaw('_rgt - _lft = 1')->where('position','left')->orderBy('_lft','asc')->descendantsAndSelf(1)->first();
-////            if(is_null($lefty) || $lefty->_lft >= $leaf_lefty->_lft || $lefty->hasLeftChild()){
-////                $nominee = $leaf_lefty;
-////            } else {
-////                $nominee = $lefty;
-////            }
-//
-//            if (!$to_user->hasLeftChild()) {
-//                return $to_user->appendAsLeftNode($this->user->buildBinaryTreeNode());
-//            } else {
-//                return $this->attachUserToBinary($to_user->children()->left()->first(), $string, ++$call);
-//            }
-//        } else
-//            if (!$to_user->hasRightChild()) {
-//                return $to_user->appendAsRightNode($this->user->buildBinaryTreeNode());
-//            } else {
-//                return $this->attachUserToBinary($to_user->children()->right()->first(), $string,++$call);
-//            }
-//
-//    }
     private function updateNodeVacancy(Tree $node)
     {
 
@@ -170,6 +143,16 @@ class AssignNodeResolver
 
     }
 
+
+    private function fixLeftAndRightNodes(Tree $node)
+    {
+        $node->refresh();
+        if($node->hasRightChild() && $node->hasLeftChild()){
+            if($node->leftChild()->_lft > $node->rightChild()->_lft )
+                $node->leftChild()->insertBeforeNode($node->rightChild());
+        }
+
+    }
     private function attachUserToBinary(Tree $to_user, string $string)
     {
         $new_tree_node = $this->user->buildBinaryTreeNode();
@@ -178,10 +161,8 @@ class AssignNodeResolver
 
             if (!$to_user->hasLeftChild()) {
                 $to_user->appendAsLeftNode($new_tree_node);
-                if ($to_user->hasRightChild()) {
-                    if ($new_tree_node->_lft > $to_user->rightChild()->_lft)
-                        $new_tree_node->insertBeforeNode($to_user->rightChild());
-                }
+
+                $this->fixLeftAndRightNodes($to_user);
                 $this->updateNodeVacancy($to_user);
             } else {
                 $lefty = Tree::query()
@@ -193,10 +174,7 @@ class AssignNodeResolver
                     ->limit(1)
                     ->first();
                 $lefty->appendAsLeftNode($new_tree_node);
-                if ($lefty->hasRightChild()) {
-                    if ($new_tree_node->_lft > $to_user->rightChild()->_lft)
-                        $new_tree_node->insertBeforeNode($lefty->rightChild());
-                }
+                $this->fixLeftAndRightNodes($lefty);
                 $this->updateNodeVacancy($lefty);
             }
         } else
@@ -204,10 +182,7 @@ class AssignNodeResolver
             if (!$to_user->hasRightChild()) {
 
                 $to_user->appendAsRightNode($new_tree_node);
-                if ($to_user->hasLeftChild()) {
-                    if ($new_tree_node->_rgt < $to_user->rightChild()->_rgt)
-                        $new_tree_node->insertAfterNode($to_user->leftChild());
-                }
+                $this->fixLeftAndRightNodes($to_user);
                 $this->updateNodeVacancy($to_user);
             } else {
                 $righty = Tree::query()
@@ -221,10 +196,7 @@ class AssignNodeResolver
 
 
                 $righty->appendAsRightNode($new_tree_node);
-                if ($righty->hasLeftChild()) {
-                    if ($new_tree_node->_rgt < $to_user->rightChild()->_rgt)
-                        $new_tree_node->insertAfterNode($righty->leftChild());
-                }
+                $this->fixLeftAndRightNodes($righty);
                 $this->updateNodeVacancy($righty);
             }
 
@@ -253,25 +225,48 @@ class AssignNodeResolver
     {
         $flag = true;
         if (!is_null($this->attach_to_user)) {
-            if ($this->user->hasRole(USER_ROLE_SUPER_ADMIN)) {
-                if ($this->attach_to_user->binaryTree->children->count() < 2) {
+            if ($this->attach_to_user->binaryTree->children->count() < 2) {
+                if ($this->to_user->hasRole(USER_ROLE_SUPER_ADMIN)) {
                     $new_tree_node = $this->user->buildBinaryTreeNode();
-                    if ($this->attach_to_user->binaryTree->hasLeftChild()) {
+                    if (!$this->attach_to_user->binaryTree->hasRightChild() && $this->order->getAttachUserPosition() == 1 ) {
                         $this->attach_to_user->binaryTree->appendAsRightNode($new_tree_node);
-                        if ($new_tree_node->_rgt < $this->attach_to_user->binaryTree->rightChild()->_rgt)
-                            $new_tree_node->insertAfterNode($this->attach_to_user->binaryTree->leftChild());
+
+                        $this->fixLeftAndRightNodes($this->attach_to_user->binaryTree);
+                        $this->updateNodeVacancy($this->attach_to_user->binaryTree);
+                    } else if (!$this->attach_to_user->binaryTree->hasLeftChild() && $this->order->getAttachUserPosition() == 0 ) {
+                        $this->attach_to_user->binaryTree->appendAsLeftNode($new_tree_node);
+
+                        $this->fixLeftAndRightNodes($this->attach_to_user->binaryTree);
                         $this->updateNodeVacancy($this->attach_to_user->binaryTree);
                     } else {
-                        $this->attach_to_user->binaryTree->appendAsLeftNode($new_tree_node);
-                        if ($this->attach_to_user->binaryTree->hasRightChild()) {
-                            if ($new_tree_node->_lft > $this->attach_to_user->binaryTree->rightChild()->_lft)
-                                $new_tree_node->insertBeforeNode($this->attach_to_user->binaryTree->rightChild());
-                        }
-                        $this->updateNodeVacancy($this->attach_to_user->binaryTree);
+                        $flag = false;
                     }
 
                 } else {
-                    $flag = false;
+                    list($lefty, $righty) = $this->leftyAndRighty($this->to_user->binaryTree);
+                    if ($this->attach_to_user->binaryTree->id == optional($lefty)->id && $this->order->getAttachUserPosition() == 0) {
+                        if (!$this->attach_to_user->binaryTree->hasLeftChild()) {
+                            $new_tree_node = $this->user->buildBinaryTreeNode();
+                            $this->attach_to_user->binaryTree->appendAsRightNode($new_tree_node);
+
+                            $this->fixLeftAndRightNodes($this->attach_to_user->binaryTree);
+                            $this->updateNodeVacancy($this->attach_to_user->binaryTree);
+                        } else {
+                            $flag = false;
+                        }
+                    } else if ($this->attach_to_user->binaryTree->id == optional($righty)->id && $this->order->getAttachUserPosition() == 1) {
+                        if (!$this->attach_to_user->binaryTree->hasRightChild()) {
+                            $new_tree_node = $this->user->buildBinaryTreeNode();
+                            $this->attach_to_user->binaryTree->appendAsLeftNode($new_tree_node);
+
+                            $this->fixLeftAndRightNodes($this->attach_to_user->binaryTree);
+                            $this->updateNodeVacancy($this->attach_to_user->binaryTree);
+                        } else {
+                            $flag = false;
+                        }
+                    } else {
+                        $flag = false;
+                    }
                 }
             } else {
                 $flag = false;
@@ -284,5 +279,44 @@ class AssignNodeResolver
             $this->attachUserToBinary($this->to_user->binaryTree, $position);
         }
         return $flag;
+    }
+
+
+    private function leftyAndRighty(Tree $tree_node)
+    {
+
+        $lefty = $this->getLefty($tree_node);
+
+        $righty = $this->getRighty($tree_node);
+
+        return [$lefty, $righty];
+    }
+
+
+    private function getLefty(Tree $tree_node)
+    {
+        $lefty = Tree::query()
+            ->where('_lft', '>', $tree_node->_lft)
+            ->where('_rgt', '<', $tree_node->_rgt)
+            ->where('position', 'left')
+            ->whereIn('vacancy', [VACANCY_ALL, VACANCY_LEFT])
+            ->orderBy('_lft', 'asc')
+            ->limit(1)
+            ->first();
+        return $lefty;
+    }
+
+
+    private function getRighty(Tree $tree_node)
+    {
+        $righty = Tree::query()
+            ->where('_lft', '>', $tree_node->_lft)
+            ->where('_rgt', '<', $tree_node->_rgt)
+            ->whereIn('vacancy', [VACANCY_ALL, VACANCY_RIGHT])
+            ->where('position', 'right')
+            ->orderBy('_rgt', 'desc')
+            ->limit(1)
+            ->first();
+        return $righty;
     }
 }
