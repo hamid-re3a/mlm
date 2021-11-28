@@ -67,6 +67,7 @@ class MLMController extends Controller
                 'right_leg_points' => $binary_tree->rightSideChildrenPackagePrice(),
                 'children_count_left' => $binary_tree->leftChildCount(),
                 'children_count_right' => $binary_tree->rightChildCount(),
+                'members_count' => $referral_tree->descendantsCount(),
 
 
                 'default_binary_position' => $user->default_binary_position,
