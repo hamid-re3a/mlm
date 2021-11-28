@@ -64,6 +64,8 @@ use User\database\factories\UserFactory;
  * @property int|null $is_deactivate
  * @property int|null $is_freeze
  * @property string|null $block_type
+ * @property string|null $country
+ * @property string|null $country_iso2
  * @method static \Illuminate\Database\Eloquent\Builder|User whereBlockType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereIsDeactivate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereIsFreeze($value)
@@ -197,6 +199,7 @@ class User extends Model
         return $this->binaryTree()->create();
     }
 
+
     /**
      * Methods
      */
@@ -215,6 +218,8 @@ class User extends Model
         $user->setIsDeactivate((boolean)$this->attributes['is_deactivate']);
         $user->setIsFreeze((boolean)$this->attributes['is_freeze']);
         $user->setGender((string)$this->attributes['gender']);
+        $user->setCountry((string)$this->attributes['country']);
+        $user->setCountryIso2((string)$this->attributes['country_iso2']);
 
         if ($this->getRoleNames()->count()) {
             $role_name = implode(",", $this->getRoleNames()->toArray());

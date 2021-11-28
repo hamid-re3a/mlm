@@ -26,6 +26,8 @@ class UserRepository
         $user_find->username = $user->getUsername() ? $user->getUsername() : $user_find->username;
         $user_find->email = $user->getEmail() ? $user->getEmail() : $user_find->email;
         $user_find->block_type = $user->getBlockType() ? $user->getBlockType() : $user_find->block_type;
+        $user_find->country = empty($user->getCountry()) ? null : $user->getCountry();
+        $user_find->country_iso2 = empty($user->getCountryIso2()) ? null : $user->getCountryIso2();
         $user_find->sponsor_id = $user->getSponsorId() ? $user->getSponsorId() : $user_find->sponsor_id;
         $user_find->is_freeze = $user->getIsFreeze() ? $user->getIsFreeze() : $user_find->is_freeze;
         $user_find->is_deactivate = $user->getIsDeactivate() ? $user->getIsDeactivate() : $user_find->is_deactivate;
