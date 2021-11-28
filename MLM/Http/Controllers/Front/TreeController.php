@@ -210,10 +210,7 @@ class TreeController extends Controller
         return [$lefty, $righty];
     }
 
-    /**
-     * @param Tree $tree_node
-     * @return \Illuminate\Database\Eloquent\Model|\Kalnoy\Nestedset\QueryBuilder|Tree|object|null
-     */
+
     private function getLefty(Tree $tree_node)
     {
         $lefty = Tree::query()
@@ -227,10 +224,7 @@ class TreeController extends Controller
         return $lefty;
     }
 
-    /**
-     * @param Tree $tree_node
-     * @return \Illuminate\Database\Eloquent\Model|\Kalnoy\Nestedset\QueryBuilder|Tree|object|null
-     */
+
     private function getRighty(Tree $tree_node)
     {
         $righty = Tree::query()
@@ -275,7 +269,6 @@ class TreeController extends Controller
         $users = Tree::with(['user', 'user.rank_model'])
             ->where('_dpt', '>', $depth)
             ->where('_dpt', '<=', $depth + $level)
-            ->limit(500)
             ->descendantsAndSelf($tree->id)
             ->groupBy('parent_id');
 
