@@ -12,6 +12,11 @@ Route::middleware(['auth'])->group(function () {
     //Admin Routes
     Route::middleware(['role:' . USER_ROLE_SUPER_ADMIN . '|' . USER_ROLE_ADMIN_MLM])->prefix('admin')->name('admin.')->group(function () {
 
+        Route::name('dashboard.')->prefix('dashboard')->group(function () {
+            Route::get('country_members_chart', [\MLM\Http\Controllers\Admin\DashboardController::class, 'countryMembersChart'])->name('country-members-charts');
+            Route::get('sales_distribution_chart', [\MLM\Http\Controllers\Admin\DashboardController::class, 'salesDistributionChart'])->name('sales-distribution-charts');
+        });
+
         Route::prefix('packages_roi')->name('packagesRoi.')->group(function () {
             Route::get('/', [PackageRoiController::class, 'index'])->name('index');
             Route::get('/show', [PackageRoiController::class, 'show'])->name('show');
@@ -53,7 +58,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer.')->group(function () {
         Route::name('dashboard.')->prefix('dashboard')->group(function () {
             Route::post('binary_tree_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'binaryMembers'])->name('binary-members-charts');
-
+            Route::get('country_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'countryMembersChart'])->name('country-members-charts');
+            Route::get('sales_distribution_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'salesDistributionChart'])->name('sales-distribution-charts');
         });
         Route::name('trees.')->prefix('trees')->group(function () {
             Route::get('referral_multi_level', [\MLM\Http\Controllers\Front\TreeController::class, 'getReferralTreeMultiLevel'])->name('referral-multi-level');
