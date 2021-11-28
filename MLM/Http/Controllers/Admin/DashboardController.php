@@ -21,7 +21,7 @@ class DashboardController extends Controller
     /**
      * Country member chart
      * @group
-     * Admin User > User MLM Dashboard
+     * Admin User > Admin MLM Dashboard
      * @return JsonResponse
      */
     public function countryMembersChart()
@@ -50,7 +50,7 @@ class DashboardController extends Controller
     /**
      * Sales distribution chart
      * @group
-     * Admin User > User MLM Dashboard
+     * Admin User > Admin MLM Dashboard
      * @return JsonResponse
      */
     public function salesDistributionChart()
