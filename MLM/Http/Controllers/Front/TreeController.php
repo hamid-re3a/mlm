@@ -72,7 +72,7 @@ class TreeController extends Controller
         else
             $node = $this->getRighty($tree);
 
-        if ($node) {    
+        if ($node) {
             $to_show_node = $this->findTopThreeNode($node);
         } else {
             $to_show_node = $tree;
