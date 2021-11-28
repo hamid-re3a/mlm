@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Packages\Services\Grpc\PackageClientFacade;
 use Packages\Services\Grpc\PackageGrpcClientProvider;
+use User\Commands\UpdateUsersFromGrpc;
 use User\Convert\FixTreeConvertCommand;
 use Wallets\Services\Grpc\WalletClientFacade;
 use Wallets\Services\Grpc\WalletClientProvider;
@@ -33,6 +34,7 @@ class UserServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerFacades();
+        $this->registerCommands();
 
         if (!$this->app->runningInConsole()) {
             return;
@@ -127,6 +129,16 @@ class UserServiceProvider extends ServiceProvider
         GatewayClientFacade::shouldProxyTo(GatewayGrpcClientProvider::class);
         WalletClientFacade::shouldProxyTo(WalletClientProvider::class);
         PackageClientFacade::shouldProxyTo(PackageGrpcClientProvider::class);
+    }
+
+    /**
+     * Register commands
+     */
+    private function registerCommands()
+    {
+        $this->commands([
+            UpdateUsersFromGrpc::class
+        ]);
     }
 
     /**
