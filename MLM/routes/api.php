@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
     //Client routes
     Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer.')->group(function () {
         Route::name('dashboard.')->prefix('dashboard')->group(function () {
-            Route::post('binary_tree_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'binaryMembers'])->name('binary-members-charts');
+            Route::post('binary_tree_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'binaryMembersChart'])->name('binary-members-charts');
             Route::get('country_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'countryMembersChart'])->name('country-members-charts');
             Route::get('sales_distribution_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'salesDistributionChart'])->name('sales-distribution-charts');
         });

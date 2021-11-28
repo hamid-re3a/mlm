@@ -93,9 +93,9 @@ class OrderedPackageRepository
         }
 
         return [
-            'B' => $count_results->where('name','=','B')->pluck('count')['0'] * 100 / $count_results->sum('count'),
-            'I' => $count_results->where('name','=','I')->pluck('count')['0'] * 100 / $count_results->sum('count'),
-            'A' => $count_results->where('name','=','A')->pluck('count')['0'] * 100 / $count_results->sum('count'),
+            'B' => $count_results->sum('count') != 0 ? $count_results->where('name','=','B')->pluck('count')['0'] * 100 / $count_results->sum('count') : 0,
+            'I' => $count_results->sum('count') != 0 ?$count_results->where('name','=','I')->pluck('count')['0'] * 100 / $count_results->sum('count') : 0,
+            'A' => $count_results->sum('count') != 0 ?$count_results->where('name','=','A')->pluck('count')['0'] * 100 / $count_results->sum('count') : 0,
         ];
     }
 }
