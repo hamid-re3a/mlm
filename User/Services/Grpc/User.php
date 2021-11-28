@@ -61,6 +61,14 @@ class User extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string gender = 12;</code>
      */
     protected $gender = '';
+    /**
+     * Generated from protobuf field <code>string country = 13;</code>
+     */
+    protected $country = '';
+    /**
+     * Generated from protobuf field <code>string country_iso2 = 14;</code>
+     */
+    protected $country_iso2 = '';
 
     /**
      * Constructor.
@@ -80,6 +88,8 @@ class User extends \Google\Protobuf\Internal\Message
      *     @type bool $is_freeze
      *     @type bool $is_deactivate
      *     @type string $gender
+     *     @type string $country
+     *     @type string $country_iso2
      * }
      */
     public function __construct($data = NULL) {
@@ -347,6 +357,50 @@ class User extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->gender = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string country = 13;</code>
+     * @return string
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * Generated from protobuf field <code>string country = 13;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setCountry($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->country = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string country_iso2 = 14;</code>
+     * @return string
+     */
+    public function getCountryIso2()
+    {
+        return $this->country_iso2;
+    }
+
+    /**
+     * Generated from protobuf field <code>string country_iso2 = 14;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setCountryIso2($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->country_iso2 = $var;
 
         return $this;
     }
