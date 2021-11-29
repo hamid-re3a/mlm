@@ -21,9 +21,18 @@ class ReferralTreeResource extends JsonResource
             'id' => $this->id,
             'created_at' => $this->created_at->timestamp,
             'user' => $this->user,
-            'user_rank' => $this->user->rank,
+            'rank' => $this->user->rank_model,
+            'sponsor_user' => $this->user->sponsor,
+            'parent_user' => optional($this->parent)->user,
+            'avatar' => $this->getAvatar($this),
+            'country' => $this->user->country,
+            'country_iso2' => $this->user->country_iso2,
+            'highest_package_detail' => $this->user->biggestActivePackage(),
+            'highest_package' => optional($this->user->biggestActivePackage())->package,
             'has_children' => $this->children()->exists(),
             'children_count' => $this->children()->count(),
+            'has_more'=> false,
+            'page' => 0
         ];
     }
 

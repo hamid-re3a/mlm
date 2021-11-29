@@ -43,6 +43,7 @@ class MLMController extends Controller
                 'right_leg_points' => 0,
                 'children_count_left' => 0,
                 'children_count_right' => 0,
+                'members_count' => 0,
 
                 'default_binary_position' => $user->default_binary_position,
                 'sponsor_user' => $user->sponsor,

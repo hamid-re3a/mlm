@@ -3,6 +3,7 @@
 namespace MLM\Jobs;
 
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -23,14 +24,14 @@ class TradingProfitCommissionJob implements ShouldQueue
 
     public function __construct(OrderedPackage $ordered_package)
     {
-        $this->queue = env('QUEUE_ROI_NAME','mlm_roi');
+        $this->queue = env('QUEUE_ROI_NAME', 'mlm_roi');
         $this->ordered_package = $ordered_package;
     }
 
     public function handle(PackageService $package_service)
     {
-        if(!getSetting('TRADING_PROFIT_COMMISSION_IS_ACTIVE')){
-            return ;
+        if (!getSetting('TRADING_PROFIT_COMMISSION_IS_ACTIVE')) {
+            return;
         }
 
         if (arrayHasValue(TRADING_PROFIT_COMMISSION, $this->ordered_package->user->deactivated_commission_types)) {
@@ -38,6 +39,26 @@ class TradingProfitCommissionJob implements ShouldQueue
         }
         if (!$this->ordered_package->active()->exists() || $this->ordered_package->isSpecialPackage() || $this->ordered_package->isCompanyPackage() || !$this->ordered_package->canGetCommission())
             return;
+        $dayName = Carbon::make($this->ordered_package->created_at)->dayName;
+        switch ($dayName) {
+            case "Friday":
+                if (Carbon::make($this->ordered_package->created_at)->addDays(3)->timestamp < now()->timestamp)
+                    return;
+                break;
+            case "Saturday":
+                if (Carbon::make($this->ordered_package->created_at)->addDays(2)->timestamp < now()->timestamp)
+                    return;
+                break;
+            case "Sunday":
+            case "Tuesday":
+            case "Wednesday":
+            case "Thursday":
+            case "Monday":
+                if (Carbon::make($this->ordered_package->created_at)->addDays(1)->timestamp < now()->timestamp)
+                    return;
+                break;
+        }
+
 
         if (!$this->ordered_package->commissions()
             ->where('type', TRADING_PROFIT_COMMISSION)
