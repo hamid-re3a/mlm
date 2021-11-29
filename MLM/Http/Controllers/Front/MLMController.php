@@ -47,6 +47,7 @@ class MLMController extends Controller
 
                 'default_binary_position' => $user->default_binary_position,
                 'sponsor_user' => $user->sponsor,
+                'user_active_packages' => $user->ordered_packages()->active()->get(),
                 'highest_package_detail' => $user->biggestActivePackage(),
                 'highest_package' => optional($user->biggestActivePackage())->package,
                 'rank' => $user->rank_model
@@ -73,6 +74,7 @@ class MLMController extends Controller
 
                 'default_binary_position' => $user->default_binary_position,
                 'sponsor_user' => $user->sponsor,
+                'user_active_packages' => $user->ordered_packages()->active()->get(),
                 'highest_package_detail' => $user->biggestActivePackage(),
                 'highest_package' => optional($user->biggestActivePackage())->package,
                 'rank' => $user->rank_model
