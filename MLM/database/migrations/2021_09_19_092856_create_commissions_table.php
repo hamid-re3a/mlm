@@ -20,6 +20,7 @@ class CreateCommissionsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('ordered_package_id')->nullable();
             $table->foreign('ordered_package_id')->references('id')->on('ordered_packages');
+
             $table->string('type')->index();
             $table->unsignedDouble('amount')->nullable();
 

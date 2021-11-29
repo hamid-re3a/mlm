@@ -47,35 +47,38 @@ class TrainerBonusCommissionJob implements ShouldQueue
 
                 if (!CommissionModel::query()->where('user_id', $grand_parent->id)->type($this->getType())->exists())
                     if ($grand_parent->eligibleForQuickStartBonus()) {
+                        /** @var  $biggest_active_package OrderedPackage */
+                        $biggest_active_package = $grand_parent->biggestActivePackage();
 
-                        $left_binary_children = $grand_parent->binaryTree->leftSideChildrenIds();
-                        $right_binary_children = $grand_parent->binaryTree->rightSideChildrenIds();
+                        if ($biggest_active_package) {
+                            $left_binary_children = $grand_parent->binaryTree->leftSideChildrenIds();
+                            $right_binary_children = $grand_parent->binaryTree->rightSideChildrenIds();
 
-                        $referral_children = $grand_parent->referralTree->childrenUserIds();
+                            $referral_children = $grand_parent->referralTree->childrenUserIds();
 
-                        $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
-                        $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
+                            $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
+                            $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
 
-                        if ($this->hasAtLeastOnEligibleForQuickStartUser($left_binary_sponsored_children) &&
-                            $this->hasAtLeastOnEligibleForQuickStartUser($right_binary_sponsored_children)) {
-                            $commission_amount = 200;
-                            /** @var $deposit_service_object  Deposit */
-                            $deposit_service_object = app(Deposit::class);
-                            $deposit_service_object->setUserId($grand_parent->id);
-                            $deposit_service_object->setAmount($commission_amount);
-                            $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
+                            if ($this->hasAtLeastOnEligibleForQuickStartUser($left_binary_sponsored_children) &&
+                                $this->hasAtLeastOnEligibleForQuickStartUser($right_binary_sponsored_children)) {
+                                $commission_amount = 200;
+                                /** @var $deposit_service_object  Deposit */
+                                $deposit_service_object = app(Deposit::class);
+                                $deposit_service_object->setUserId($grand_parent->id);
+                                $deposit_service_object->setAmount($commission_amount);
+                                $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
-                            $deposit_service_object->setDescription(serialize([
-                                'description' => 'Commission # ' . $this->getType()
-                            ]));
-                            $deposit_service_object->setType('Commission');
-                            $deposit_service_object->setSubType('Trainer Bonus');
+                                $deposit_service_object->setDescription(serialize([
+                                    'description' => 'Commission # ' . $this->getType()
+                                ]));
+                                $deposit_service_object->setType('Commission');
+                                $deposit_service_object->setSubType('Trainer Bonus');
 
-                            (new CommissionResolver)->payCommission($deposit_service_object, $grand_parent, $this->getType(), $this->package->id);
+                                (new CommissionResolver)->payCommission($deposit_service_object, $grand_parent, $this->getType(),$biggest_active_package->id, $this->package->id);
 
 
+                            }
                         }
-
                     }
 
             }

@@ -81,18 +81,31 @@ class OrderedPackage extends Model
 
     public function canGetCommission()
     {
+
         if (in_array($this->plan, [
             OrderPlans::ORDER_PLAN_PURCHASE, OrderPlans::ORDER_PLAN_START,
+            OrderPlans::ORDER_PLAN_START_50,OrderPlans::ORDER_PLAN_START_75
+        ])) {
+
+            if ($this->commissions()->sum('amount') >= $this->price * 4.9){
+                return false;
+            }
+            else
+                return true;
+        }
+
+
+        if (in_array($this->plan, [
             OrderPlans::ORDER_PLAN_COMPANY, OrderPlans::ORDER_PLAN_SPECIAL,
         ])) {
             return true;
         } else if ($this->plan == OrderPlans::ORDER_PLAN_START_50) {
             $childrenIds = $this->user->referralTree->childrenUserIds();
-            $children = ReferralTree::query()->whereIn('user_id',$childrenIds)
+            $children = ReferralTree::query()->whereIn('user_id', $childrenIds)
                 ->whereDate("created_at", ">", Carbon::make($this->created_at)->toDate())
                 ->get();
 
-            return $this->checkIfChildrenHasSamePackage($children,$this->price);
+            return $this->checkIfChildrenHasSamePackage($children, $this->price);
         } else if ($this->plan == OrderPlans::ORDER_PLAN_START_75) {
 
             $left_binary_children = $this->user->binaryTree->leftSideChildrenIds();
@@ -103,15 +116,15 @@ class OrderedPackage extends Model
             $left_binary_sponsored_children = array_intersect($left_binary_children, $referral_children);
             $right_binary_sponsored_children = array_intersect($right_binary_children, $referral_children);
 
-            $left_children = ReferralTree::query()->whereIn('user_id',$left_binary_sponsored_children)
+            $left_children = ReferralTree::query()->whereIn('user_id', $left_binary_sponsored_children)
                 ->whereDate("created_at", ">", Carbon::make($this->created_at)->toDate())
                 ->get();
-            $right_children = ReferralTree::query()->whereIn('user_id',$right_binary_sponsored_children)
+            $right_children = ReferralTree::query()->whereIn('user_id', $right_binary_sponsored_children)
                 ->whereDate("created_at", ">", Carbon::make($this->created_at)->toDate())
                 ->get();
 
-            if($this->checkIfChildrenHasSamePackage($left_children,$this->price)
-                && $this->checkIfChildrenHasSamePackage($right_children,$this->price))
+            if ($this->checkIfChildrenHasSamePackage($left_children, $this->price)
+                && $this->checkIfChildrenHasSamePackage($right_children, $this->price))
                 return true;
 
             return false;
@@ -120,9 +133,10 @@ class OrderedPackage extends Model
         return false;
     }
 
-    private function checkIfChildrenHasSamePackage($children,$price){
-        foreach ($children as $child){
-            if($child->user->biggestActivePackage()->price == $price){
+    private function checkIfChildrenHasSamePackage($children, $price)
+    {
+        foreach ($children as $child) {
+            if ($child->user->biggestActivePackage()->price == $price) {
                 return true;
             }
         }

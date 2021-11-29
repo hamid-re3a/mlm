@@ -45,7 +45,7 @@ class DirectSellCommissionJob implements ShouldQueue
             }
             /** @var  $biggest_active_package OrderedPackage */
             $biggest_active_package = $parent->biggestActivePackage();
-            if ($biggest_active_package && $biggest_active_package->canGetCommission()) {
+            if ($biggest_active_package) {
                 $is_eligible_for_quick_start_bonus = false;
                 if ($parent->eligibleForQuickStartBonus()) {
                     $is_eligible_for_quick_start_bonus = true;
@@ -68,7 +68,7 @@ class DirectSellCommissionJob implements ShouldQueue
                 $deposit_service_object->setSubType('Direct Sale');
 
 
-                (new CommissionResolver)->payCommission($deposit_service_object, $parent, $this->getType(), $biggest_active_package->id);
+                (new CommissionResolver)->payCommission($deposit_service_object, $parent, $this->getType(), $biggest_active_package->id, $this->package->id);
 
             }
         }

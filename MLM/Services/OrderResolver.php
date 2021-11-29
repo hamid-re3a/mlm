@@ -216,6 +216,9 @@ class OrderResolver
                     return [false, trans('order.responses.selected-package-should-be-greater-or-equal-to-previous-package')];
 
             }
+
+            if(OrderedPackage::query()->where('user_id', $this->user->id)->active()->count() > 9)
+                return [false, trans('order.responses.only-10-active-package-is-allowed')];
         } catch (\Exception $exception) {
             Log::error('OrderResolver@isValid =>' . $exception->getMessage());
             return [false, trans('responses.unknown')];

@@ -51,7 +51,7 @@ class IndirectSellCommissionJob implements ShouldQueue
             return ;
         }
         $biggest_active_package = $parent->biggestActivePackage();
-        if ($biggest_active_package && $biggest_active_package->canGetCommission()) {
+        if ($biggest_active_package) {
 
             /** @var  $indirect_found OrderedPackagesIndirectCommission */
             $indirect_found = $biggest_active_package->indirectCommission()->where('level', $this->level)->first();
@@ -72,7 +72,7 @@ class IndirectSellCommissionJob implements ShouldQueue
 
 
 
-                (new CommissionResolver)->payCommission($deposit_service_object,$parent,$this->getType(),$this->package->id);
+                (new CommissionResolver)->payCommission($deposit_service_object,$parent,$this->getType(),$biggest_active_package->id, $this->package->id);
 
             }
         }

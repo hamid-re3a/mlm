@@ -231,7 +231,9 @@ class User extends Model
 
     public function biggestActivePackage(): ?OrderedPackage
     {
-        return $this->ordered_packages()->active()->biggest()->first();
+        return $this->ordered_packages()->active()->biggest()->get()->filter(function ($item) {
+            return $item->canGetCommission();
+        })->first();
     }
 
     public function biggestOrderedPackage(): ?OrderedPackage

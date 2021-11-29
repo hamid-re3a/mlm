@@ -24,8 +24,8 @@ class OrderTest extends MLMTest
         parent::setUp();
         Mail::fake();
         ReferralTree::create(['user_id' => 1]);
-        Tree::create(['user_id' => 1,'position'=>'left']);
-        WalletClientFacade::shouldReceive('deposit')->andReturn( new Deposit());
+        Tree::create(['user_id' => 1, 'position' => 'left']);
+        WalletClientFacade::shouldReceive('deposit')->andReturn(new Deposit());
 
     }
 
@@ -43,7 +43,7 @@ class OrderTest extends MLMTest
         $this->assertNull($user->referralTree);
 
         list($bool, $msg) = (new OrderResolver($order))->handle();
-        $this->assertTrue($bool,$msg);
+        $this->assertTrue($bool, $msg);
 
         $user->refresh();
         $this->assertNotNull($user->binaryTree);
@@ -87,22 +87,21 @@ class OrderTest extends MLMTest
         $user->save();
 
 
-
         //register second user
         $second_user = $this->registerUser($user->id);
-        $this->assertEquals($second_user->binaryTree->parent->id,$user->binaryTree->id);
+        $this->assertEquals($second_user->binaryTree->parent->id, $user->binaryTree->id);
         // register $third_user
         $third_user = $this->registerUser($user->id);
-        $this->assertEquals($third_user->binaryTree->parent->id,$second_user->binaryTree->id);
+        $this->assertEquals($third_user->binaryTree->parent->id, $second_user->binaryTree->id);
 
         // register $forth_user
         $forth_user = $this->registerUser($user->id);
-        $this->assertEquals($forth_user->binaryTree->parent->id,$third_user->binaryTree->id);
+        $this->assertEquals($forth_user->binaryTree->parent->id, $third_user->binaryTree->id);
 
         // register $fifth_user
         $fifth_user = $this->registerUser($user->id);
 
-        $this->assertEquals($fifth_user->binaryTree->parent->id,$forth_user->binaryTree->id);
+        $this->assertEquals($fifth_user->binaryTree->parent->id, $forth_user->binaryTree->id);
     }
 
     /**
@@ -112,16 +111,16 @@ class OrderTest extends MLMTest
     {
         /**
          *    ['id' => 1, 'position' => null, 'parent_id' => null],
-        ['id' => 2, 'position' => 'left', 'parent_id' => 1],
-        ['id' => 3, 'position' => 'right', 'parent_id' => 1],
-        ['id' => 4, 'position' => 'right', 'parent_id' => 2],
-        ['id' => 5, 'position' => 'left', 'parent_id' => 2],
-        ['id' => 6, 'position' => 'right', 'parent_id' => 3],
-        ['id' => 7, 'position' => 'left', 'parent_id' => 3],
-        ['id' => 8, 'position' => 'right', 'parent_id' => 4],
-        ['id' => 9, 'position' => 'left', 'parent_id' => 4],
-        ['id' => 10, 'position' => 'right', 'parent_id' => 5],
-        ['id' => 11, 'position' => 'left', 'parent_id' => 5],
+         * ['id' => 2, 'position' => 'left', 'parent_id' => 1],
+         * ['id' => 3, 'position' => 'right', 'parent_id' => 1],
+         * ['id' => 4, 'position' => 'right', 'parent_id' => 2],
+         * ['id' => 5, 'position' => 'left', 'parent_id' => 2],
+         * ['id' => 6, 'position' => 'right', 'parent_id' => 3],
+         * ['id' => 7, 'position' => 'left', 'parent_id' => 3],
+         * ['id' => 8, 'position' => 'right', 'parent_id' => 4],
+         * ['id' => 9, 'position' => 'left', 'parent_id' => 4],
+         * ['id' => 10, 'position' => 'right', 'parent_id' => 5],
+         * ['id' => 11, 'position' => 'left', 'parent_id' => 5],
          */
         $user1 = User::query()->find(1);
         $user2 = $this->registerUser();
@@ -159,7 +158,7 @@ class OrderTest extends MLMTest
         $user10 = $this->registerUser($user5->id);
 
 
-        $this->assertEquals($user10->binaryTree->parent->id,$user5->binaryTree->id);
+        $this->assertEquals($user10->binaryTree->parent->id, $user5->binaryTree->id);
 
         $user5->default_binary_position = "left";
         $user5->save();
@@ -169,16 +168,15 @@ class OrderTest extends MLMTest
         $user1->default_binary_position = "right";
         $user1->save();
         $user12 = $this->registerUser($user1->id);
-        $this->assertEquals(6,$user12->binaryTree->parent->id);
-
-
+        $this->assertEquals(6, $user12->binaryTree->parent->id);
 
 
         $user1->default_binary_position = "left";
         $user1->save();
         $user13 = $this->registerUser($user1->id);
-        $this->assertEquals(11,$user13->binaryTree->parent->id);
+        $this->assertEquals(11, $user13->binaryTree->parent->id);
     }
+
     /**
      * @test
      */
@@ -198,20 +196,21 @@ class OrderTest extends MLMTest
 
         //register second user
         $second_user = $this->registerUser($user->id);
-        $this->assertEquals($second_user->binaryTree->parent->id,$user->binaryTree->id);
+        $this->assertEquals($second_user->binaryTree->parent->id, $user->binaryTree->id);
         // register $third_user
         $third_user = $this->registerUser($user->id);
-        $this->assertEquals($third_user->binaryTree->parent->id,$second_user->binaryTree->id);
+        $this->assertEquals($third_user->binaryTree->parent->id, $second_user->binaryTree->id);
 
         // register $forth_user
         $forth_user = $this->registerUser($user->id);
-        $this->assertEquals($forth_user->binaryTree->parent->id,$third_user->binaryTree->id);
+        $this->assertEquals($forth_user->binaryTree->parent->id, $third_user->binaryTree->id);
 
         // register $fifth_user
         $fifth_user = $this->registerUser($user->id);
 
-        $this->assertEquals($fifth_user->binaryTree->parent->id,$forth_user->binaryTree->id);
+        $this->assertEquals($fifth_user->binaryTree->parent->id, $forth_user->binaryTree->id);
     }
+
     /**
      * @test
      */
@@ -290,6 +289,7 @@ class OrderTest extends MLMTest
         $this->assertEquals($user->binaryTree->converted_points, 99);
 
     }
+
     /**
      * @test
      */
@@ -321,7 +321,7 @@ class OrderTest extends MLMTest
     {
 
 
-        $user = $this->registerUser();
+        $user = $this->registerUser(1, 999999);
 
         $second_user = $this->registerUser($user->id, RANK_6_EXECUTIVE['condition_converted_in_bp'] * BF_TO_BB_RATIO);
         $user->default_binary_position = "right";
@@ -390,6 +390,7 @@ class OrderTest extends MLMTest
         $this->assertEquals(0, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
 
     }
+
     /**
      * @test
      */
@@ -417,7 +418,7 @@ class OrderTest extends MLMTest
      */
     public function residual_bonus_commission()
     {
-        $user = $this->registerUser(1, 99, 1);
+        $user = $this->registerUser(1, 99999, 1);
 
         $second_user = $this->registerUser($user->id, 5 * RANK_6_EXECUTIVE['condition_converted_in_bp'] * BF_TO_BB_RATIO);
         $user->default_binary_position = "right";
@@ -443,13 +444,44 @@ class OrderTest extends MLMTest
             'due_date' => now()->toDate()
         ]);
         $this->artisan('roi:trading')->execute();
-
         $this->assertEquals(1, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
-        $this->assertEquals(3 / 100 * 99, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
+//        $this->assertEquals((3 / 100 * 99) *1000, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
 
 
         $this->artisan('roi:residual')->execute();
         $this->assertEquals(1, $user->commissions()->type(RESIDUAL_BONUS_COMMISSION)->count(), 'Number of residual commissions');
+
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_not_get_commission_more_than_5_times_of_package_value()
+    {
+        $user = $this->registerUser(1, 99, 1);
+
+        $second_user = $this->registerUser($user->id);
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+
+
+        $fourth_user = $this->registerUser($second_user->id);
+        $second_user->default_binary_position = "right";
+        $second_user->save();
+        $fifth_user = $this->registerUser($second_user->id);
+
+
+        $sixth_user = $this->registerUser($third_user->id);
+        $third_user->default_binary_position = "right";
+        $third_user->save();
+        $seventh_user = $this->registerUser($third_user->id);
+        foreach (range(0, 21) as $item)
+             $this->registerUser($user->id);
+
+        $this->assertTrue(500> $user->commissions()->sum('amount'), 'value checker');
+
 
     }
 
@@ -527,7 +559,7 @@ class OrderTest extends MLMTest
         ]);
         $order = $this->createOrderWithUser($user, $package_price, $package_id);
         list($bool, $msg) = (new OrderResolver($order))->handle();
-        $this->assertTrue($bool,$msg);
+        $this->assertTrue($bool, $msg);
         return $user;
     }
 
