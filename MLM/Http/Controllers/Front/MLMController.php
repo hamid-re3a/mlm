@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use MLM\Http\Requests\BinaryTreeMultiRequest;
 use MLM\Http\Requests\MLMInfoRequest;
 use MLM\Http\Requests\ReferralTreeMultiRequest;
+use MLM\Models\OrderedPackage;
 use MLM\Models\ReferralTree;
 use MLM\Models\Tree;
 use User\Models\User;
@@ -47,7 +48,7 @@ class MLMController extends Controller
 
                 'default_binary_position' => $user->default_binary_position,
                 'sponsor_user' => $user->sponsor,
-                'user_active_packages' => $user->ordered_packages()->active()->get(),
+                'user_active_packages' => OrderedPackage::query()->with('package')->whereIn('id',$user->ordered_packages()->active()->pluck('id')->toArray())->get(),
                 'highest_package_detail' => $user->biggestActivePackage(),
                 'highest_package' => optional($user->biggestActivePackage())->package,
                 'rank' => $user->rank_model
@@ -74,7 +75,7 @@ class MLMController extends Controller
 
                 'default_binary_position' => $user->default_binary_position,
                 'sponsor_user' => $user->sponsor,
-                'user_active_packages' => $user->ordered_packages()->active()->get(),
+                'user_active_packages' => OrderedPackage::query()->with('package')->whereIn('id',$user->ordered_packages()->active()->pluck('id')->toArray())->get(),
                 'highest_package_detail' => $user->biggestActivePackage(),
                 'highest_package' => optional($user->biggestActivePackage())->package,
                 'rank' => $user->rank_model
