@@ -69,7 +69,9 @@ class TrainerBonusCommissionJob implements ShouldQueue
                                 $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
                                 $deposit_service_object->setDescription(serialize([
-                                    'description' => 'Commission # ' . $this->getType()
+                                    'description' => 'Commission # ' . $this->getType(),
+                                    'from' => '',
+                                    'package name' => ''
                                 ]));
                                 $deposit_service_object->setType('Commission');
                                 $deposit_service_object->setSubType('Trainer Bonus');

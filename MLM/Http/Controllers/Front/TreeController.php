@@ -255,6 +255,9 @@ class TreeController extends Controller
             ->descendantsAndSelf($tree->id)
             ->groupBy('parent_id');
 
+//        ->where('_lft', '>', $tree->_lft)
+//        ->where('_rgt', '<', $tree->_rgt)
+//        ->orWhere('id',$tree->id)
         list($lefty, $righty) = $this->leftyAndRighty(auth()->user()->binaryTree);
         return array($users, $lefty, $righty);
     }

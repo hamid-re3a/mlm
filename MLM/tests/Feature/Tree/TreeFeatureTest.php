@@ -26,6 +26,7 @@ class TreeFeatureTest extends MLMTest
         $this->withHeaders($this->getHeaders(1, USER_ROLE_CLIENT));
 
         $response = $this->get(route('customer.trees.binary-multi-level').'?level=3&position=left');
+        dd($response->json());
         $response->assertOk();
         $response = $this->get(route('customer.trees.referral-multi-level'));
         $response->assertOk();

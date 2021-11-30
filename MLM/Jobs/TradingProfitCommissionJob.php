@@ -63,7 +63,7 @@ class TradingProfitCommissionJob implements ShouldQueue
         if (!$this->ordered_package->commissions()
             ->where('type', TRADING_PROFIT_COMMISSION)
             ->whereDate('created_at', now()->toDate())
-            ->where('ordered_package_id', $this->ordered_package->id)->exists()) {
+            ->exists()) {
 
 
             /** @var  $roi PackageRoi */
