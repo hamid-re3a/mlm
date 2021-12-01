@@ -25,6 +25,9 @@ class CommissionResolver
      */
     public function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null, $because_of_package_id = null): void
     {
+
+        if($deposit_service_object->getAmount() <= 0)
+            return;
         DB::beginTransaction();
         try {
             /** @var  $commission Commission */

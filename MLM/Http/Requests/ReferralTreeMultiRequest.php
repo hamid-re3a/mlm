@@ -26,6 +26,7 @@ class ReferralTreeMultiRequest extends FormRequest
         return [
             'id' => 'sometimes|exists:users',
             'level' => 'sometimes|numeric|min:1|max:15',
+            'position' => 'sometimes|in:top',
         ];
     }
 }

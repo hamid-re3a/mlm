@@ -118,16 +118,26 @@ class TreeController extends Controller
             $tree = ReferralTree::with('user')->where('user_id', request('id'))->firstOrFail();
         else
             $tree = ReferralTree::with('user')->where('user_id', auth()->user()->id)->first();
-        $depth = $tree->_dpt;
+
+
+
+        $to_show_node = $tree;
+
+        if (request('position') == 'top') {
+            $to_show_node = $this->findTopThreeNode($tree);
+        }
+
+
+        $depth = $to_show_node->_dpt;
 
         $users = ReferralTree::with('user')
             ->where('_dpt', '>', $depth)
             ->where('_dpt', '<=', $depth + $level)
             ->limit(500)
-            ->descendantsAndSelf($tree->id)
+            ->descendantsAndSelf($to_show_node->id)
             ->groupBy('parent_id');
 
-        return api()->success('', $this->referralTreeResource($tree, $users));
+        return api()->success('', $this->referralTreeResource($to_show_node, $users));
     }
 
     private function referralTreeResource($tree, &$array)
@@ -222,7 +232,7 @@ class TreeController extends Controller
         return $righty;
     }
 
-    private function findTopThreeNode(Tree $lefty, $level = 3)
+    private function findTopThreeNode($lefty, $level = 3)
     {
         $to_show = $lefty;
         if (!is_null($lefty->parent) && $level != 1) {

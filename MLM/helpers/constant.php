@@ -353,6 +353,7 @@ const RANKS = [
 ];
 const MIN_ROI_PERCENTAGE = 0;
 const MAX_ROI_PERCENTAGE = 100;
+const TRAINER_BONUS_REWARD = 100;
 CONST MLM_SETTINGS = [
     'IS_UNDER_MAINTENANCE' => [
         'value' => false,
@@ -398,6 +399,11 @@ CONST MLM_SETTINGS = [
         'value' => MAX_ROI_PERCENTAGE,
         'title' => 'MAX_ROI_PERCENTAGE',
         'description' => 'MAX_ROI_PERCENTAGE'
+    ],
+    'TRAINER_BONUS_REWARD' => [
+        'value' => TRAINER_BONUS_REWARD,
+        'title' => 'TRAINER_BONUS_REWARD',
+        'description' => 'TRAINER_BONUS_REWARD'
     ],
 
 ];

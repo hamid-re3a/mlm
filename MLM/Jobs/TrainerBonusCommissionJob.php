@@ -61,7 +61,7 @@ class TrainerBonusCommissionJob implements ShouldQueue
 
                             if ($this->hasAtLeastOnEligibleForQuickStartUser($left_binary_sponsored_children) &&
                                 $this->hasAtLeastOnEligibleForQuickStartUser($right_binary_sponsored_children)) {
-                                $commission_amount = 200;
+                                $commission_amount = (int)getSetting('TRAINER_BONUS_REWARD');
                                 /** @var $deposit_service_object  Deposit */
                                 $deposit_service_object = app(Deposit::class);
                                 $deposit_service_object->setUserId($grand_parent->id);
