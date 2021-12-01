@@ -264,7 +264,7 @@ class OrderTest extends MLMTest
 
         $this->assertEquals(1, $user->commissions()->type(TRAINER_BONUS_COMMISSION)->count(), 'Number of trainer bonus commissions');
 
-        $this->assertEquals(200, $user->commissions()->type(TRAINER_BONUS_COMMISSION)->sum('amount'), 'Sum of earned commissions');
+        $this->assertEquals(TRAINER_BONUS_REWARD, $user->commissions()->type(TRAINER_BONUS_COMMISSION)->sum('amount'), 'Sum of earned commissions');
 
     }
 
