@@ -81,7 +81,13 @@ class TradingProfitCommissionJob implements ShouldQueue
                 $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::JANEX);
 
                 $deposit_service_object->setDescription(serialize([
-                    'description' => 'Commission # ' . TRADING_PROFIT_COMMISSION
+                    'description' => 'Commission # ' . TRADING_PROFIT_COMMISSION,
+                    'from_user_id' => null,
+                    'from_user_name' => null,
+                    'from_package_name' => null,
+                    'from_order_id' => null,
+                    'for_package_name' => $this->ordered_package->package->name,
+                    'for_order_id' => $this->ordered_package->order_id,
                 ]));
                 $deposit_service_object->setType('Commission');
                 $deposit_service_object->setSubType('Trading Profit');

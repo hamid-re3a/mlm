@@ -48,7 +48,6 @@ class ResidualBonusCommissionJob implements ShouldQueue
             $users = ReferralTree::query()
                 ->where('_dpt', $depth + $residual_bonus_setting->level)
                 ->descendantsAndSelf($tree->id)
-
                 ->pluck('user_id')->toArray();
 
             $descendants_commission = CommissionModel::query()->where('type', TRADING_PROFIT_COMMISSION)
@@ -66,7 +65,13 @@ class ResidualBonusCommissionJob implements ShouldQueue
         $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::JANEX);
 
         $deposit_service_object->setDescription(serialize([
-            'description' => 'Commission # ' . RESIDUAL_BONUS_COMMISSION
+            'description' => 'Commission # ' . RESIDUAL_BONUS_COMMISSION,
+            'from_user_id' => null,
+            'from_user_name' => null,
+            'from_package_name' => null,
+            'from_order_id' => null,
+            'for_package_name' => null,
+            'for_order_id' => null,
         ]));
         $deposit_service_object->setType('Commission');
         $deposit_service_object->setSubType('Residual Bonus');

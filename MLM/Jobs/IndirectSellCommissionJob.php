@@ -65,7 +65,13 @@ class IndirectSellCommissionJob implements ShouldQueue
                 $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
                 $deposit_service_object->setDescription(serialize([
-                    'description' => 'Commission # ' . $this->getType()
+                    'description' => 'Commission # ' . $this->getType(),
+                    'from_user_id' => $this->package->user->id,
+                    'from_user_name' => $this->package->user->full_name,
+                    'from_package_name' => $this->package->package->name,
+                    'from_order_id' => $this->package->order_id,
+                    'for_package_name'=>$biggest_active_package->package->name,
+                    'for_order_id'=>$biggest_active_package->order_id,
                 ]));
                 $deposit_service_object->setType('Commission');
                 $deposit_service_object->setSubType('Indirect Sale');
