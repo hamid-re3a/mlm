@@ -3,6 +3,7 @@
 namespace MLM\tests\UnitTest\Order;
 
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Mail;
 use MLM\Models\OrderedPackage;
@@ -350,6 +351,9 @@ class OrderTest extends MLMTest
         $third_user = $this->registerUser($user->id);
 
 
+        $oneMonthLater = now()->addDays(30);
+        Carbon::setTestNow($oneMonthLater);
+
         PackageRoi::factory()->create([
             'package_id' => 1,
             'roi_percentage' => 3,
@@ -378,11 +382,14 @@ class OrderTest extends MLMTest
 
         $third_user = $this->registerUser($user->id);
 
+        $oneMonthLater = now()->addDays(30);
+        Carbon::setTestNow($oneMonthLater);
         PackageRoi::factory()->create([
             'package_id' => 1,
             'roi_percentage' => 3,
             'due_date' => now()->toDate()
         ]);
+
         $this->artisan('roi:trading')
             ->execute();
 
@@ -405,6 +412,8 @@ class OrderTest extends MLMTest
         $third_user = $this->registerUser($user->id);
 
 
+        $oneMonthLater = now()->addDays(30);
+        Carbon::setTestNow($oneMonthLater);
         $this->artisan('roi:trading')->execute();
 
         $this->assertEquals(0, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
@@ -438,11 +447,14 @@ class OrderTest extends MLMTest
         $third_user->save();
         $seventh_user = $this->registerUser($third_user->id);
 
+        $oneMonthLater = now()->addDays(30);
+        Carbon::setTestNow($oneMonthLater);
         PackageRoi::factory()->create([
             'package_id' => 1,
             'roi_percentage' => 3,
             'due_date' => now()->toDate()
         ]);
+
         $this->artisan('roi:trading')->execute();
         $this->assertEquals(1, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
 //        $this->assertEquals((3 / 100 * 99) *1000, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
