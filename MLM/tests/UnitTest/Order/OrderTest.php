@@ -369,6 +369,98 @@ class OrderTest extends MLMTest
 
     /**
      * @test
+     * @dataProvider days
+     */
+    public function trading_profit_commission_cooling($day)
+    {
+        Carbon::setTestNow(now()->addDays($day));
+        $user = $this->registerUser(1, 99, 1);
+
+        $second_user = $this->registerUser($user->id);
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+
+
+        PackageRoi::factory()->create([
+            'package_id' => 1,
+            'roi_percentage' => 3,
+            'due_date' => now()->toDate()
+        ]);
+        $this->artisan('roi:trading')
+            ->execute();
+
+        $this->assertEquals(0, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
+        $this->assertEquals(0, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
+
+    }
+
+    public function days()
+    {
+
+        return [
+            [1],
+            [2],
+            [3],
+            [4],
+            [5],
+            [6],
+            [7],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider days
+     */
+    public function trading_profit_commission_after_cooling_days($day)
+    {
+        Carbon::setTestNow(now()->addDays($day));
+
+        $dayName = now()->dayName;
+
+        $user = $this->registerUser(1, 99, 1);
+
+        $second_user = $this->registerUser($user->id);
+        $user->default_binary_position = "right";
+        $user->save();
+
+        $third_user = $this->registerUser($user->id);
+        switch ($dayName) {
+            case "Friday":
+                Carbon::setTestNow(now()->addDays(3));
+                break;
+            case "Saturday":
+                Carbon::setTestNow(now()->addDays(2));
+                break;
+            case "Sunday":
+            case "Tuesday":
+            case "Wednesday":
+            case "Thursday":
+            case "Monday":
+                Carbon::setTestNow(now()->addDays(1));
+                break;
+        }
+
+
+        PackageRoi::factory()->create([
+            'package_id' => 1,
+            'roi_percentage' => 3,
+            'due_date' => now()->toDate()
+        ]);
+
+
+        $this->artisan('roi:trading')
+            ->execute();
+
+        $this->assertEquals(1, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->count(), 'Number of trading commissions');
+        $this->assertEquals(3 / 100 * 99, $user->commissions()->type(TRADING_PROFIT_COMMISSION)->sum('amount'));
+
+    }
+
+    /**
+     * @test
      */
     public function trading_profit_commission_not_should_pay_to_user_prohibited()
     {
@@ -490,9 +582,9 @@ class OrderTest extends MLMTest
         $third_user->save();
         $seventh_user = $this->registerUser($third_user->id);
         foreach (range(0, 21) as $item)
-             $this->registerUser($user->id);
+            $this->registerUser($user->id);
 
-        $this->assertTrue(500> $user->commissions()->sum('amount'), 'value checker');
+        $this->assertTrue(500 > $user->commissions()->sum('amount'), 'value checker');
 
 
     }

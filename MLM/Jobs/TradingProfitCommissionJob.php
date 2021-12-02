@@ -42,11 +42,11 @@ class TradingProfitCommissionJob implements ShouldQueue
         $dayName = Carbon::make($this->ordered_package->created_at)->dayName;
         switch ($dayName) {
             case "Friday":
-                if (!(Carbon::make($this->ordered_package->created_at)->addDays(3)->timestamp < now()->timestamp))
+                if (Carbon::make($this->ordered_package->created_at)->addDays(3)->timestamp > now()->timestamp)
                     return;
                 break;
             case "Saturday":
-                if (!(Carbon::make($this->ordered_package->created_at)->addDays(2)->timestamp < now()->timestamp))
+                if (Carbon::make($this->ordered_package->created_at)->addDays(2)->timestamp > now()->timestamp)
                     return;
                 break;
             case "Sunday":
@@ -54,7 +54,7 @@ class TradingProfitCommissionJob implements ShouldQueue
             case "Wednesday":
             case "Thursday":
             case "Monday":
-                if (!(Carbon::make($this->ordered_package->created_at)->addDays(1)->timestamp < now()->timestamp))
+                if (Carbon::make($this->ordered_package->created_at)->addDays(1)->timestamp > now()->timestamp)
                     return;
                 break;
         }
