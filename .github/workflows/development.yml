@@ -25,8 +25,8 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
-    - name: Execute tests
-      run: php ./vendor/bin/phpunit
+#    - name: Execute tests
+#      run: php ./vendor/bin/phpunit
 
   laravel-deploy:
     runs-on: vmi627964
@@ -42,6 +42,6 @@ jobs:
         sudo docker tag development-mlm:1 staging-reg.dreamcometrue.ai/development-mlm:1
         sudo docker push staging-reg.dreamcometrue.ai/development-mlm:1
     - name: deploy docker-compose
-      run: | 
+      run: |
         sudo docker-compose -f devops/docker-compose-files/docker-compose-development.yml -p mlm down
         sudo docker-compose -f devops/docker-compose-files/docker-compose-development.yml -p mlm up -d

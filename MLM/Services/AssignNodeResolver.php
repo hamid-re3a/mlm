@@ -133,11 +133,11 @@ class AssignNodeResolver
         if ($node->children()->count() == 0) {
             $node->vacancy = VACANCY_ALL;
         } else if ($node->children()->count() == 2) {
-            $node->vacancy = VACANCY_NONE;
+            $node->vacancy = VACANCY_LEFT;
         } else if ($node->children()->count() == 1 && $node->hasLeftChild()) {
             $node->vacancy = VACANCY_RIGHT;
         } else {
-            $node->vacancy = VACANCY_LEFT;
+            $node->vacancy = VACANCY_NONE;
         }
         $node->save();
 
@@ -147,7 +147,7 @@ class AssignNodeResolver
     private function fixLeftAndRightNodes(Tree $node)
     {
         $node->refresh();
-        if($node->hasRightChild() && $node->hasLeftChild()){
+        if($node->hasRightChild() || $node->hasLeftChild()){
             if($node->leftChild()->_lft > $node->rightChild()->_lft )
                 $node->leftChild()->insertBeforeNode($node->rightChild());
         }

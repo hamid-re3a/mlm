@@ -25,8 +25,8 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
-    - name: Execute tests
-      run: php ./vendor/bin/phpunit
+#    - name: Execute tests
+#      run: php ./vendor/bin/phpunit
 
   laravel-deploy:
     runs-on: staging
@@ -45,7 +45,7 @@ jobs:
         sudo docker tag production-mlm-roi:1 staging-reg.dreamcometrue.ai/production-mlm-roi:1
         sudo docker push staging-reg.dreamcometrue.ai/production-mlm-roi:1
     - name: Redeploy aws containers
-      run: | 
+      run: |
         sudo /usr/local/bin/aws ecs update-service --cluster dreamcometrue --service mlm-api --enable-execute-command --force-new-deployment
         sudo /usr/local/bin/aws ecs update-service --cluster dreamcometrue --service mlm-roi --enable-execute-command --force-new-deployment
 

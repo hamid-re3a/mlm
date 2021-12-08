@@ -12,6 +12,27 @@ use User\tests\UserTest;
 class UserFeatureTest extends UserTest
 {
 
+//    /**
+//     * @test
+//     */
+//    public function list_of_users()
+//    {
+//        $user = User::factory()->create(['first_name'=>'hamid']);
+//        $user = User::factory()->create();
+//        $user = User::factory()->create();
+//        $user = User::factory()->create();
+//        $user = User::factory()->create();
+//        $this->withHeaders($this->getHeaders(1));
+//        $res = $this->get(route('admin.users'), [
+//
+//        ]);
+////        dd($res->json());
+//        $res->assertOk();
+//        $user->refresh();
+//        $this->assertEquals($user->deactivated_commission_types,[TRAINER_BONUS_COMMISSION]);
+//
+//    }
+
     /**
      * @test
      */
