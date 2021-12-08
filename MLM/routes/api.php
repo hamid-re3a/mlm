@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use MLM\Http\Controllers\Admin\EmailContentController;
 use MLM\Http\Controllers\Admin\PackageRoiController;
 use MLM\Http\Controllers\Admin\RankController;
 use MLM\Http\Controllers\Admin\ResidualBonusSettingController;
@@ -10,6 +11,11 @@ Route::middleware(['auth'])->group(function () {
 
     //Admin Routes
     Route::middleware(['role:' . USER_ROLE_SUPER_ADMIN . '|' . USER_ROLE_ADMIN_MLM])->prefix('admin')->name('admin.')->group(function () {
+
+        Route::name('dashboard.')->prefix('dashboard')->group(function () {
+            Route::get('country_members_chart', [\MLM\Http\Controllers\Admin\DashboardController::class, 'countryMembersChart'])->name('country-members-charts');
+            Route::get('sales_distribution_chart', [\MLM\Http\Controllers\Admin\DashboardController::class, 'salesDistributionChart'])->name('sales-distribution-charts');
+        });
 
         Route::prefix('packages_roi')->name('packagesRoi.')->group(function () {
             Route::get('/', [PackageRoiController::class, 'index'])->name('index');
@@ -40,18 +46,30 @@ Route::middleware(['auth'])->group(function () {
             Route::get('', [AdminSettingController::class, 'index'])->name('list');
             Route::patch('', [AdminSettingController::class, 'update'])->name('update');
         });
+
+        Route::name('email-contents.')->prefix('email-contents')->group(function () {
+            Route::get('', [EmailContentController::class, 'index'])->name('list');
+            Route::patch('', [EmailContentController::class, 'update'])->name('update');
+        });
+
     });
 
     //Client routes
     Route::middleware(['role:' . USER_ROLE_CLIENT])->name('customer.')->group(function () {
         Route::name('dashboard.')->prefix('dashboard')->group(function () {
-            Route::post('binary_tree_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'binaryMembers'])->name('binary-members-charts');
-
+            Route::post('binary_tree_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'binaryMembersChart'])->name('binary-members-charts');
+            Route::get('country_members_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'countryMembersChart'])->name('country-members-charts');
+            Route::get('sales_distribution_chart', [\MLM\Http\Controllers\Front\DashboardController::class, 'salesDistributionChart'])->name('sales-distribution-charts');
         });
         Route::name('trees.')->prefix('trees')->group(function () {
             Route::get('referral_multi_level', [\MLM\Http\Controllers\Front\TreeController::class, 'getReferralTreeMultiLevel'])->name('referral-multi-level');
             Route::get('binary_multi_level', [\MLM\Http\Controllers\Front\TreeController::class, 'getBinaryTreeMultiLevel'])->name('binary-multi-level');
             Route::get('get_mlm_info', [\MLM\Http\Controllers\Front\MLMController::class, 'getMLMInfo'])->name('mlm-info');
+        });
+
+
+        Route::prefix('ranks')->name('ranks.')->group(function () {
+            Route::get('', [RankController::class, 'index'])->name('index');
         });
     });
 

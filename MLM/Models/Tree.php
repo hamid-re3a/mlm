@@ -225,6 +225,8 @@ class Tree extends Model
             return [];
 
         $children = $left_child->descendants()->pluck('user_id')->toArray();
+        if(!is_array($children))
+            $children = [];
 
         return  array_merge([$left_child->user_id],$children);
     }
@@ -264,6 +266,8 @@ class Tree extends Model
             return [];
 
         $children = $right_child->descendants()->pluck('user_id')->toArray();
+        if(!is_array($children))
+            $children = [];
         return  array_merge([$right_child->user_id],$children);
     }
 

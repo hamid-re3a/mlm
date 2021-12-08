@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  mlm-roi:
+    image: staging-reg.dreamcometrue.ai/staging-mlm-roi:1
+    restart: unless-stopped
+    networks:
+      - mysql_wo_r2f
+networks:
+  mysql_wo_r2f:
+    external: true

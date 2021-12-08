@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use MLM\Jobs\Emails\EmailJob;
 use MLM\Mail\UserCommissionEmail;
 use MLM\Models\Commission;
-use MLM\Services\Wallet\WalletClientFacade;
+use Wallets\Services\Grpc\WalletClientFacade;
 use User\Models\User;
 use Wallets\Services\Grpc\Deposit;
 
@@ -20,16 +20,21 @@ class CommissionResolver
      * @param User $user
      * @param $type
      * @param null $package_id
+     * @param null $because_of_package_id
      * @throws \Exception
      */
-    public function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null): void
+    public function payCommission(Deposit $deposit_service_object, User $user, $type, $package_id = null, $because_of_package_id = null): void
     {
+
+        if($deposit_service_object->getAmount() <= 0)
+            return;
         DB::beginTransaction();
         try {
             /** @var  $commission Commission */
             $commission = $user->commissions()->create([
                 'amount' => $deposit_service_object->getAmount(),
                 'ordered_package_id' => $package_id,
+                'because_of_ordered_package_id' => $because_of_package_id,
                 'type' => $type,
             ]);
             if ($commission) {
@@ -55,7 +60,7 @@ class CommissionResolver
     {
         try {
             $type = $deposit_service_object->getType() . ' ' . $deposit_service_object->getSubType();
-            EmailJob::dispatch(new UserCommissionEmail($user, $commission, $type),$user->email);
+            EmailJob::dispatch(new UserCommissionEmail($user, $commission, $type), $user->email);
         } catch (\Throwable $exception) {
             Log::info('Commission email is not sent because => ' . $exception->getMessage());
         }

@@ -124,4 +124,9 @@ class ReferralTree extends Model
         return $this->descendants()->pluck('user_id')->toArray();
     }
 
+    public function descendantsCount()
+    {
+        return ReferralTree::query()->where('_lft', '>', $this->_lft)
+            ->where('_rgt', '<', $this->_rgt)->count();
+    }
 }

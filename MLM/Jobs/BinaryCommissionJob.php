@@ -26,15 +26,15 @@ class BinaryCommissionJob implements ShouldQueue
 
     public function __construct(User $user, OrderedPackage $package)
     {
-        $this->queue = env('QUEUE_COMMISSIONS_NAME','mlm_commissions');
+        $this->queue = env('QUEUE_COMMISSIONS_NAME', 'mlm_commissions');
         $this->package = $package;
         $this->user = $user;
     }
 
     public function handle(UserService $user_service)
     {
-        if(!getSetting('BINARY_COMMISSION_IS_ACTIVE')){
-            return ;
+        if (!getSetting('BINARY_COMMISSION_IS_ACTIVE')) {
+            return;
         }
 
         if (!is_null($this->user->binaryTree->parent) && !is_null($this->user->binaryTree->parent->user_id)) {
@@ -42,12 +42,12 @@ class BinaryCommissionJob implements ShouldQueue
 
             if (arrayHasValue(BINARY_COMMISSION, $parent->deactivated_commission_types)) {
                 BinaryCommissionJob::dispatch($parent, $this->package);
-                return ;
+                return;
             }
             if ($parent->hasCompletedBinaryLegs()) {
 
                 $biggest_active_package = $parent->biggestActivePackage();
-                if ($biggest_active_package  && $biggest_active_package->canGetCommission()) {
+                if ($biggest_active_package) {
                     $left_binary_children_price = $parent->binaryTree->leftSideChildrenPackagePrice();
                     $right_binary_children_price = $parent->binaryTree->rightSideChildrenPackagePrice();
                     $weaker_leg_price = $left_binary_children_price >= $right_binary_children_price ? $right_binary_children_price : $left_binary_children_price;
@@ -83,11 +83,17 @@ class BinaryCommissionJob implements ShouldQueue
                                 $deposit_service_object->setWalletName(\Wallets\Services\Grpc\WalletNames::EARNING);
 
                                 $deposit_service_object->setDescription(serialize([
-                                    'description' => 'Commission # ' . $this->getType()
+                                    'description' => 'Commission # ' . $this->getType(),
+                                    'from_user_id' => $this->package->user->id,
+                                    'from_user_name' => $this->package->user->full_name,
+                                    'from_package_name' => $this->package->package->name,
+                                    'from_order_id' => $this->package->order_id,
+                                    'for_package_name'=>$biggest_active_package->package->name,
+                                    'for_order_id'=>$biggest_active_package->order_id,
                                 ]));
                                 $deposit_service_object->setType('Commission');
                                 $deposit_service_object->setSubType('Binary');
-                                (new CommissionResolver)->payCommission($deposit_service_object, $parent, $this->getType(), $biggest_active_package->id);
+                                (new CommissionResolver)->payCommission($deposit_service_object, $parent, $this->getType(), $biggest_active_package->id, $this->package->id);
                             }
 
 

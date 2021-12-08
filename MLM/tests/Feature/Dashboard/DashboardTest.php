@@ -15,7 +15,7 @@ class DashboardTest extends MLMTest
     /**
      * @test
      */
-    public function binary_chart()
+    public function user_binary_chart()
     {
         Mail::fake();
         $this->buildBinaryTree();
@@ -25,6 +25,62 @@ class DashboardTest extends MLMTest
         $response = $this->post(route('customer.dashboard.binary-members-charts'),[
             'type' => 'week'
         ]);
+        $response->assertOk();
+    }
+
+    /**
+     * @test
+     */
+    public function user_country_chart()
+    {
+        Mail::fake();
+        $this->buildBinaryTree();
+        $this->buildReferralTree();
+        $this->withHeaders($this->getHeaders(1, USER_ROLE_CLIENT));
+
+        $response = $this->get(route('customer.dashboard.country-members-charts'));
+        $response->assertOk();
+    }
+
+    /**
+     * @test
+     */
+    public function user_distribution_chart()
+    {
+        Mail::fake();
+        $this->buildBinaryTree();
+        $this->buildReferralTree();
+        $this->withHeaders($this->getHeaders(1, USER_ROLE_CLIENT));
+
+        $response = $this->get(route('customer.dashboard.sales-distribution-charts'));
+        $response->assertOk();
+    }
+
+    /**
+     * @test
+     */
+    public function admin_country_chart()
+    {
+        Mail::fake();
+        $this->buildBinaryTree();
+        $this->buildReferralTree();
+        $this->withHeaders($this->getHeaders(1, USER_ROLE_ADMIN_MLM));
+
+        $response = $this->get(route('admin.dashboard.country-members-charts'));
+        $response->assertOk();
+    }
+
+    /**
+     * @test
+     */
+    public function admin_distribution_chart()
+    {
+        Mail::fake();
+        $this->buildBinaryTree();
+        $this->buildReferralTree();
+        $this->withHeaders($this->getHeaders(1, USER_ROLE_ADMIN_MLM));
+
+        $response = $this->get(route('admin.dashboard.sales-distribution-charts'));
         $response->assertOk();
     }
 

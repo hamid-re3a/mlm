@@ -12,6 +12,27 @@ use User\tests\UserTest;
 class UserFeatureTest extends UserTest
 {
 
+//    /**
+//     * @test
+//     */
+//    public function list_of_users()
+//    {
+//        $user = User::factory()->create(['first_name'=>'hamid']);
+//        $user = User::factory()->create();
+//        $user = User::factory()->create();
+//        $user = User::factory()->create();
+//        $user = User::factory()->create();
+//        $this->withHeaders($this->getHeaders(1));
+//        $res = $this->get(route('admin.users'), [
+//
+//        ]);
+////        dd($res->json());
+//        $res->assertOk();
+//        $user->refresh();
+//        $this->assertEquals($user->deactivated_commission_types,[TRAINER_BONUS_COMMISSION]);
+//
+//    }
+
     /**
      * @test
      */
@@ -106,7 +127,7 @@ class UserFeatureTest extends UserTest
 //        $user = User::factory()->create();
 //        $user->assignRole(USER_ROLE_CLIENT);
 //        $user->save();
-//        $hash = md5(serialize($user->getUserService()));
+//        $hash = md5(serialize($user->getGrpcMessage()));
 //        $this->put(route('users.binaryPosition'), [
 //            'id' => $user->id,
 //            'default_binary_position' => \MLM\Models\Tree::RIGHT

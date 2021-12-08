@@ -48,7 +48,7 @@ class UserTest extends TestCase
 
         $user->assignRole(USER_ROLE_SUPER_ADMIN);
         $user->save();
-        $hash = md5(serialize($user->getUserService()));
+        $hash = md5(serialize($user->getGrpcMessage()));
         return [
             'X-user-id' => $user->id,
             'X-user-hash' => $hash,

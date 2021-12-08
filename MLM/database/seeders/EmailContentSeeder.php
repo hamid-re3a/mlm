@@ -19,23 +19,24 @@ class EmailContentSeeder extends Seeder
      */
     public function run()
     {
-
-        foreach (EMAIL_CONTENT_SETTINGS as $key => $setting) {
-
-            if (!EmailContentSetting::query()->whereKey($key)->exists()) {
-                EmailContentSetting::query()->create([
-                    'key' => $key,
-                    'is_active' => $setting['is_active'],
-                    'subject' => $setting['subject'],
-                    'from' => env('MAIL_FROM',$setting['from']),
-                    'from_name' => $setting['from_name'],
-                    'body' => $setting['body'],
-                    'variables' => $setting['variables'],
-                    'variables_description' => $setting['variables_description'],
-                    'type' => $setting['type'],
-                ]);
+        if (defined('EMAIL_CONTENT_SETTINGS'))
+            foreach (EMAIL_CONTENT_SETTINGS as $key => $setting) {
+                $now = now()->toDateTimeString();
+                EmailContentSetting::query()->updateOrInsert(
+                    ['key' => $key],
+                    [
+                        'is_active' => $setting['is_active'],
+                        'subject' => $setting['subject'],
+                        'from' => env('MAIL_FROM', $setting['from']),
+                        'from_name' => $setting['from_name'],
+                        'body' => $setting['body'],
+                        'variables' => $setting['variables'],
+                        'variables_description' => $setting['variables_description'],
+                        'type' => $setting['type'],
+                        'created_at' => $now,
+                        'updated_at' => $now
+                    ]);
             }
-        }
 
     }
 }

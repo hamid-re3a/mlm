@@ -26,7 +26,7 @@ class PackageRoiStoreRequest extends FormRequest
     {
         $request=$this->request->all();
         return [
-            'roi_percentage' => 'required|numeric',
+            'roi_percentage' => 'required|numeric'.'|max:'.getSetting('MAX_ROI_PERCENTAGE').'|min:'.getSetting('MIN_ROI_PERCENTAGE'),
             'due_date' => 'required',
             'package_id'  => [
                 'required',

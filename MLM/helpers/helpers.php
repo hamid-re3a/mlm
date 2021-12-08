@@ -35,23 +35,6 @@ if (!function_exists('getRank')) {
     }
 }
 
-if (!function_exists('getPackageGrpcClient')) {
-    function getPackageGrpcClient()
-    {
-        return new \Packages\Services\Grpc\PackagesServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-if (!function_exists('getWalletGrpcClient')) {
-    function getWalletGrpcClient()
-    {
-        return new \Wallets\Services\Grpc\WalletServiceClient(env('SUBSCRIPTION_GRPC_URL','staging-api-gateway.janex.org:9596'), [
-            'credentials' => \Grpc\ChannelCredentials::createInsecure()
-        ]);
-    }
-}
-
 
 if (!function_exists('userRankBasedOnConvertedPoint')) {
     function userRankBasedOnConvertedPoint($converted_point): \MLM\Models\Rank
@@ -110,7 +93,6 @@ if (!function_exists('getMLMSetting')) {
         $setting = \MLM\Models\Setting::query()->where('name', $key)->first();
         if ($setting)
             return $setting->value;
-
 
         if (defined('MLM_SETTINGS') AND is_array(MLM_SETTINGS) AND array_key_exists($key, MLM_SETTINGS))
             return MLM_SETTINGS[$key]['value'];

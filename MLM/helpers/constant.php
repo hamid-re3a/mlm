@@ -37,7 +37,7 @@ const RANK_1_BINARY_ACTIVE = [
 const RANK_2_BRONZE = [
     'rank_name' => 'bronze',
     'rank' => 2,
-    'condition_converted_in_bp' => 1000, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
+    'condition_converted_in_bp' => 1000, 'condition_sub_rank' => 0, 'condition_direct_or_indirect' => false,
     'prize_in_pf' => null, 'prize_alternative' => 'PIN',
     'cap' => 1000,
     'condition_number_of_right_children' => 1,
@@ -47,7 +47,7 @@ const RANK_2_BRONZE = [
 const RANK_3_SILVER = [
     'rank_name' => 'silver',
     'rank' => 3,
-    'condition_converted_in_bp' => 2500, 'condition_sub_rank' => 1, 'condition_direct_or_indirect' => false,
+    'condition_converted_in_bp' => 2500, 'condition_sub_rank' => 0, 'condition_direct_or_indirect' => false,
     'prize_in_pf' => 150, 'prize_alternative' => 'Watch',
     'cap' => 1500,
     'condition_number_of_right_children' => 1,
@@ -351,7 +351,9 @@ const RANKS = [
     13 => RANK_13_PRESIDENT,
     14 => RANK_14_ROYAL_PRESIDENT,
 ];
-
+const MIN_ROI_PERCENTAGE = 0;
+const MAX_ROI_PERCENTAGE = 100;
+const TRAINER_BONUS_REWARD = 100;
 CONST MLM_SETTINGS = [
     'IS_UNDER_MAINTENANCE' => [
         'value' => false,
@@ -388,6 +390,21 @@ CONST MLM_SETTINGS = [
         'title' => 'RESIDUAL_BONUS_COMMISSION',
         'description' => 'RESIDUAL_BONUS_COMMISSION is enabled or not.'
     ],
+    'MIN_ROI_PERCENTAGE' => [
+        'value' => MIN_ROI_PERCENTAGE,
+        'title' => 'MIN_ROI_PERCENTAGE',
+        'description' => 'MIN_ROI_PERCENTAGE'
+    ],
+    'MAX_ROI_PERCENTAGE' => [
+        'value' => MAX_ROI_PERCENTAGE,
+        'title' => 'MAX_ROI_PERCENTAGE',
+        'description' => 'MAX_ROI_PERCENTAGE'
+    ],
+    'TRAINER_BONUS_REWARD' => [
+        'value' => TRAINER_BONUS_REWARD,
+        'title' => 'TRAINER_BONUS_REWARD',
+        'description' => 'TRAINER_BONUS_REWARD'
+    ],
 
 ];
 
@@ -395,7 +412,7 @@ const EMAIL_CONTENT_SETTINGS = [
     'USER_RANK_HAS_BEEN_CHANGED' => [
         'is_active' => true,
         'subject' => 'Your rank has been changed',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.ai',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -413,7 +430,7 @@ const EMAIL_CONTENT_SETTINGS = [
     'USER_GOT_COMMISSION' => [
         'is_active' => true,
         'subject' => 'You have received commissions',
-        'from' => 'it@ridetothefuture.com',
+        'from' => 'it@dreamcometrue.ai',
         'from_name' => 'Janex Support Team',
         'body' => <<<EOT
                 <div>
@@ -429,4 +446,3 @@ const EMAIL_CONTENT_SETTINGS = [
         'type' => 'email',
     ],
 ];
-
