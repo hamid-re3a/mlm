@@ -25,8 +25,8 @@ jobs:
       run: |
         mkdir -p database
         touch database/database.sqlite
-#    - name: Execute tests
-#      run: php ./vendor/bin/phpunit
+    - name: Execute tests
+      run: php ./vendor/bin/phpunit
 
 #  laravel-deploy:
 #    runs-on: staging
